@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import { Azeret_Mono as GeistMono } from 'next/font/google';
+import { Geist_Mono } from 'next/font/google';
 import './globals.css';
 
-const geistMono = GeistMono({ subsets: ['latin'] });
+const geistMono = Geist_Mono({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Todo List',
