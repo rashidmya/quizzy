@@ -1,4 +1,8 @@
-# Next.js and Postgres Starter Template
+# Quiz app using Next.js and Postgres
+
+## Features
+- **coming soon**
+
 
 ## Tech Stack
 
