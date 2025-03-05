@@ -1,4 +1,6 @@
+// queries
 import { getQuizzes } from "@/lib/queries/quizzes";
+// sections
 import QuizList from "@/sections/dashboard/quiz/quiz-list";
 
 // This will be replaced by 'use cache' soon

@@ -1,12 +1,8 @@
 import Link from "next/link";
 // components
 import { Button } from "@/components/ui/button";
-// form
-import { useForm, useFieldArray } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 // db
-import { getQuizWithQuestions, Quiz, Question } from "@/lib/queries/quizzes";
+import { getQuizWithQuestions} from "@/lib/queries/quizzes";
 // paths
 import { PATH_DASHBOARD } from "@/routes/paths";
 // sections

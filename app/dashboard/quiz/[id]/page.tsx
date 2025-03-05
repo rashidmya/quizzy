@@ -1,8 +1,12 @@
-import { Button } from "@/components/ui/button";
-import { getQuizWithQuestions, Quiz, Question } from "@/lib/queries/quizzes";
-import { PATH_DASHBOARD } from "@/routes/paths";
-import QuestionList from "@/sections/dashboard/question/question-list";
 import Link from "next/link";
+// components
+import { Button } from "@/components/ui/button";
+// queries
+import { getQuizWithQuestions } from "@/lib/queries/quizzes";
+// paths
+import { PATH_DASHBOARD } from "@/routes/paths";
+// sections
+import QuestionList from "@/sections/dashboard/question/question-list";
 
 // This will be replaced by 'use cache' soon
 export const dynamic = "force-static";

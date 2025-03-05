@@ -19,6 +19,7 @@ export async function getQuizzes() {
 }
 
 export type Question = InferSelectModel<typeof questions>;
+
 export type Choice = InferSelectModel<typeof choices>;
 
 export async function getQuizWithQuestions(quizId: string) {
