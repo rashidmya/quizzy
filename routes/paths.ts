@@ -16,7 +16,7 @@ export const PATH_AUTH = {
 export const PATH_DASHBOARD = {
   root: ROOTS_DASHBOARD,
   quiz: {
-    root: ROOTS_DASHBOARD,
+    root: path(ROOTS_DASHBOARD, "/quiz"),
     new: path(ROOTS_DASHBOARD, "/quiz/new"),
     view: (id: string) => path(ROOTS_DASHBOARD, `/quiz/${id}`),
     edit: (id: string) => path(ROOTS_DASHBOARD, `/quiz/${id}/edit`),

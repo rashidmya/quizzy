@@ -1,8 +1,17 @@
-import { Button } from "@/components/ui/button";
-import { getQuizWithQuestions, Quiz, Question } from "@/lib/queries/quizzes";
-import { PATH_DASHBOARD } from "@/routes/paths";
-import QuestionList from "@/sections/dashboard/question/question-list";
 import Link from "next/link";
+// components
+import { Button } from "@/components/ui/button";
+// form
+import { useForm, useFieldArray } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+// db
+import { getQuizWithQuestions, Quiz, Question } from "@/lib/queries/quizzes";
+// paths
+import { PATH_DASHBOARD } from "@/routes/paths";
+// sections
+import QuizEdit from "@/sections/dashboard/quiz/quiz-edit";
+
 
 // This will be replaced by 'use cache' soon
 export const dynamic = "force-static";
@@ -33,11 +42,10 @@ export default async function Page({
         </div>
 
         <h1 className="text-2xl font-bold mb-4 text-center text-gray-100">
-          {quiz.title}
+          Modify Quiz
         </h1>
-        <h4 className="text-center">{quiz.description}</h4>
         <div className="mt-22">
-          {quiz.questions && <QuestionList questions={quiz.questions} />}
+          <QuizEdit quiz={quiz} />
         </div>
       </main>
     </div>

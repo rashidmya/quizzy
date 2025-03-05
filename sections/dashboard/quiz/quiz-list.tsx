@@ -16,7 +16,7 @@ export default function QuizList({ quizzes }: { quizzes: Quiz[] }) {
           >
             <span className="text-gray-200 text-sm">{quiz.title}</span>
             <Button variant='outline' asChild>
-              <Link href={PATH_DASHBOARD.quiz.view(quiz.id)}>Modify</Link>
+              <Link href={PATH_DASHBOARD.quiz.view(quiz.id)}>View</Link>
             </Button>
           </li>
         ))}

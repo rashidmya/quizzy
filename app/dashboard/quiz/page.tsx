@@ -1,5 +1,5 @@
 import { getQuizzes } from "@/lib/queries/quizzes";
-import QuizList from "@/sections/quiz/quiz-list";
+import QuizList from "@/sections/dashboard/quiz/quiz-list";
 
 // This will be replaced by 'use cache' soon
 export const dynamic = "force-static";
