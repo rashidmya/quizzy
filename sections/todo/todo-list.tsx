@@ -1,9 +1,9 @@
 'use client';
 
 import { useActionState } from 'react';
-import { addTodo, deleteTodo } from './actions';
+import { addTodo, deleteTodo } from '../../actions/todo';
 import { Loader2, Plus, Trash2 } from 'lucide-react';
-import { Todo } from '@/lib/db/queries';
+import { Todo } from '@/lib/todos';
 
 export default function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
   const [addState, addAction, isAddPending] = useActionState(addTodo, {
