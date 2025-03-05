@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.2",
+    "@radix-ui/react-tabs": "^1.1.3",
     "@tailwindcss/postcss": "4.0.0-beta.4",
     "@types/node": "^22.10.1",
     "@types/react": "npm:types-react@19.0.0-rc.1",
@@ -26,6 +27,7 @@
     "next": "15.0.4-canary.36",
     "postgres": "^3.4.5",
     "react": "19.0.0-rc-2d16326d-20240930",
+    "react-aria-components": "^1.6.0",
     "react-dom": "19.0.0-rc-2d16326d-20240930",
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "4.0.0-beta.4",

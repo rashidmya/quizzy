@@ -5,8 +5,8 @@ import './globals.css';
 const geistMono = Geist_Mono({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Todo List',
-  description: 'A simple todo list application',
+  title: 'Quizzy',
+  description: 'A simple quiz app',
 };
 
 export default function RootLayout({

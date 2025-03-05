@@ -1,5 +1,5 @@
-import { db } from './db/drizzle';
-import { todos } from './db/schema';
+import { db } from '../db/drizzle';
+import { todos } from '../db/schema';
 import { InferSelectModel } from 'drizzle-orm';
 
 export type Todo = InferSelectModel<typeof todos>;
