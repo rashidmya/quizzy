@@ -1,6 +1,6 @@
 "use client";
 
-import React, { startTransition, useActionState } from "react";
+import React, { startTransition, useActionState, useState } from "react";
 // react-hook-form
 import { useForm, useFieldArray, UseFormReturn } from "react-hook-form";
 import { z } from "zod";
@@ -9,11 +9,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
 // types
 import { QuizWithQuestions } from "@/types/quiz";
 // actions
 import { saveQuiz } from "@/actions/quiz";
-import { Loader2 } from "lucide-react";
+// icons
+import { Loader2, Plus, Trash2, Delete } from "lucide-react";
 
 type Props = {
   quiz: QuizWithQuestions;
@@ -35,8 +42,14 @@ const questionSchema = z.object({
 
 // Define the overall quiz form schema.
 const quizFormSchema = z.object({
-  title: z.string().min(1, { message: "Title is required" }),
-  description: z.string().optional(),
+  title: z
+    .string()
+    .min(1, { message: "Title is required" })
+    .max(30, { message: "Title must be at most 30 characters" }),
+  description: z
+    .string()
+    .max(100, { message: "Description must be at most 100 characters" })
+    .optional(),
   questions: z
     .array(questionSchema)
     .min(1, { message: "At least one question is required" }),
@@ -74,81 +87,94 @@ function QuestionEditor({
   });
 
   return (
-    <div key={questionIndex} className="border p-4 rounded">
-      {/* Question Text */}
-      <div className="space-y-2">
+    <AccordionItem
+      key={questionIndex}
+      value={questionIndex.toString()}
+      className="border p-4 rounded m-4"
+    >
+      <AccordionTrigger>
         <Label htmlFor={`questions.${questionIndex}.text`}>
           Question {questionIndex + 1}
         </Label>
-        <Input
-          id={`questions.${questionIndex}.text`}
-          {...register(`questions.${questionIndex}.text` as const)}
-          placeholder="Enter question text"
-        />
-        {questionError?.text && (
-          <p className="text-red-500 text-sm">{questionError.text.message}</p>
-        )}
-      </div>
+      </AccordionTrigger>
 
-      {/* Choices Section */}
-      <div className="space-y-2 mt-4">
-        <h3 className="text-lg font-semibold">Choices</h3>
-        {choiceFields.map((choiceField, choiceIndex) => (
-          <div key={choiceField.id} className="flex items-center space-x-2">
-            <Input
-              {...register(
-                `questions.${questionIndex}.choices.${choiceIndex}.text` as const
-              )}
-              placeholder={`Choice ${choiceIndex + 1}`}
-              className="flex-1"
-            />
-            <label className="flex items-center space-x-1">
+      <AccordionContent>
+        {/* Question Text */}
+        <div className="space-y-2">
+          <Input
+            id={`questions.${questionIndex}.text`}
+            {...register(`questions.${questionIndex}.text` as const)}
+            placeholder="Enter question text"
+          />
+          {questionError?.text && (
+            <p className="text-red-500 text-sm">{questionError.text.message}</p>
+          )}
+        </div>
+
+        {/* Choices Section */}
+        <div className="space-y-2 mt-4">
+          <h3 className="text-lg font-semibold">Choices</h3>
+          {choiceFields.map((choiceField, choiceIndex) => (
+            <div key={choiceField.id} className="flex items-center space-x-2">
               <Input
-                type="checkbox"
                 {...register(
-                  `questions.${questionIndex}.choices.${choiceIndex}.isCorrect` as const
+                  `questions.${questionIndex}.choices.${choiceIndex}.text` as const
                 )}
+                placeholder={`Choice ${choiceIndex + 1}`}
+                className="flex-1"
               />
-              <span>Correct</span>
-            </label>
+              <label className="flex items-center space-x-1">
+                <Input
+                  type="checkbox"
+                  {...register(
+                    `questions.${questionIndex}.choices.${choiceIndex}.isCorrect` as const
+                  )}
+                />
+                <span>Correct</span>
+              </label>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={() => removeChoice(choiceIndex)}
+              >
+                <Delete />
+              </Button>
+            </div>
+          ))}
+          {questionError?.choices &&
+            typeof questionError.choices.message === "string" && (
+              <p className="text-red-500 text-sm">
+                {questionError.choices.message}
+              </p>
+            )}
+          <div className="flex justify-end mt-2">
             <Button
               type="button"
-              variant="destructive"
-              onClick={() => removeChoice(choiceIndex)}
+              onClick={() => appendChoice({ text: "", isCorrect: false })}
             >
-              Remove Choice
+              <Plus />
             </Button>
           </div>
-        ))}
-        {questionError?.choices &&
-          typeof questionError.choices.message === "string" && (
-            <p className="text-red-500 text-sm">
-              {questionError.choices.message}
-            </p>
-          )}
-        <Button
-          type="button"
-          onClick={() => appendChoice({ text: "", isCorrect: false })}
-        >
-          Add Choice
-        </Button>
-      </div>
+        </div>
 
-      {/* Remove Question Button */}
-      <div className="mt-4">
-        <Button
-          type="button"
-          variant="destructive"
-          onClick={() => removeQuestion(questionIndex)}
-        >
-          Remove Question
-        </Button>
-      </div>
-    </div>
+        {/* Remove Question Button */}
+        <div className="mt-4">
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={() => removeQuestion(questionIndex)}
+          >
+            <Trash2 />
+          </Button>
+        </div>
+      </AccordionContent>
+    </AccordionItem>
   );
 }
 
 export default function QuizEdit({ quiz }: Props) {
+  const [openItems, setOpenItems] = useState<string[]>([]);
+
   const [addState, addAction, isAddPending] = useActionState(saveQuiz, {
     message: "",
   });
@@ -170,6 +196,7 @@ export default function QuizEdit({ quiz }: Props) {
     control,
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<QuizFormValues>({
     resolver: zodResolver(quizFormSchema),
@@ -200,16 +227,22 @@ export default function QuizEdit({ quiz }: Props) {
     });
   };
 
+  const titleValue = watch("title") || "";
+  const descriptionValue = watch("description") || "";
+
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Quiz Title */}
         <div className="space-y-2">
           <Label htmlFor="title">Quiz Title</Label>
+          {/* Character counter */}
+          <div className="text-sm text-gray-500">{titleValue.length} / 30</div>
           <Input
             id="title"
             {...register("title")}
             placeholder="Enter quiz title"
+            maxLength={30} // enforce limit at the input level
           />
           {errors.title && (
             <p className="text-red-500 text-sm">{errors.title.message}</p>
@@ -219,10 +252,15 @@ export default function QuizEdit({ quiz }: Props) {
         {/* Quiz Description */}
         <div className="space-y-2">
           <Label htmlFor="description">Description</Label>
+          {/* Character counter */}
+          <div className="text-sm text-gray-500">
+            {descriptionValue.length} / 100
+          </div>
           <Input
             id="description"
             {...register("description")}
             placeholder="Enter quiz description"
+            maxLength={100} // enforce limit at the input level
           />
           {errors.description && (
             <p className="text-red-500 text-sm">{errors.description.message}</p>
@@ -232,27 +270,44 @@ export default function QuizEdit({ quiz }: Props) {
         {/* Questions Section */}
         <div className="space-y-4">
           <h2 className="text-xl font-bold">Questions</h2>
-          {questionFields.map((field, index) => (
-            <QuestionEditor
-              key={field.id}
-              questionIndex={index}
-              control={control}
-              register={register}
-              removeQuestion={removeQuestion}
-              questionError={errors.questions ? errors.questions[index] : null}
-            />
-          ))}
+          <div className="grid grid-cols-1 gap-4">
+            <Accordion
+              type="multiple"
+              className="w-full"
+              value={openItems}
+              onValueChange={(values) => setOpenItems(values)}
+            >
+              {questionFields.map((field, index) => (
+                <QuestionEditor
+                  key={field.id}
+                  questionIndex={index}
+                  control={control}
+                  register={register}
+                  removeQuestion={(i) => {
+                    removeQuestion(i);
+                    setOpenItems((prev) => prev.filter((v) => v !== i.toString()));
+                  }}
+                  questionError={
+                    errors.questions ? errors.questions[index] : null
+                  }
+                />
+              ))}
+            </Accordion>
+          </div>
           {errors.questions && typeof errors.questions.message === "string" && (
             <p className="text-red-500 text-sm">{errors.questions.message}</p>
           )}
           <Button
             type="button"
-            onClick={() =>
+            onClick={() => {
+              // Append a new question.
               appendQuestion({
                 text: "",
                 choices: [{ text: "", isCorrect: false }],
-              })
-            }
+              });
+              // The new question's index will be the current length.
+              setOpenItems((prev) => [...prev, questionFields.length.toString()]);
+            }}
           >
             Add Question
           </Button>

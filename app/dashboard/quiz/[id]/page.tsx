@@ -30,9 +30,13 @@ export default async function Page({
   return (
     <div className="min-h-screen p-8">
       <main>
-        <div className="mb-4 justify-between">
+        <div className="mb-4">
           <Button variant='link' asChild>
             <Link href={PATH_DASHBOARD.quiz.root}>Back</Link>
+          </Button>
+
+          <Button variant='link' asChild>
+            <Link href={PATH_DASHBOARD.quiz.edit(quiz.id)}>Modify</Link>
           </Button>
         </div>
 
