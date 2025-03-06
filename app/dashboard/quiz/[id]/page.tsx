@@ -11,7 +11,7 @@ import QuestionList from "@/sections/dashboard/question/question-list";
 // This will be replaced by 'use cache' soon
 export const dynamic = "force-static";
 
-export default async function Page({
+export default async function ViewQuizPage({
   params,
 }: {
   params: Promise<{ id: string }>;

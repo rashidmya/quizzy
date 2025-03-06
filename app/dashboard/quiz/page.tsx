@@ -6,7 +6,7 @@ import QuizList from "@/sections/dashboard/quiz/quiz-list";
 // This will be replaced by 'use cache' soon
 export const dynamic = "force-static";
 
-export default async function Page() {
+export default async function QuizHome() {
   const quizzes = await getQuizzes();
 
   return (

@@ -22,10 +22,6 @@ import { saveQuiz } from "@/actions/quiz";
 // icons
 import { Loader2, Plus, Trash2, Delete } from "lucide-react";
 
-type Props = {
-  quiz: QuizWithQuestions;
-};
-
 // Define a schema for a choice.
 const choiceSchema = z.object({
   text: z.string().min(1, { message: "Choice text is required" }),
@@ -172,24 +168,32 @@ function QuestionEditor({
   );
 }
 
-export default function QuizEdit({ quiz }: Props) {
+type Props = {
+  quiz?: QuizWithQuestions;
+  isEdit?: boolean;
+};
+
+export default function QuizNewEdit({ quiz, isEdit = false }: Props) {
   const [openItems, setOpenItems] = useState<string[]>([]);
 
-  const [addState, addAction, isAddPending] = useActionState(saveQuiz, {
-    message: "",
-  });
+  const [saveQuizState, saveQuizAction, isSavePending] = useActionState(
+    saveQuiz,
+    {
+      message: "",
+    }
+  );
 
   // Convert the passed quiz data to default form values.
   const defaultValues: QuizFormValues = {
-    title: quiz.title,
-    description: quiz.description ?? "",
-    questions: quiz.questions.map((q) => ({
+    title: quiz?.title || "",
+    description: quiz?.description || "",
+    questions: quiz?.questions?.map((q) => ({
       text: q.text,
       choices: q.choices.map((c) => ({
         text: c.text,
         isCorrect: c.isCorrect,
       })),
-    })),
+    })) || [{ text: "", choices: [{ text: "", isCorrect: false }] }],
   };
 
   const {
@@ -214,17 +218,21 @@ export default function QuizEdit({ quiz }: Props) {
   });
 
   const onSubmit = (data: QuizFormValues) => {
-    console.log("Submitted data:", data);
+    if (isEdit && quiz) {
 
-    const formData = new FormData();
-    formData.append("quizId", quiz.id);
-    formData.append("title", data.title);
-    formData.append("description", data.description ?? "");
-    formData.append("questions", JSON.stringify(data.questions));
+      const formData = new FormData();
+      formData.append("quizId", quiz.id);
+      formData.append("title", data.title);
+      formData.append("description", data.description ?? "");
+      formData.append("questions", JSON.stringify(data.questions));
 
-    startTransition(() => {
-      addAction(formData);
-    });
+      startTransition(() => {
+        saveQuizAction(formData);
+      });
+      return
+    }
+
+    
   };
 
   const titleValue = watch("title") || "";
@@ -285,7 +293,9 @@ export default function QuizEdit({ quiz }: Props) {
                   register={register}
                   removeQuestion={(i) => {
                     removeQuestion(i);
-                    setOpenItems((prev) => prev.filter((v) => v !== i.toString()));
+                    setOpenItems((prev) =>
+                      prev.filter((v) => v !== i.toString())
+                    );
                   }}
                   questionError={
                     errors.questions ? errors.questions[index] : null
@@ -306,7 +316,10 @@ export default function QuizEdit({ quiz }: Props) {
                 choices: [{ text: "", isCorrect: false }],
               });
               // The new question's index will be the current length.
-              setOpenItems((prev) => [...prev, questionFields.length.toString()]);
+              setOpenItems((prev) => [
+                ...prev,
+                questionFields.length.toString(),
+              ]);
             }}
           >
             Add Question
@@ -314,14 +327,14 @@ export default function QuizEdit({ quiz }: Props) {
         </div>
 
         <Button type="submit">
-          {isAddPending ? (
+          {isSavePending ? (
             <Loader2 className="size-5 animate-spin" />
           ) : (
             <span>Save Quiz</span>
           )}
         </Button>
-        {addState.message && (
-          <p className="text-sm text-gray-400 mb-2">{addState.message}</p>
+        {saveQuizState.message && (
+          <p className="text-sm text-gray-400 mb-2">{saveQuizState.message}</p>
         )}
       </form>
     </div>
