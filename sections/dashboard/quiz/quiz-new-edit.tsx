@@ -1,6 +1,7 @@
 "use client";
 
-import React, { startTransition, useActionState, useState } from "react";
+import { useRouter } from "next/navigation";
+import { startTransition, useActionState, useEffect, useState } from "react";
 // react-hook-form
 import { useForm, useFieldArray, UseFormReturn } from "react-hook-form";
 import { z } from "zod";
@@ -18,9 +19,11 @@ import {
 // types
 import { QuizWithQuestions } from "@/types/quiz";
 // actions
-import { saveQuiz } from "@/actions/quiz";
+import { newQuiz, saveQuiz } from "@/actions/quiz";
 // icons
 import { Loader2, Plus, Trash2, Delete } from "lucide-react";
+// paths
+import { PATH_DASHBOARD } from "@/routes/paths";
 
 // Define a schema for a choice.
 const choiceSchema = z.object({
@@ -174,14 +177,18 @@ type Props = {
 };
 
 export default function QuizNewEdit({ quiz, isEdit = false }: Props) {
+  const { push } = useRouter();
+
   const [openItems, setOpenItems] = useState<string[]>([]);
 
-  const [saveQuizState, saveQuizAction, isSavePending] = useActionState(
-    saveQuiz,
-    {
-      message: "",
-    }
-  );
+  const [saveState, saveAction, isSavePending] = useActionState(saveQuiz, {
+    message: "",
+  });
+
+  const [newState, newAction, isNewPending] = useActionState(newQuiz, {
+    message: "",
+    quizId: "",
+  });
 
   // Convert the passed quiz data to default form values.
   const defaultValues: QuizFormValues = {
@@ -218,22 +225,31 @@ export default function QuizNewEdit({ quiz, isEdit = false }: Props) {
   });
 
   const onSubmit = (data: QuizFormValues) => {
-    if (isEdit && quiz) {
+    const formData = new FormData();
 
-      const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("description", data.description ?? "");
+    formData.append("questions", JSON.stringify(data.questions));
+
+    if (isEdit && quiz) {
       formData.append("quizId", quiz.id);
-      formData.append("title", data.title);
-      formData.append("description", data.description ?? "");
-      formData.append("questions", JSON.stringify(data.questions));
 
       startTransition(() => {
-        saveQuizAction(formData);
+        saveAction(formData);
       });
-      return
+      return;
     }
 
-    
+    startTransition(() => {
+      newAction(formData);
+    });
   };
+
+  useEffect(() => {
+    if (newState.quizId && !isNewPending) {
+      push(PATH_DASHBOARD.quiz.view(newState.quizId));
+    }
+  }, [newState.quizId, isNewPending, push]);
 
   const titleValue = watch("title") || "";
   const descriptionValue = watch("description") || "";
@@ -327,14 +343,15 @@ export default function QuizNewEdit({ quiz, isEdit = false }: Props) {
         </div>
 
         <Button type="submit">
-          {isSavePending ? (
+          {isSavePending || isNewPending ? (
             <Loader2 className="size-5 animate-spin" />
           ) : (
             <span>Save Quiz</span>
           )}
         </Button>
-        {saveQuizState.message && (
-          <p className="text-sm text-gray-400 mb-2">{saveQuizState.message}</p>
+
+        {saveState.message && (
+          <p className="text-sm text-gray-400 mb-2">{saveState.message}</p>
         )}
       </form>
     </div>
