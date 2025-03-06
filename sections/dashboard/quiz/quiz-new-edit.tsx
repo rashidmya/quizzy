@@ -353,6 +353,9 @@ export default function QuizNewEdit({ quiz, isEdit = false }: Props) {
         {saveState.message && (
           <p className="text-sm text-gray-400 mb-2">{saveState.message}</p>
         )}
+         {newState.message && (
+          <p className="text-sm text-gray-400 mb-2">{newState.message}</p>
+        )}
       </form>
     </div>
   );
