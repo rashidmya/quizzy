@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Quiz } from "@/lib/queries/quizzes";
+import { Quiz } from "@/lib/db/queries/quizzes";
 import { PATH_DASHBOARD } from "@/routes/paths";
 import Link from "next/link";
 

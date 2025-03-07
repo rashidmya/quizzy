@@ -2,7 +2,7 @@ import Link from "next/link";
 // components
 import { Button } from "@/components/ui/button";
 // queries
-import { getQuizWithQuestions } from "@/lib/queries/quizzes";
+import { getQuizWithQuestions } from "@/lib/db/queries/quizzes";
 // paths
 import { PATH_DASHBOARD } from "@/routes/paths";
 // sections

@@ -1,4 +1,4 @@
-import { Choice, Question, Quiz } from "@/lib/queries/quizzes";
+import { Choice, Question, Quiz } from "@/lib/db/queries/quizzes";
 
 
 export type QuizWithQuestions = Quiz & {

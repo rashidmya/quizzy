@@ -1,6 +1,6 @@
 "use client";
 
-import { Choice, Question } from "@/lib/queries/quizzes";
+import { Choice, Question } from "@/lib/db/queries/quizzes";
 
 interface QuestionWithChoices extends Question {
   choices: Choice[];

@@ -1,5 +1,5 @@
 // queries
-import { getQuizzes } from "@/lib/queries/quizzes";
+import { getQuizzes } from "@/lib/db/queries/quizzes";
 // sections
 import QuizList from "@/sections/dashboard/quiz/quiz-list";
 
