@@ -1,5 +1,5 @@
-import { db } from '../db/drizzle';
-import { quizzes, questions, choices } from '../db/schema';
+import { db } from '../drizzle';
+import { quizzes, questions, choices } from '../schema';
 import { eq, InferSelectModel } from 'drizzle-orm';
 
 
