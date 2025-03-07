@@ -26,13 +26,16 @@ export const quizzes = pgTable("quizzes", {
   id: uuid("id").defaultRandom().primaryKey(),
   title: varchar("title", { length: 100 }).notNull(),
   description: varchar("description", { length: 1024 }),
+  createdBy: uuid("created_by")
+    .references(() => users.id)
+    .notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const questions = pgTable("questions", {
   id: uuid("id").defaultRandom().primaryKey(),
-  quizId: uuid('quiz_id').references(() => quizzes.id, { onDelete: 'cascade' }),
+  quizId: uuid("quiz_id").references(() => quizzes.id, { onDelete: "cascade" }),
   text: varchar("text", { length: 1024 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -40,7 +43,9 @@ export const questions = pgTable("questions", {
 
 export const choices = pgTable("choices", {
   id: uuid("id").defaultRandom().primaryKey(),
-  questionId: uuid('question_id').references(() => questions.id, { onDelete: 'cascade' }),
+  questionId: uuid("question_id").references(() => questions.id, {
+    onDelete: "cascade",
+  }),
   text: varchar("text", { length: 1024 }).notNull(),
   // Mark the correct choice (if needed)
   isCorrect: boolean("is_correct").default(false).notNull(),

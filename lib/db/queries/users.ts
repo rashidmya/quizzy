@@ -8,6 +8,7 @@ export async function getUser(email: string) {
   return db
     .select({
       id: users.id,
+      email: users.email,
       password: users.password,
     })
     .from(users)

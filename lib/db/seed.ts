@@ -1,18 +1,23 @@
 // db/seed.ts
-import { db } from './drizzle';
-import { users, quizzes, questions, choices, quizAttempts } from './schema';
+import { hash } from "bcrypt-ts";
+import { db } from "./drizzle";
+import { users, quizzes, questions, choices, quizAttempts } from "./schema";
 
 async function main() {
   // Seed 5 sample users without specifying the id.
+
+  const defaultPassword = "password";
+  const hashedPassword = await hash(defaultPassword, 10);
   const insertedUsers = await db
     .insert(users)
     .values(
-      Array.from({ length: 5 }).map((_, i) => ({
+      Array.from({ length: 1 }).map((_, i) => ({
         email: `user${i}@example.com`,
+        password: hashedPassword,
       }))
     )
     .returning();
-  
+
   // Seed 2 sample quizzes without specifying the id.
   const insertedQuizzes = await db
     .insert(quizzes)
@@ -20,6 +25,7 @@ async function main() {
       Array.from({ length: 2 }).map((_, i) => ({
         title: `Quiz Title ${i + 1}`,
         description: `This is a description for quiz ${i + 1}.`,
+        createdBy: insertedUsers[0].id
       }))
     )
     .returning();
@@ -48,20 +54,7 @@ async function main() {
     await db.insert(choices).values(choicesForQuestion);
   }
 
-  // Seed 10 sample quiz attempts with random scores (0 to 100)
-  for (let i = 0; i < 10; i++) {
-    const randomUser = insertedUsers[Math.floor(Math.random() * insertedUsers.length)];
-    const randomQuiz = insertedQuizzes[Math.floor(Math.random() * insertedQuizzes.length)];
-    await db
-      .insert(quizAttempts)
-      .values({
-        userId: randomUser.id,
-        quizId: randomQuiz.id,
-        score: Math.floor(Math.random() * 101),
-      });
-  }
-
-  console.log('Seeding complete!');
+  console.log("Seeding complete!");
   process.exit();
 }
 
