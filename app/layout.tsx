@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
-import { Geist_Mono } from 'next/font/google';
+import { Roboto } from 'next/font/google';
 import './globals.css';
 
-const geistMono = Geist_Mono({ subsets: ['latin'] });
+const acme = Roboto({
+  subsets: ['latin'],
+  weight: '400'
+});
 
 export const metadata: Metadata = {
   title: 'Quizzy',
@@ -16,7 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${geistMono.className} dark`}>
+      <body className={`${acme.className} dark`}>
         {children}
       </body>
     </html>
