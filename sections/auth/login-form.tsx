@@ -1,14 +1,19 @@
 "use client";
 
+import { useState } from "react";
+import Link from "next/link";
+// lib
 import { cn } from "@/lib/utils";
+// components
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+// react-hook-form
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+// next-auth
 import { signIn } from "next-auth/react";
-import { useState } from "react";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -128,9 +133,9 @@ export default function LoginForm(
       </div>
       <div className="text-center text-sm">
         Don&apos;t have an account?{" "}
-        <a href="/auth/register" className="underline underline-offset-4">
+        <Link href="/auth/register" className="underline underline-offset-4">
           Sign up
-        </a>
+        </Link>
       </div>
     </form>
   );

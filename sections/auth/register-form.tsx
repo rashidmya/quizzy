@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
+import Link from "next/link";
 
 const registerSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -98,9 +99,9 @@ export default function RegisterForm(
       </div>
       <div className="text-center text-sm">
         Already have an account?
-        <a href="/auth/login" className="underline underline-offset-4">
+        <Link href="/auth/login" className="underline underline-offset-4">
           Sign in
-        </a>
+        </Link>
       </div>
     </form>
   );
