@@ -19,15 +19,6 @@ declare module "next-auth" {
   }
 }
 
-// Example user verification function.
-// Replace with your actual logic.
-async function verifyUser(email: string, password: string) {
-  if (email === "jsmith@example.com" && password === "password") {
-    return { id: "1", name: "John Smith", email: "jsmith@example.com" };
-  }
-  return null;
-}
-
 export const authOptions: NextAuthOptions = {
   ...authConfig,
   providers: [
