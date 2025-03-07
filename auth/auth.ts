@@ -1,8 +1,14 @@
+// next-auth
 import NextAuth from "next-auth";
 import type { NextAuthOptions, DefaultSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+// auth.config
 import { authConfig } from "./auth.config";
+// db
+import { getUser } from "@/lib/db/queries/users";
+// bcrypt
+import { compare } from "bcrypt-ts";
 
 // Extend the Session type to include an id.
 declare module "next-auth" {
@@ -35,10 +41,16 @@ export const authOptions: NextAuthOptions = {
         },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
-        if (!credentials) return null;
-        const user = await verifyUser(credentials.email, credentials.password);
-        return user;
+      async authorize({ email, password }: any) {
+        if (!email || !password) return null;
+
+        const user = await getUser(email);
+        if (user.length === 0) return null;
+
+        const passwordsMatch = await compare(password, user[0].password!);
+        if (passwordsMatch) return user[0];
+
+        return null;
       },
     }),
     GoogleProvider({
