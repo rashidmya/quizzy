@@ -3,5 +3,5 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className="font-regular antialiased">{children}</div>;
+  return <div>{children}</div>;
 }
