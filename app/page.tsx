@@ -1,3 +1,4 @@
+import Hero from "@/components/sections/hero/default";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -6,11 +7,9 @@ export const dynamic = "force-static";
 
 export default async function Home() {
   return (
-    <div className="min-h-screen p-8 ">
-      <main className="max-w-[350px] mx-auto">
-        <h1 className="text-2xl font-bold mb-4 text-center text-gray-100">
-          Quizzy
-        </h1>
+    <div>
+      <main>
+        <Hero />
         <div className="text-center">
           <Button asChild>
             <Link href="/dashboard">Dashboard</Link>
