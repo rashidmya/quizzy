@@ -40,7 +40,7 @@ export default async function ViewQuizPage({
           </Button>
         </div>
 
-        <h1 className="text-2xl font-bold mb-4 text-center text-gray-100">
+        <h1 className="text-2xl font-bold mb-4 text-center">
           {quiz.title}
         </h1>
         <h4 className="text-center">{quiz.description}</h4>

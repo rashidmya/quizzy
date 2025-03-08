@@ -19,10 +19,10 @@ export default function QuestionList({
             key={question.id}
             className="flex items-center py-2 px-4 rounded-lg"
           >
-            <span className="text-gray-200 text-sm ">{question.text}</span>
+            <span className="text-md font-bold">{question.text}</span>
             <ul>
               {question.choices.map((choice) => (
-                <li key={choice.id} className="mx-8">{choice.text}</li>
+                <li key={choice.id} className="mx-8 text-sm">{choice.text}</li>
               ))}
             </ul>
           </li>

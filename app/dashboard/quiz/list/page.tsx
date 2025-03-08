@@ -12,7 +12,7 @@ export default async function QuizListPage() {
   return (
     <div className="min-h-screen p-8">
       <main className="max-w-[350px] mx-auto">
-        <h1 className="text-2xl font-bold mb-4 text-center text-gray-100">
+        <h1 className="text-2xl font-bold mb-4 text-center">
           Quizzes List
         </h1>
         <QuizList quizzes={quizzes} />
