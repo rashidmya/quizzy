@@ -3,7 +3,7 @@ import { Roboto } from "next/font/google";
 // css
 import "./globals.css";
 //
-import { SessionProvider } from "@/components/session-provider";
+import { SessionProvider } from "@/components/providers/session-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 
 const acme = Roboto({
