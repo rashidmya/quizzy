@@ -9,11 +9,11 @@ export default async function Home() {
     <div className="min-h-screen p-8 ">
       <main className="max-w-[350px] mx-auto">
         <h1 className="text-2xl font-bold mb-4 text-center text-gray-100">
-          Quizzy
+          Dashboard
         </h1>
         <div className="text-center">
           <Button asChild>
-            <Link href="/dashboard">Dashboard</Link>
+            <Link href="/dashboard/quiz">Create Quiz</Link>
           </Button>
         </div>
       </main>

@@ -34,15 +34,20 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize({ email, password }: any) {
         if (!email || !password) return null;
-
+      
         const user = await getUser(email);
-        if (user.length === 0) return null;
-
+        if (user.length === 0) {
+          return null;
+        }
+      
         const passwordsMatch = await compare(password, user[0].password!);
-        if (passwordsMatch) return user[0];
-
-        return null;
+        if (passwordsMatch) {
+          return user[0];
+        }
+      
+        return null
       },
+      
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",

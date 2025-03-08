@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1733332502118,
-      "tag": "0000_bitter_talisman",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1741100013864,
-      "tag": "0001_tidy_anthem",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1741216215803,
-      "tag": "0002_same_songbird",
+      "when": 1741388849014,
+      "tag": "0000_grey_redwing",
       "breakpoints": true
     }
   ]

@@ -14,6 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 // next-auth
 import { signIn } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -25,6 +26,8 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export default function LoginForm(
   props: React.ComponentPropsWithoutRef<"form">
 ) {
+  const [loading, setLoading] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -32,16 +35,29 @@ export default function LoginForm(
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
   });
-  const [loading, setLoading] = useState(false);
+
+  const searchParams = useSearchParams();
+
+  const error = searchParams.get("error");
+
+  let errorMessage = "";
+  if (error === "CredentialsSignin") {
+    errorMessage = "Invalid email or password";
+  }
 
   const onSubmit = async (data: LoginFormValues) => {
-    setLoading(true);
-    await signIn("credentials", {
-      ...data,
-      redirect: true,
-      callbackUrl: "/dashboard",
-    });
-    setLoading(false);
+    try {
+      setLoading(true);
+      await signIn("credentials", {
+        ...data,
+        redirect: true,
+        callbackUrl: "/dashboard",
+      });
+
+      setLoading(false);
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (
@@ -55,6 +71,11 @@ export default function LoginForm(
         <p className="text-balance text-sm text-muted-foreground">
           Enter your email below to login to your account
         </p>
+      </div>
+      <div className="flex flex-col items-center gap-2 text-center">
+        <span className="text-balance text-sm text-muted-foreground">
+          {errorMessage && <p className="text-red-600">{errorMessage}</p>}
+        </span>
       </div>
       <div className="grid gap-6">
         <div className="grid gap-2">

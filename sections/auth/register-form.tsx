@@ -1,44 +1,82 @@
 "use client";
 
+import { startTransition } from "react";
+// next
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+// nextauth
+import { signIn } from "next-auth/react";
+// lib
 import { cn } from "@/lib/utils";
+import { useActionState } from "@/hooks/use-action-state";
+// components
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+// react-hook-form
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { signIn } from "next-auth/react";
-import { useState } from "react";
-import Link from "next/link";
+// actions
+import { createUser } from "@/actions/user";
 
-const registerSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Please enter a valid email"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
+const registerSchema = z
+  .object({
+    email: z.string().email("Please enter a valid email"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z
+      .string()
+      .min(6, "Confirm password must be at least 6 characters"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function RegisterForm(
   props: React.ComponentPropsWithoutRef<"form">
 ) {
-  const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormValues>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
   });
-  const [loading, setLoading] = useState(false);
+
+  const [createState, createAction, isCreatePending] = useActionState(
+    createUser,
+    {
+      message: "",
+    }
+  );
 
   const onSubmit = async (data: RegisterFormValues) => {
-    setLoading(true);
-    // Simulate API call for registration.
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    // After registration, sign in with credentials.
-    await signIn("credentials", {
-      email: data.email,
-      password: data.password,
-      redirect: true,
-      callbackUrl: "/dashboard",
-    });
-    setLoading(false);
+    try {
+      const formData = new FormData();
+      formData.append("email", data.email);
+      formData.append("password", data.password);
+
+      // Await the result of createUser.
+      const result = await createAction(formData);
+
+      // Check the result for an error.
+      if (result.error) {
+        return;
+      }
+
+      // If registration is successful, sign in.
+      await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: true,
+        callbackUrl: "/dashboard",
+      });
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (
@@ -53,20 +91,14 @@ export default function RegisterForm(
           Enter your details below to sign up
         </p>
       </div>
-      <div className="grid gap-6">
-        <div className="grid gap-2">
-          <Label htmlFor="name">Name</Label>
-          <Input
-            id="name"
-            type="text"
-            placeholder="Your name"
-            {...register("name")}
-            required
-          />
-          {errors.name && (
-            <p className="mt-1 text-xs text-red-600">{errors.name.message}</p>
+      <div className="flex flex-col items-center gap-2 text-center">
+        <p className="text-balance text-sm text-muted-foreground">
+          {createState.error && (
+            <span className="text-red-600">{createState.message}</span>
           )}
-        </div>
+        </p>
+      </div>
+      <div className="grid gap-6">
         <div className="grid gap-2">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -90,11 +122,28 @@ export default function RegisterForm(
             required
           />
           {errors.password && (
-            <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>
+            <p className="mt-1 text-xs text-red-600">
+              {errors.password.message}
+            </p>
           )}
         </div>
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Signing up..." : "Sign Up"}
+        <div className="grid gap-2">
+          <Label htmlFor="confirmPassword">Confirm Password</Label>
+          <Input
+            id="confirmPassword"
+            type="password"
+            placeholder="Confirm your password"
+            {...register("confirmPassword")}
+            required
+          />
+          {errors.confirmPassword && (
+            <p className="mt-1 text-xs text-red-600">
+              {errors.confirmPassword.message}
+            </p>
+          )}
+        </div>
+        <Button type="submit" className="w-full" disabled={isCreatePending}>
+          {isCreatePending ? "Signing up..." : "Sign Up"}
         </Button>
       </div>
       <div className="text-center text-sm">

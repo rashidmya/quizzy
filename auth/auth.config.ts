@@ -4,6 +4,7 @@ export const authConfig: NextAuthOptions = {
   pages: {
     signIn: "/auth/login",
   },
+  debug: true, // Enable debug logs
   providers: [
     // Add your providers here (e.g., CredentialsProvider, GoogleProvider)
   ],
@@ -14,7 +15,10 @@ export const authConfig: NextAuthOptions = {
       return true;
     },
     async redirect({ url, baseUrl }) {
-      return baseUrl;
+      if (url.startsWith("/")) {
+        return `${baseUrl}${url}`;
+      }
+      return url;
     },
     async jwt({ token, user }) {
       if (user) token.id = user.id;
