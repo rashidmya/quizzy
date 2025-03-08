@@ -11,6 +11,7 @@ export async function getQuizzes() {
       id: quizzes.id,
       title: quizzes.title,
       description: quizzes.description,
+      createdBy: quizzes.createdBy,
       createdAt: quizzes.createdAt,
       updatedAt: quizzes.updatedAt,
 
