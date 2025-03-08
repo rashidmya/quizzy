@@ -8,16 +8,20 @@ import {
   NavbarRight,
 } from "../../ui/navbar";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "../../ui/sheet";
-import { Menu, GitBranch, Sun, Moon } from "lucide-react";
+import { Menu, Sun, Moon } from "lucide-react";
 import LaunchUI from "../../logos/launch-ui";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { PATH_AUTH } from "@/routes/paths";
+import { useTheme } from "next-themes";
+import Github from "@/components/logos/github";
 
 export default function Navbar() {
   const { data: session } = useSession();
 
   const user = session && session.user;
+
+  const { resolvedTheme, setTheme } = useTheme();
 
   return (
     <header className="sticky top-0 z-50 -mb-4 px-4 pb-4">
@@ -38,12 +42,12 @@ export default function Navbar() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <GitBranch className="h-5 w-5" />
+                <Github className="h-5 w-5" />
                 <span className="sr-only">View on GitHub</span>
               </Link>
             </Button>
-            <Button variant="ghost">
-              {"dark" === "dark" ? (
+            <Button onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")} variant="ghost">
+              {resolvedTheme === "dark" ? (
                 <Sun className="h-5 w-5" />
               ) : (
                 <Moon className="h-5 w-5" />
