@@ -12,7 +12,7 @@ import { Menu, Sun, Moon } from "lucide-react";
 import LaunchUI from "../../logos/launch-ui";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
-import { PATH_AUTH } from "@/routes/paths";
+import { PATH_AUTH, PATH_DASHBOARD } from "@/routes/paths";
 import { useTheme } from "next-themes";
 import Github from "@/components/logos/github";
 
@@ -46,7 +46,12 @@ export default function Navbar() {
                 <span className="sr-only">View on GitHub</span>
               </Link>
             </Button>
-            <Button onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")} variant="ghost">
+            <Button
+              onClick={() =>
+                setTheme(resolvedTheme === "dark" ? "light" : "dark")
+              }
+              variant="ghost"
+            >
               {resolvedTheme === "dark" ? (
                 <Sun className="h-5 w-5" />
               ) : (
@@ -74,17 +79,32 @@ export default function Navbar() {
                   >
                     <span>Quizzy</span>
                   </a>
+
                   {user ? (
-                    <Link
-                      href="/"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        signOut({ redirect: true, callbackUrl: "/" });
-                      }}
-                      className="text-muted-foreground hover:text-foreground"
-                    >
-                      Logout
-                    </Link>
+                    <>
+                      <Link
+                        href={PATH_DASHBOARD.root}
+                        className="text-muted-foreground hover:text-foreground"
+                      >
+                        My Account
+                      </Link>
+                      <Link
+                        href={PATH_DASHBOARD.root}
+                        className="text-muted-foreground hover:text-foreground"
+                      >
+                        Dashboard
+                      </Link>
+                      <Link
+                        href="/"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          signOut({ redirect: true, callbackUrl: "/" });
+                        }}
+                        className="text-muted-foreground hover:text-foreground"
+                      >
+                        Logout
+                      </Link>
+                    </>
                   ) : (
                     <Link
                       href={PATH_AUTH.login}

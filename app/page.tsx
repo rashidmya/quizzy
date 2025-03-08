@@ -8,14 +8,7 @@ export const dynamic = "force-static";
 export default async function Home() {
   return (
     <div>
-      <main>
-        <Hero />
-        <div className="text-center">
-          <Button asChild>
-            <Link href="/dashboard">Dashboard</Link>
-          </Button>
-        </div>
-      </main>
+      <Hero />
     </div>
   );
 }

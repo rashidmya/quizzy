@@ -18,7 +18,7 @@ import {
   navigationMenuTriggerStyle,
 } from "./navigation-menu";
 // paths
-import { PATH_AUTH } from "@/routes/paths";
+import { PATH_AUTH, PATH_DASHBOARD } from "@/routes/paths";
 import LaunchUI from "../logos/launch-ui";
 
 export default function Navigation({ user }: { user?: any }) {
@@ -47,6 +47,12 @@ export default function Navigation({ user }: { user?: any }) {
                     </a>
                   </NavigationMenuLink>
                 </li>
+                <ListItem
+                  href={PATH_DASHBOARD.root}
+                  title="Dashboard"
+                >
+                  Access your dashboard to oversee your quizzes.
+                </ListItem>
                 <ListItem
                   onClick={(e) => {
                     e.preventDefault();
