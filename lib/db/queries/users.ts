@@ -2,7 +2,7 @@ import { db } from "../drizzle";
 import { users } from "../schema";
 import { eq, InferSelectModel } from "drizzle-orm";
 
-export type Todo = InferSelectModel<typeof users>;
+export type User = InferSelectModel<typeof users>;
 
 export async function getUser(email: string) {
   return db
