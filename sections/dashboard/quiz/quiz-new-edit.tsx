@@ -24,6 +24,7 @@ import { newQuiz, saveQuiz } from "@/actions/quiz";
 import { Loader2, Plus, Trash2, Delete } from "lucide-react";
 // paths
 import { PATH_DASHBOARD } from "@/routes/paths";
+import { useSession } from "next-auth/react";
 
 // Define a schema for a choice.
 const choiceSchema = z.object({
@@ -179,6 +180,8 @@ type Props = {
 export default function QuizNewEdit({ quiz, isEdit = false }: Props) {
   const { push } = useRouter();
 
+  const { data: session } = useSession();
+
   const [openItems, setOpenItems] = useState<string[]>([]);
 
   const [saveState, saveAction, isSavePending] = useActionState(saveQuiz, {
@@ -237,8 +240,11 @@ export default function QuizNewEdit({ quiz, isEdit = false }: Props) {
       startTransition(() => {
         saveAction(formData);
       });
+
       return;
     }
+
+    formData.append("userId", session?.user.id || "");
 
     startTransition(() => {
       newAction(formData);
@@ -353,7 +359,7 @@ export default function QuizNewEdit({ quiz, isEdit = false }: Props) {
         {saveState.message && (
           <p className="text-sm text-gray-400 mb-2">{saveState.message}</p>
         )}
-         {newState.message && (
+        {newState.message && (
           <p className="text-sm text-gray-400 mb-2">{newState.message}</p>
         )}
       </form>

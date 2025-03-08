@@ -1,15 +1,20 @@
-'use server';
+"use server";
 
-import { revalidatePath } from 'next/cache';
-import { eq } from 'drizzle-orm';
-import { db } from '@/lib/db/drizzle';
-import { quizzes, questions, choices } from '@/lib/db/schema';
+import { revalidatePath } from "next/cache";
+import { eq } from "drizzle-orm";
+import { db } from "@/lib/db/drizzle";
+import { quizzes, questions, choices } from "@/lib/db/schema";
 
 export async function newQuiz(_: any, formData: FormData) {
   // Extract form values.
+  const userId = formData.get("userId") as string;
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
   const questionsJson = formData.get("questions") as string;
+
+  if (!userId.trim()) {
+    return { message: "User not authenticated" };
+  }
 
   // Basic validation.
   if (!title.trim()) {
@@ -30,7 +35,7 @@ export async function newQuiz(_: any, formData: FormData) {
   // Insert a new quiz record.
   const insertedQuiz = await db
     .insert(quizzes)
-    .values({ title, description })
+    .values({ title, description, createdBy: userId })
     .returning({ id: quizzes.id });
   const newQuizId = insertedQuiz[0].id;
 
@@ -60,7 +65,6 @@ export async function newQuiz(_: any, formData: FormData) {
 }
 
 export async function saveQuiz(_: any, formData: FormData) {
-  console.log(formData);
   // Extract form values.
   const quizId = formData.get("quizId") as string;
   const title = formData.get("title") as string;
