@@ -1,3 +1,5 @@
+"use client";
+
 import Navigation from "../../ui/navigation";
 import { Button } from "../../ui/button";
 import {
@@ -5,12 +7,18 @@ import {
   NavbarLeft,
   NavbarRight,
 } from "../../ui/navbar";
-import { Sheet, SheetContent, SheetTrigger } from "../../ui/sheet";
-import { Menu, Github, Sun, Moon } from "lucide-react";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "../../ui/sheet";
+import { Menu, GitBranch, Sun, Moon } from "lucide-react";
 import LaunchUI from "../../logos/launch-ui";
 import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
+import { PATH_AUTH } from "@/routes/paths";
 
 export default function Navbar() {
+  const { data: session } = useSession();
+
+  const user = session && session.user;
+
   return (
     <header className="sticky top-0 z-50 -mb-4 px-4 pb-4">
       <div className="fade-bottom bg-background/15 absolute left-0 h-24 w-full backdrop-blur-lg"></div>
@@ -21,7 +29,7 @@ export default function Navbar() {
               <LaunchUI />
               Quizzy
             </a>
-            <Navigation />
+            <Navigation user={user} />
           </NavbarLeft>
           <NavbarRight>
             <Button variant="ghost" asChild>
@@ -30,7 +38,7 @@ export default function Navbar() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Github className="h-5 w-5" />
+                <GitBranch className="h-5 w-5" />
                 <span className="sr-only">View on GitHub</span>
               </Link>
             </Button>
@@ -43,6 +51,7 @@ export default function Navbar() {
               <span className="sr-only">Toggle dark/light mode</span>
             </Button>
             <Sheet>
+              <SheetTitle hidden>Quizzy App</SheetTitle>
               <SheetTrigger asChild>
                 <Button
                   variant="ghost"
@@ -59,26 +68,27 @@ export default function Navbar() {
                     href="/"
                     className="flex items-center gap-2 text-xl font-bold"
                   >
-                    <span>Launch UI</span>
+                    <span>Quizzy</span>
                   </a>
-                  <a
-                    href="/"
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    Getting Started
-                  </a>
-                  <a
-                    href="/"
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    Components
-                  </a>
-                  <a
-                    href="/"
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    Documentation
-                  </a>
+                  {user ? (
+                    <Link
+                      href="/"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        signOut({ redirect: true, callbackUrl: "/" });
+                      }}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      Sign Out
+                    </Link>
+                  ) : (
+                    <Link
+                      href={PATH_AUTH.login}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      Sign In
+                    </Link>
+                  )}
                 </nav>
               </SheetContent>
             </Sheet>

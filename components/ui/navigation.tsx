@@ -4,7 +4,7 @@ import { forwardRef } from "react";
 // next
 import Link from "next/link";
 // next-auth
-import { useSession, signOut } from "next-auth/react";
+import { signOut } from "next-auth/react";
 // lib
 import { cn } from "@/lib/utils";
 // components
@@ -18,14 +18,12 @@ import {
 // paths
 import { PATH_AUTH } from "@/routes/paths";
 
-export default function Navigation() {
-  const { data: session } = useSession();
-
+export default function Navigation({ user }: { user?: any }) {
   return (
     <NavigationMenu className="hidden md:flex">
       <NavigationMenuList>
         <NavigationMenuItem>
-          {session?.user ? (
+          {user ? (
             <Link href="" legacyBehavior passHref>
               <NavigationMenuLink
                 onClick={(e) => {
