@@ -10,39 +10,65 @@ import { cn } from "@/lib/utils";
 // components
 import {
   NavigationMenu,
+  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
+  NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "./navigation-menu";
 // paths
 import { PATH_AUTH } from "@/routes/paths";
+import LaunchUI from "../logos/launch-ui";
 
 export default function Navigation({ user }: { user?: any }) {
   return (
     <NavigationMenu className="hidden md:flex">
       <NavigationMenuList>
-        <NavigationMenuItem>
-          {user ? (
-            <Link href="" legacyBehavior passHref>
-              <NavigationMenuLink
-                onClick={(e) => {
-                  e.preventDefault();
-                  signOut({ redirect: true, callbackUrl: "/" });
-                }}
-                className={navigationMenuTriggerStyle()}
-              >
-                Sign Out
-              </NavigationMenuLink>
-            </Link>
-          ) : (
+        {user ? (
+          <NavigationMenuItem>
+            <NavigationMenuTrigger>{user.email}</NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                <li className="row-span-3">
+                  <NavigationMenuLink asChild>
+                    <a
+                      className="flex h-full w-full select-none flex-col justify-end rounded-md bg-linear-to-b from-muted/30 to-muted/10 p-6 no-underline outline-hidden focus:shadow-md"
+                      href="/"
+                    >
+                      <LaunchUI />
+                      <div className="mb-2 mt-4 text-lg font-medium">
+                        My Account
+                      </div>
+                      <p className="text-sm leading-tight text-muted-foreground">
+                        Manage your account settings, update your profile, and
+                        review your activity.
+                      </p>
+                    </a>
+                  </NavigationMenuLink>
+                </li>
+                <ListItem
+                  onClick={(e) => {
+                    e.preventDefault();
+                    signOut({ redirect: true, callbackUrl: "/" });
+                  }}
+                  href="/"
+                  title="Logout"
+                >
+                  Sign out from your account.
+                </ListItem>
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+        ) : (
+          <NavigationMenuItem>
             <Link href={PATH_AUTH.login} legacyBehavior passHref>
               <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                 Login
               </NavigationMenuLink>
             </Link>
-          )}
-        </NavigationMenuItem>
+          </NavigationMenuItem>
+        )}
       </NavigationMenuList>
     </NavigationMenu>
   );

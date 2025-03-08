@@ -79,7 +79,7 @@ export default function Navbar() {
                       }}
                       className="text-muted-foreground hover:text-foreground"
                     >
-                      Sign Out
+                      Logout
                     </Link>
                   ) : (
                     <Link
