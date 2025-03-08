@@ -5,7 +5,8 @@ import "./globals.css";
 // components
 import Navbar from "@/components/sections/navbar/default";
 //
-import ClientProvider from "./client-provider";
+import { SessionProvider } from "@/components/session-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const acme = Roboto({
   subsets: ["latin"],
@@ -25,15 +26,21 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${acme.className} dark flex min-h-screen flex-col font-regular antialiased`}
+        className={`${acme.className} flex min-h-screen flex-col font-regular antialiased`}
       >
-        <ClientProvider>
-          <div className="flex min-h-screen w-full flex-col">
-            <Navbar />
-            <main>{children}</main>
-            
-          </div>
-        </ClientProvider>
+        <SessionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <div className="flex min-h-screen w-full flex-col">
+              <Navbar />
+              <main>{children}</main>
+            </div>
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );
