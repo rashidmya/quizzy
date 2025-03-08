@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 // css
 import "./globals.css";
-// components
-import Navbar from "@/components/sections/navbar/default";
 //
 import { SessionProvider } from "@/components/session-provider";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -36,7 +34,6 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <div className="flex min-h-screen w-full flex-col">
-              <Navbar />
               <main>{children}</main>
             </div>
           </ThemeProvider>

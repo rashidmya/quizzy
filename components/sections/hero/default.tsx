@@ -9,6 +9,7 @@ import Glow from "@/components/ui/glow";
 import Image from "next/image";
 import { useTheme } from "next-themes";
 import Github from "@/components/logos/github";
+import Link from "next/link";
 
 export default function Hero() {
   const { resolvedTheme } = useTheme();
@@ -34,13 +35,13 @@ export default function Hero() {
             <span className="text-muted-foreground">
               Quizzy is Open Source!
             </span>
-            <a
-              href="/"
+            <Link
+              href="https://github.com/rashidmya/quizzy"
               className="flex items-center gap-1"
             >
-              Get started
+              View on GitHub
               <ArrowRightIcon className="h-3 w-3" />
-            </a>
+            </Link>
           </Badge>
           <h1 className="relative z-10 inline-block animate-appear bg-gradient-to-r from-foreground to-foreground bg-clip-text text-4xl font-semibold leading-tight text-transparent drop-shadow-2xl sm:text-6xl sm:leading-tight md:text-8xl md:leading-tight dark:to-muted-foreground">
           Create and share quizzes
@@ -53,11 +54,6 @@ export default function Hero() {
             <div className="relative z-10 flex animate-appear justify-center gap-4 opacity-0 delay-300">
               <Button variant="default" size="lg" asChild>
                 <a href="/dashboard/quiz">Create Quiz</a>
-              </Button>
-              <Button variant="default" size="lg" asChild>
-                <a href="https://github.com/your-repo/quizzy" target="_blank" rel="noopener noreferrer">
-                  <Github className="mr-2 h-4 w-4" /> View on GitHub
-                </a>
               </Button>
             </div>
           </div>
