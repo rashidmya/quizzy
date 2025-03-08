@@ -3,17 +3,17 @@ import { Roboto } from "next/font/google";
 // css
 import "./globals.css";
 //
-import { SessionProvider } from "@/components/session-provider";
-import { ThemeProvider } from "@/components/theme-provider";
+import { SessionProvider } from "@/components/providers/session-provider";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 
-const acme = Roboto({
+const roboto = Roboto({
   subsets: ["latin"],
   weight: "400",
 });
 
 export const metadata: Metadata = {
   title: "Quizzy",
-  description: "A simple quiz app",
+  description: "Simple app to create quizzes",
 };
 
 export default function RootLayout({
@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${acme.className} flex min-h-screen flex-col font-regular antialiased`}
+        className={'overflow-hidden'}
       >
         <SessionProvider>
           <ThemeProvider
