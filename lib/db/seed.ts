@@ -10,12 +10,11 @@ async function main() {
   const hashedPassword = await hash(defaultPassword, 10);
   const insertedUsers = await db
     .insert(users)
-    .values(
-      Array.from({ length: 1 }).map((_, i) => ({
-        email: `user${i}@example.com`,
-        password: hashedPassword,
-      }))
-    )
+    .values({
+      name: "John Doe",
+      email: "bugadev@proton.com",
+      password: hashedPassword,
+    })
     .returning();
 
   // Seed 2 sample quizzes without specifying the id.
@@ -25,7 +24,7 @@ async function main() {
       Array.from({ length: 2 }).map((_, i) => ({
         title: `Quiz Title ${i + 1}`,
         description: `This is a description for quiz ${i + 1}.`,
-        createdBy: insertedUsers[0].id
+        createdBy: insertedUsers[0].id,
       }))
     )
     .returning();

@@ -9,6 +9,7 @@ import {
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
   email: varchar("email", { length: 30 }).notNull().unique(),
   password: varchar("password", { length: 255 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -17,8 +18,8 @@ export const users = pgTable("users", {
 
 export const quizzes = pgTable("quizzes", {
   id: uuid("id").defaultRandom().primaryKey(),
-  title: varchar("title", { length: 100 }).notNull(),
-  description: varchar("description", { length: 1024 }),
+  title: varchar("title", { length: 80 }).notNull(),
+  description: varchar("description", { length: 100 }),
   createdBy: uuid("created_by")
     .references(() => users.id)
     .notNull(),
