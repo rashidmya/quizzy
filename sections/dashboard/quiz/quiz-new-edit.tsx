@@ -1,7 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { startTransition, useActionState, useEffect, useState } from "react";
+// next
+import { useRouter } from "next/navigation";
 // react-hook-form
 import { useForm, useFieldArray, UseFormReturn } from "react-hook-form";
 import { z } from "zod";
@@ -24,7 +25,8 @@ import { newQuiz, saveQuiz } from "@/actions/quiz";
 import { Loader2, Plus, Trash2, Delete } from "lucide-react";
 // paths
 import { PATH_DASHBOARD } from "@/routes/paths";
-import { useSession } from "next-auth/react";
+// hooks
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 // Define a schema for a choice.
 const choiceSchema = z.object({
@@ -180,7 +182,7 @@ type Props = {
 export default function QuizNewEdit({ quiz, isEdit = false }: Props) {
   const { push } = useRouter();
 
-  const { data: session } = useSession();
+  const user = useCurrentUser();
 
   const [openItems, setOpenItems] = useState<string[]>([]);
 
@@ -244,7 +246,7 @@ export default function QuizNewEdit({ quiz, isEdit = false }: Props) {
       return;
     }
 
-    formData.append("userId", session?.user.id || "");
+    formData.append("userId", user.id || "");
 
     startTransition(() => {
       newAction(formData);

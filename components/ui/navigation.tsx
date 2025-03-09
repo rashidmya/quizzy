@@ -19,9 +19,13 @@ import {
 } from "./navigation-menu";
 // paths
 import { PATH_AUTH, PATH_DASHBOARD } from "@/routes/paths";
+// logo
 import LaunchUI from "../logos/launch-ui";
 
-export default function Navigation({ user }: { user?: any }) {
+export default function Navigation({ user }: {   user: {
+  email: string
+  name: string
+}}) {
   return (
     <NavigationMenu className="hidden md:flex">
       <NavigationMenuList>

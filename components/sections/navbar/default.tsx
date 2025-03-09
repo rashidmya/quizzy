@@ -1,5 +1,12 @@
 "use client";
 
+//auth
+import { signOut } from "next-auth/react";
+// next
+import Link from "next/link";
+// icons
+import { Menu, Sun, Moon } from "lucide-react";
+// components
 import Navigation from "../../ui/navigation";
 import { Button } from "../../ui/button";
 import {
@@ -8,18 +15,18 @@ import {
   NavbarRight,
 } from "../../ui/navbar";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "../../ui/sheet";
-import { Menu, Sun, Moon } from "lucide-react";
-import LaunchUI from "../../logos/launch-ui";
-import Link from "next/link";
-import { signOut, useSession } from "next-auth/react";
+// paths
 import { PATH_AUTH, PATH_DASHBOARD } from "@/routes/paths";
+// next-theme
 import { useTheme } from "next-themes";
+// logo
 import Github from "@/components/logos/github";
+import LaunchUI from "../../logos/launch-ui";
+// hooks
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 export default function Navbar() {
-  const { data: session } = useSession();
-
-  const user = session && session.user;
+  const user = useCurrentUser();
 
   const { resolvedTheme, setTheme } = useTheme();
 

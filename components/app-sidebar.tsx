@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+// icons
 import {
   BookOpen,
   Bot,
@@ -10,7 +10,7 @@ import {
   Settings2,
   SquareTerminal,
 } from "lucide-react";
-
+// components
 import { NavMain } from "@/components/nav-main";
 import { NavProjects } from "@/components/nav-projects";
 import { NavUser } from "@/components/nav-user";
@@ -22,7 +22,8 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { useSession } from "next-auth/react";
+// hooks
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 // This is sample data.
 const data = {
@@ -133,9 +134,8 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { data: session } = useSession();
+  const user = useCurrentUser();
 
-  const user = session?.user || { email: "", name: "" };
 
   return (
     <Sidebar collapsible="icon" {...props}>
