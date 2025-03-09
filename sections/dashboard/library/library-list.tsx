@@ -1,9 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { BookOpen as BookOpenIcon, MoreVertical } from "lucide-react";
 import { PATH_DASHBOARD } from "@/routes/paths";
@@ -26,34 +24,11 @@ export type Quiz = {
 };
 
 export default function QuizLibrary({ quizzes }: { quizzes: Quiz[] }) {
-  // Local state for search input.
-  const [search, setSearch] = useState("");
-
-  // Filter quizzes by title based on the search term.
-  const filteredQuizzes = useMemo(
-    () =>
-      quizzes.filter((quiz) =>
-        quiz.title.toLowerCase().includes(search.toLowerCase())
-      ),
-    [quizzes, search]
-  );
-
   return (
     <div className="space-y-8">
-      {/* Search Bar */}
-      <div className="mb-4">
-        <Input
-          type="text"
-          placeholder="Search quizzes..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full"
-        />
-      </div>
-
       {/* List of Horizontal Cards */}
       <div className="space-y-4">
-        {filteredQuizzes.map((quiz) => (
+        {quizzes.map((quiz) => (
           <Card key={quiz.id} className="flex-row items-center p-4">
             {/* Quiz Icon on the left */}
             <div className="flex-shrink-0 bg-muted text-muted-foreground flex h-12 w-12 items-center justify-center rounded mr-4">
