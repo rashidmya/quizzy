@@ -13,7 +13,7 @@ export default function Index() {
 
   useEffect(() => {
     if (pathname == PATH_DASHBOARD.quiz.root) {
-      router.push(PATH_DASHBOARD.quiz.list);
+      router.push(PATH_DASHBOARD.root);
     }
   });
 

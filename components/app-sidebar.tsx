@@ -28,17 +28,17 @@ const data = {
     },
     {
       title: "Library",
-      url: "#",
+      url: PATH_DASHBOARD.library.root,
       icon: FoldersIcon,
     },
     {
       title: "Reports",
-      url: "#",
+      url: PATH_DASHBOARD.reports.root,
       icon: ChartLine,
     },
     {
       title: "Settings",
-      url: "#",
+      url: PATH_DASHBOARD.settings.root,
       icon: Settings,
     },
   ],
