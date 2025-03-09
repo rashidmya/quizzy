@@ -26,8 +26,7 @@ export function NavMain({
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarMenu>
         {projects.map((item) => {
-          const isActive =
-            pathname === item.url || pathname.startsWith(item.url + "/");
+          const isActive = pathname === item.url;
           return (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton size="lg" isActive={isActive} asChild>
