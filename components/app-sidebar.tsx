@@ -1,18 +1,9 @@
 "use client";
 
 // icons
-import {
-  BookOpen,
-  Bot,
-  Frame,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
-} from "lucide-react";
+import { HomeIcon, FoldersIcon, ChartLine, Settings } from "lucide-react";
 // components
 import { NavMain } from "@/components/nav-main";
-import { NavProjects } from "@/components/nav-projects";
 import { NavUser } from "@/components/nav-user";
 import { NavHeader } from "@/components/nav-header";
 import {
@@ -24,111 +15,31 @@ import {
 } from "@/components/ui/sidebar";
 // hooks
 import { useCurrentUser } from "@/hooks/use-current-user";
+// paths
+import { PATH_DASHBOARD } from "@/routes/paths";
 
 // This is sample data.
 const data = {
   navMain: [
     {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
+      title: "Home",
+      url: PATH_DASHBOARD.root,
+      icon: HomeIcon,
     },
     {
-      title: "Models",
+      title: "Library",
       url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
+      icon: FoldersIcon,
     },
     {
-      title: "Documentation",
+      title: "Reports",
       url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
+      icon: ChartLine,
     },
     {
       title: "Settings",
       url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
+      icon: Settings,
     },
   ],
 };
@@ -136,15 +47,13 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useCurrentUser();
 
-
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <NavHeader />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavMain projects={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />
