@@ -23,22 +23,16 @@ CREATE TABLE IF NOT EXISTS "quiz_attempts" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "quizzes" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"title" varchar(100) NOT NULL,
-	"description" varchar(1024),
+	"title" varchar(80) NOT NULL,
+	"description" varchar(100),
 	"created_by" uuid NOT NULL,
-	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "todos" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"text" varchar(255) NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "users" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"name" varchar(100) NOT NULL,
 	"email" varchar(30) NOT NULL,
 	"password" varchar(255) NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
