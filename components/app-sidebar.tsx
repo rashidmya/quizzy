@@ -2,12 +2,9 @@
 
 import * as React from "react";
 import {
-  AudioWaveform,
   BookOpen,
   Bot,
-  Command,
   Frame,
-  GalleryVerticalEnd,
   Map,
   PieChart,
   Settings2,
@@ -138,6 +135,8 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: session } = useSession();
 
+  const user = session?.user || { email: "", name: "" };
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -148,7 +147,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={session?.user} />
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
