@@ -6,9 +6,9 @@ import "./globals.css";
 import { SessionProvider } from "@/components/providers/session-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 
-const acme = Roboto({
+const roboto = Roboto({
   subsets: ["latin"],
-  weight: "400",
+  weight:  ["100", "300", "500", "700", "900"],
 });
 
 export const metadata: Metadata = {
@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${acme.className} flex min-h-screen flex-col font-regular antialiased`}
+        className={`${roboto.className} flex min-h-screen flex-col font-regular antialiased`}
       >
         <SessionProvider>
           <ThemeProvider

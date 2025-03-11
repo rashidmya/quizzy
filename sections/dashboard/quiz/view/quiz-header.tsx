@@ -10,14 +10,14 @@ type QuizHeaderProps = {
   title: string;
   description: string | null;
   participantCount: number;
-  onEdit: (newTitle: string) => void;
+  onTitleEdit: (newTitle: string) => void;
 };
 
 export function QuizHeader({
   title,
   description,
   participantCount,
-  onEdit,
+  onTitleEdit,
 }: QuizHeaderProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(title);
@@ -28,7 +28,7 @@ export function QuizHeader({
 
   const handleBlur = () => {
     setIsEditing(false);
-    onEdit(editedTitle);
+    onTitleEdit(editedTitle);
   };
 
   return (
