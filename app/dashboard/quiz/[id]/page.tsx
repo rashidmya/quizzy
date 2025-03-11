@@ -1,7 +1,7 @@
 // queries
 import { getQuizWithQuestions } from "@/lib/db/queries/quizzes";
 // sections
-import QuizView from "@/sections/dashboard/quiz/quiz-view";
+import QuizView from "@/sections/dashboard/quiz/view/quiz-view";
 
 // This will be replaced by 'use cache' soon
 export const dynamic = "force-static";
@@ -22,9 +22,5 @@ export default async function QuizViewPage({
       </h1>
     );
 
-  return (
-    <div className="min-h-screen p-8">
-      <QuizView quiz={quiz} />
-    </div>
-  );
+  return <QuizView quiz={quiz} />;
 }
