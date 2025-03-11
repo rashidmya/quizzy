@@ -1,14 +1,18 @@
 "use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 // components
 import { Card, CardFooter } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // sections
 import QuizQuestionList from "@/sections/dashboard/quiz/view/quiz-question-list";
-// types
-import { useState } from "react";
 import { QuizHeader } from "./quiz-header";
 import { QuizActions } from "./quiz-actions";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+// types
 import { QuizWithQuestions } from "@/types/quiz";
+// paths
+import { PATH_DASHBOARD } from "@/routes/paths";
 
 // This will be replaced by 'use cache' soon
 export const dynamic = "force-static";
@@ -27,6 +31,8 @@ export default function QuizDashboardCard({
   quiz,
   participantCount = 2,
 }: QuizDashboardCardProps) {
+  const { push } = useRouter();
+
   const [isLive, setIsLive] = useState(false);
   const [currentTab, setCurrentTab] = useState("questions");
 
@@ -45,8 +51,7 @@ export default function QuizDashboardCard({
   };
 
   const handleEdit = () => {
-    // edit quiz name or details
-    console.log("Edit quiz");
+    push(PATH_DASHBOARD.quiz.edit(quiz.id));
   };
 
   return (
