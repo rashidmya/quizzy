@@ -12,7 +12,7 @@ async function main() {
     .insert(users)
     .values({
       name: "John Doe",
-      email: "bugadev@proton.com",
+      email: "bugadev@proton.me",
       password: hashedPassword,
     })
     .returning();
