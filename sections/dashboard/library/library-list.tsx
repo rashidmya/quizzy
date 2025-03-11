@@ -1,29 +1,27 @@
 "use client";
 
 import Link from "next/link";
+// lucide
+import { BookOpen as BookOpenIcon, MoreVertical } from "lucide-react";
+// paths
+import { PATH_DASHBOARD } from "@/routes/paths";
+// components
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { BookOpen as BookOpenIcon, MoreVertical } from "lucide-react";
-import { PATH_DASHBOARD } from "@/routes/paths";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+// types
+import { LibraryQuiz } from "@/types/quiz";
 
-// Type for each quiz. Adjust as necessary.
-export type Quiz = {
-  id: string;
-  title: string;
-  description: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-  createdBy: string;
-  questionCount?: number;
+type Props = {
+  quizzes: LibraryQuiz[];
 };
 
-export default function QuizLibrary({ quizzes }: { quizzes: Quiz[] }) {
+export default function QuizLibrary({ quizzes }: Props) {
   return (
     <div className="space-y-8">
       {/* List of Horizontal Cards */}
@@ -38,10 +36,12 @@ export default function QuizLibrary({ quizzes }: { quizzes: Quiz[] }) {
             <div className="flex-1">
               <h2 className="text-lg font-semibold">{quiz.title}</h2>
               <p className="text-sm text-muted-foreground">
-                By {quiz.createdBy || "Unknown"} &bull;{" "}
+                By {quiz.createdBy.name || "Unknown"} &bull;{" "}
                 {quiz.questionCount !== undefined
-                  ? `${quiz.questionCount} Questions`
-                  : "No questions"}
+                  ? `${quiz.questionCount} ${
+                      quiz.questionCount === 1 ? "question" : "questions"
+                    }`
+                  : "0 questions"}
               </p>
             </div>
             {/* Action Buttons on the right */}

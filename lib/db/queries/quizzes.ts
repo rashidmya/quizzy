@@ -1,6 +1,6 @@
 import { db } from "../drizzle";
-import { quizzes, questions, choices } from "../schema";
-import { eq, InferSelectModel } from "drizzle-orm";
+import { quizzes, questions, choices, users } from "../schema";
+import { eq, InferSelectModel, sql } from "drizzle-orm";
 
 export type Quiz = InferSelectModel<typeof quizzes>;
 
@@ -10,11 +10,18 @@ export async function getQuizzes(userId: string) {
       id: quizzes.id,
       title: quizzes.title,
       description: quizzes.description,
-      createdBy: quizzes.createdBy,
       createdAt: quizzes.createdAt,
       updatedAt: quizzes.updatedAt,
+      // Return createdBy as an object with id and name.
+      createdBy: {
+        id: users.id,
+        name: users.name,
+      },
+      // Compute questionCount using a subquery.
+      questionCount: sql<number>`CAST((SELECT COUNT(*) FROM questions WHERE questions.quiz_id = ${quizzes.id}) AS INTEGER)`
     })
     .from(quizzes)
+    .innerJoin(users, eq(quizzes.createdBy, users.id))
     .where(eq(quizzes.createdBy, userId));
 }
 
