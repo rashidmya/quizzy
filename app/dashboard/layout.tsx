@@ -11,9 +11,9 @@ export default function DashboardLayout({
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <div className="flex justify-center overflow-auto">
-          <div className="flex w-full h-full">
-            <div className="flex flex-col w-full">{children}</div>
+        <div className="flex justify-center overflow-auto ">
+          <div className="flex w-full h-full ">
+            <div className="flex flex-col w-full min-h-screen">{children}</div>
           </div>
         </div>
       </SidebarInset>
