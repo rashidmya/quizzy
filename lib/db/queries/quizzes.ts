@@ -1,11 +1,10 @@
-import { db } from '../drizzle';
-import { quizzes, questions, choices } from '../schema';
-import { eq, InferSelectModel } from 'drizzle-orm';
-
+import { db } from "../drizzle";
+import { quizzes, questions, choices } from "../schema";
+import { eq, InferSelectModel } from "drizzle-orm";
 
 export type Quiz = InferSelectModel<typeof quizzes>;
 
-export async function getQuizzes() {
+export async function getQuizzes(userId: string) {
   return db
     .select({
       id: quizzes.id,
@@ -14,9 +13,9 @@ export async function getQuizzes() {
       createdBy: quizzes.createdBy,
       createdAt: quizzes.createdAt,
       updatedAt: quizzes.updatedAt,
-
     })
     .from(quizzes)
+    .where(eq(quizzes.createdBy, userId));
 }
 
 export type Question = InferSelectModel<typeof questions>;
