@@ -29,15 +29,15 @@ export default function QuizQuestionList({ questions }: Props) {
             </div>
           </CardHeader>
           <CardContent>
-            <CardTitle className="font-semibold my-2 ml-4">
+            <CardTitle className="my-2 ml-4">
               {question.text}
             </CardTitle>
             <ul className="space-y-2">
               {question.choices.map((choice) => (
                 <li
                   key={choice.id}
-                  className={`ml-4 text-sm ${
-                    choice.isCorrect ? "font-bold text-green-600" : ""
+                  className={`ml-4 text-sm font-light ${
+                    choice.isCorrect ? " text-green-600" : ""
                   }`}
                 >
                   {choice.text}
