@@ -11,7 +11,7 @@ import QuizNewEdit from "@/sections/dashboard/quiz/quiz-new-edit";
 // This will be replaced by 'use cache' soon
 export const dynamic = "force-static";
 
-export default async function NewQuizPage() {
+export default async function QuizNewPage() {
   return (
     <div className="min-h-screen p-8">
       <main>

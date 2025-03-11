@@ -18,7 +18,7 @@ export async function getQuizzes(userId: string) {
         name: users.name,
       },
       // Compute questionCount using a subquery.
-      questionCount: sql<number>`CAST((SELECT COUNT(*) FROM questions WHERE questions.quiz_id = ${quizzes.id}) AS INTEGER)`
+      questionCount: sql<number>`CAST((SELECT COUNT(*) FROM questions WHERE questions.quiz_id = ${quizzes.id}) AS INTEGER)`,
     })
     .from(quizzes)
     .innerJoin(users, eq(quizzes.createdBy, users.id))
@@ -38,6 +38,7 @@ export async function getQuizWithQuestions(quizId: string) {
       description: quizzes.description,
       createdAt: quizzes.createdAt,
       updatedAt: quizzes.updatedAt,
+      createdBy: quizzes.createdBy,
     })
     .from(quizzes)
     .where(eq(quizzes.id, quizId));

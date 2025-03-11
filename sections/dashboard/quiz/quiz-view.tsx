@@ -1,26 +1,19 @@
 import Link from "next/link";
 // components
 import { Button } from "@/components/ui/button";
-// db
-import { getQuizWithQuestions} from "@/lib/db/queries/quizzes";
 // paths
 import { PATH_DASHBOARD } from "@/routes/paths";
 // sections
-import QuizNewEdit from "@/sections/dashboard/quiz/quiz-new-edit";
-
+import QuestionList from "@/sections/dashboard/question/question-list";
+import { QuizWithQuestions } from "@/types/quiz";
 
 // This will be replaced by 'use cache' soon
 export const dynamic = "force-static";
 
-export default async function QuizEditPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-
-  const quiz = await getQuizWithQuestions(id);
-
+type Props = {
+  quiz: QuizWithQuestions;
+};
+export default async function QuizView({ quiz }: Props) {
   if (!quiz)
     return (
       <h1 className="text-2xl font-bold mb-4 text-center text-gray-100">
@@ -32,16 +25,19 @@ export default async function QuizEditPage({
     <div className="min-h-screen p-8">
       <main>
         <div className="mb-4">
-          <Button variant='link' asChild>
+          <Button variant="link" asChild>
             <Link href={PATH_DASHBOARD.quiz.root}>Back</Link>
+          </Button>
+
+          <Button variant="link" asChild>
+            <Link href={PATH_DASHBOARD.quiz.edit(quiz.id)}>Modify</Link>
           </Button>
         </div>
 
-        <h1 className="text-2xl font-bold mb-4 text-center text-gray-100">
-          Modify Quiz
-        </h1>
+        <h1 className="text-2xl font-bold mb-4 text-center">{quiz.title}</h1>
+        <h4 className="text-center">{quiz.description}</h4>
         <div className="mt-22">
-          <QuizNewEdit isEdit quiz={quiz} />
+          {quiz.questions && <QuestionList questions={quiz.questions} />}
         </div>
       </main>
     </div>
