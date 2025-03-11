@@ -17,10 +17,15 @@ export default function QuizQuestionList({ questions }: Props) {
     <div className="space-y-4">
       {questions.map((question, i) => (
         <Card key={question.id} className="shadow-sm">
-          <CardHeader>
-            {/* Display the question type on top (default to "Multiple Choice" if not provided) */}
+          <CardHeader className="flex-row justify-between items-center">
+            {/* Display the question type on top (default to "Multiple choice" if not provided) */}
             <div className="text-xs capitalize font-bold">
               {i + 1}. {"Multiple choice"}
+            </div>
+            {/* Points display on the top right side with border */}
+            <div className="text-xs border border-gray-300 rounded px-2 py-1">
+              {/* {question.points ? `${question.points} ${question.points === 1 ? "point" : "points"}` : "0 points"} */}
+              1 points
             </div>
           </CardHeader>
           <CardContent>

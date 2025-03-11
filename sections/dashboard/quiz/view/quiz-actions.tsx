@@ -19,8 +19,8 @@ export function QuizActions({
   onEdit,
 }: QuizActionsProps) {
   return (
-    <div className="flex justify-end gap-2 mt-4">
-      <Button variant="outline" size="sm" onClick={onToggleLive}>
+    <div className="flex justify-end gap-2 mt-4 px-4">
+      <Button variant="default" size="sm" onClick={onToggleLive}>
         {isLive ? (
           <>
             <StopCircle className="h-4 w-4" />
@@ -33,15 +33,15 @@ export function QuizActions({
           </>
         )}
       </Button>
-      <Button variant="outline" size="sm" onClick={onSchedule}>
+      <Button variant="default" size="sm" onClick={onSchedule}>
         <Calendar className="h-4 w-4" />
         <span>Schedule</span>
       </Button>
-      <Button variant="outline" size="sm" onClick={onPreview}>
+      <Button variant="secondary" size="sm" onClick={onPreview}>
         <Eye className="h-4 w-4" />
         <span>Preview</span>
       </Button>
-      <Button variant="outline" size="sm" onClick={onEdit}>
+      <Button variant="secondary" size="sm" onClick={onEdit}>
         <Edit className="h-4 w-4" />
         <span>Edit</span>
       </Button>

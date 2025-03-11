@@ -51,7 +51,7 @@ export default function QuizDashboardCard({
 
   return (
     <>
-      <Card className="max-w-4xl mx-auto">
+      <Card className="mx-auto shadow-none border-none">
         <QuizHeader
           title={quiz.title}
           description={quiz.description}
@@ -68,9 +68,13 @@ export default function QuizDashboardCard({
         <CardFooter>
           {/* Tab triggers inside card footer */}
           <Tabs value={currentTab} onValueChange={setCurrentTab}>
-            <TabsList>
+            <TabsList className="h-auto gap-2 rounded-none border-b border-border bg-transparent px-0 py-1 text-foreground">
               {tabs.map((tab) => (
-                <TabsTrigger key={tab.value} value={tab.value}>
+                <TabsTrigger
+                  className="relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 hover:bg-accent hover:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent"
+                  key={tab.value}
+                  value={tab.value}
+                >
                   {tab.label}
                 </TabsTrigger>
               ))}
@@ -79,7 +83,7 @@ export default function QuizDashboardCard({
         </CardFooter>
       </Card>
       {/* Tab content rendered below the card */}
-      <div className="max-w-4xl mx-auto mt-4">
+      <div className="mx-auto mt-4">
         {currentTab === "questions" && (
           // Render the questions tab content.
           <QuizQuestionList questions={quiz.questions} />
