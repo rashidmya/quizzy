@@ -23,13 +23,15 @@ import { PATH_AUTH, PATH_DASHBOARD } from "@/routes/paths";
 import LaunchUI from "../logos/launch-ui";
 
 export default function Navigation({ user }: {   user: {
+  id: string
   email: string
   name: string
 }}) {
+  console.log(user)
   return (
     <NavigationMenu className="hidden md:flex">
       <NavigationMenuList>
-        {user ? (
+        {user.id ? (
           <NavigationMenuItem>
             <NavigationMenuTrigger>{user.email}</NavigationMenuTrigger>
             <NavigationMenuContent>
