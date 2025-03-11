@@ -6,7 +6,7 @@ interface QuestionWithChoices extends Question {
   choices: Choice[];
 }
 
-export default function QuestionList({
+export default function QuizQuestionList({
   questions,
 }: {
   questions: QuestionWithChoices[];

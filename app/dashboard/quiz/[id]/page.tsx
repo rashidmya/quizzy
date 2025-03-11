@@ -1,12 +1,6 @@
-import Link from "next/link";
-// components
-import { Button } from "@/components/ui/button";
 // queries
 import { getQuizWithQuestions } from "@/lib/db/queries/quizzes";
-// paths
-import { PATH_DASHBOARD } from "@/routes/paths";
 // sections
-import QuestionList from "@/sections/dashboard/question/question-list";
 import QuizView from "@/sections/dashboard/quiz/quiz-view";
 
 // This will be replaced by 'use cache' soon
