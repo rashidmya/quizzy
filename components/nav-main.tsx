@@ -1,7 +1,8 @@
 "use client";
 
+// lucide
 import { type LucideIcon } from "lucide-react";
-
+// components
 import {
   SidebarGroup,
   SidebarMenu,
@@ -9,31 +10,37 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 // next-nav
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
-export function NavMain({
-  projects,
-}: {
-  projects: {
+type Props = {
+  nav: {
     title: string;
     url: string;
     icon: LucideIcon;
   }[];
-}) {
+};
+
+export function NavMain({ nav }: Props) {
   const pathname = usePathname();
+  const router = useRouter();
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarMenu>
-        {projects.map((item) => {
+        {nav.map((item) => {
           const isActive = pathname === item.url;
           return (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton size="lg" isActive={isActive} asChild>
-                <a href={item.url}>
+                <div
+                  onClick={() => router.push(item.url)}
+                  role="link"
+                  tabIndex={0}
+                  className="flex items-center cursor-pointer"
+                >
                   <item.icon />
                   <span>{item.title}</span>
-                </a>
+                </div>
               </SidebarMenuButton>
             </SidebarMenuItem>
           );
