@@ -14,10 +14,11 @@ import { Trash2 } from "lucide-react";
 // sections
 import QuestionEditorDialog from "./question-editor-dialog";
 import { useFormContext } from "react-hook-form";
+import { QuestionType } from "@/types/question";
 
 export type QuestionCardData = {
   id: string;
-  type: "open_ended" | "multiple_choice";
+  type: QuestionType;
   choices: { text: string; isCorrect: boolean }[];
   text: string;
   timer?: number;
@@ -48,30 +49,57 @@ export default function QuestionCard({
     : undefined;
 
   return (
-    <Card className="shadow-sm border rounded-sm p-4">
+    <Card className="shadow-sm border rounded-sm">
       <CardHeader className="flex justify-between">
-        <div className="flex items-center gap-2">
-          <div className="border p-1 rounded">
-            <span className="text-xs capitalize p-2">
-              {question.type.replace("_", " ")}
-            </span>
-          </div>
-          {quizHasIndividualTimers && (
+        <div className="flex justify-between">
+          <div className="flex items-center gap-2">
             <div className="border p-1 rounded">
-              <span className="text-xs p-2">
-                {question.timer ? `${question.timer}s` : "No Timer"}
+              <span className="text-xs capitalize p-2">
+                {question.type.replace("_", " ")}
               </span>
             </div>
-          )}
-          <div className="border p-1 rounded">
-            <span className="text-xs p-2">
-              {question.points} {question.points === 1 ? "point" : "points"}
-            </span>
+            {quizHasIndividualTimers && (
+              <div className="border p-1 rounded">
+                <span className="text-xs p-2">
+                  {question.timer ? `${question.timer}s` : "No Timer"}
+                </span>
+              </div>
+            )}
+            <div className="border p-1 rounded">
+              <span className="text-xs p-2">
+                {question.points} {question.points === 1 ? "point" : "points"}
+              </span>
+            </div>
+          </div>
+
+          <div>
+            <QuestionEditorDialog
+              initialData={question}
+              onSave={(updatedData) => {
+                // Merge the updated text and choices with the original question
+                const updatedQuestion: QuestionCardData = {
+                  ...question,
+                  text: updatedData.text,
+                  choices: updatedData.choices,
+                };
+                onUpdate(updatedQuestion);
+              }}
+              triggerText="Edit"
+            />
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onDelete}
+              className="mx-1"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </CardHeader>
       <CardContent>
-        <CardTitle className="font-semibold">{question.text}</CardTitle>
+        <CardTitle className="font-light">{question.text}</CardTitle>
       </CardContent>
       <CardFooter className="flex justify-between gap-2">
         <div>
@@ -80,32 +108,6 @@ export default function QuestionCard({
               ERROR! <span className="text-xs">click edit for details</span>
             </p>
           )}
-        </div>
-
-        <div>
-          <QuestionEditorDialog
-            initialData={question}
-            onSave={(updatedData) => {
-              // Merge the updated text and choices with the original question
-              const updatedQuestion: QuestionCardData = {
-                ...question,
-                text: updatedData.text,
-                choices: updatedData.choices,
-              };
-              onUpdate(updatedQuestion);
-            }}
-            triggerText="Edit"
-          />
-
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={onDelete}
-            className="mx-1"
-          >
-            <Trash2 className="h-4 w-4" />
-            <span>Delete</span>
-          </Button>
         </div>
       </CardFooter>
     </Card>

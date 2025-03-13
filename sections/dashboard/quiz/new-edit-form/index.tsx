@@ -1,17 +1,26 @@
 "use client";
 
-import { startTransition, useActionState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import {
+  startTransition,
+  useActionState,
+  useEffect as useEffectHook,
+} from "react";
 import { useRouter } from "next/navigation";
 // react-hook-form
-import { useForm, useFieldArray, FormProvider } from "react-hook-form";
+import {
+  useForm,
+  useFieldArray,
+  FormProvider,
+  useFormContext,
+} from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 // lucide icons
 import { Loader2 } from "lucide-react";
-// components
+// shadcn/ui components
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 // actions
 import { newQuiz, saveQuiz } from "@/actions/quiz";
 // paths
@@ -21,6 +30,7 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 // sections
 import QuestionCard from "./question-card";
 import QuestionEditorDialog from "./question-editor-dialog";
+import { QUESTION_TYPES } from "@/types/question";
 
 // Schema definitions
 const choiceSchema = z.object({
@@ -29,8 +39,10 @@ const choiceSchema = z.object({
 });
 
 const questionSchema = z.object({
-  text: z.string().min(5, { message: "Question text is required" }),
-  type: z.enum(["open_ended", "multiple_choice"]),
+  text: z.string({ message: "Question text is required" }),
+  type: z.enum(QUESTION_TYPES, {
+    message: "Question type is required",
+  }),
   timer: z
     .number()
     .min(0, { message: "Timer must be non-negative" })
@@ -48,11 +60,8 @@ const quizFormSchema = z.object({
   title: z
     .string()
     .min(1, { message: "Title is required" })
-    .max(30, { message: "Title must be at most 30 characters" }),
-  description: z
-    .string()
-    .max(100, { message: "Description must be at most 100 characters" })
-    .optional(),
+    .max(30, { message: "Title must be at most 30 characters" })
+    .default("Untitled"),
   questions: z
     .array(questionSchema)
     .min(1, { message: "At least one question is required" }),
@@ -78,7 +87,54 @@ const DEFAULT_QUESTION = {
   choices: [{ text: "", isCorrect: false }],
 };
 
-export default function QuizForm({ quiz, isEdit = false }: Props) {
+// EditableQuizTitle component – toggles between a <p> and an <Input>.
+function EditableQuizTitle() {
+  const { watch, setValue } = useFormContext<QuizFormValues>();
+  const titleValue = watch("title");
+  const [isEditing, setIsEditing] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isEditing]);
+
+  const handleBlur = () => {
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      setIsEditing(false);
+    }
+  };
+
+  return (
+    <div className="flex-1">
+      {isEditing ? (
+        <Input
+          ref={inputRef}
+          value={titleValue}
+          onChange={(e) => setValue("title", e.target.value)}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+          className="text-2xl font-bold"
+        />
+      ) : (
+        <p
+          className="text-2xl font-bold cursor-pointer"
+          onClick={() => setIsEditing(true)}
+        >
+          {titleValue}
+        </p>
+      )}
+    </div>
+  );
+}
+
+export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
   const { push } = useRouter();
   const user = useCurrentUser();
 
@@ -130,7 +186,6 @@ export default function QuizForm({ quiz, isEdit = false }: Props) {
     name: "questions",
   });
 
-
   const onSubmit = (data: QuizFormValues) => {
     const formData = new FormData();
     formData.append("title", data.title);
@@ -159,31 +214,24 @@ export default function QuizForm({ quiz, isEdit = false }: Props) {
     }
   }, [newState.quizId, isNewPending, push]);
 
-  const titleValue = watch("title") || "";
-
   return (
-    <div>
+    <div className="min-h-screen overflow-y-auto">
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Quiz Title */}
-          <div className="space-y-2">
-            <Label htmlFor="title">Quiz Title</Label>
-            <div className="text-sm text-gray-500">
-              {titleValue.length} / 30
-            </div>
-            <Input
-              id="title"
-              {...register("title")}
-              placeholder="Enter quiz title"
-              maxLength={30}
-            />
-            {errors.title && (
-              <p className="text-red-500 text-sm">{errors.title.message}</p>
-            )}
+          {/* Sticky Navbar with Editable Title and Save Quiz Button */}
+          <div className="sticky top-0 z-50 bg-white border-b p-4 flex items-center justify-between">
+            <EditableQuizTitle />
+            <Button type="submit">
+              {isSavePending || isNewPending ? (
+                <Loader2 className="size-5 animate-spin" />
+              ) : (
+                <span>Save Quiz</span>
+              )}
+            </Button>
           </div>
-
+          {/* Quiz Title is now in the navbar, so we can remove the title field below */}
           {/* Questions Section */}
-          <div className="space-y-4">
+          <div className="space-y-4 p-4">
             <h2 className="text-xl font-bold">Questions</h2>
             <div className="grid grid-cols-1 gap-4">
               {questionFields.map((field, index) => (
@@ -205,33 +253,20 @@ export default function QuizForm({ quiz, isEdit = false }: Props) {
                   {errors.questions.message}
                 </p>
               )}
-            <QuestionEditorDialog
-              onSave={(newQuestionData) => {
-                const completeQuestion = {
-                  ...DEFAULT_QUESTION,
-                  text: newQuestionData.text,
-                  choices: newQuestionData.choices,
-                };
-                appendQuestion(completeQuestion);
-              }}
-              triggerText="Add Question"
-            />
+            <div className="flex w-full justify-center">
+              <QuestionEditorDialog
+                onSave={(newQuestionData) => {
+                  const completeQuestion = {
+                    ...DEFAULT_QUESTION,
+                    text: newQuestionData.text,
+                    choices: newQuestionData.choices,
+                  };
+                  appendQuestion(completeQuestion);
+                }}
+                triggerText="Add new question"
+              />
+            </div>
           </div>
-
-          <Button type="submit">
-            {isSavePending || isNewPending ? (
-              <Loader2 className="size-5 animate-spin" />
-            ) : (
-              <span>Save Quiz</span>
-            )}
-          </Button>
-
-          {saveState.message && (
-            <p className="text-sm text-gray-400 mb-2">{saveState.message}</p>
-          )}
-          {newState.message && (
-            <p className="text-sm text-gray-400 mb-2">{newState.message}</p>
-          )}
         </form>
       </FormProvider>
     </div>

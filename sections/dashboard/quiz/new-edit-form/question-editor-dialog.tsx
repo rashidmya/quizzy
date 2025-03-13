@@ -15,7 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Delete, Pencil } from "lucide-react";
+import { Plus, Delete, Pencil, PlusIcon } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -23,7 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SelectItemText } from "@radix-ui/react-select";
 import { getQuestionTypeLabel, QUESTION_TYPES } from "@/types/question";
 
 // Define a schema for the question dialog form.
@@ -104,10 +103,19 @@ export default function QuestionEditorDialog({
   return (
     <Dialog open={open} onOpenChange={(isOpen) => setOpen(isOpen)}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Pencil className="h-4 w-4" />
-          {triggerText}
-        </Button>
+        {initialData ? (
+          <Button className="text-xs" variant="outline" size="sm">
+            <div className="flex px-4">
+              <Pencil className="!h-4 !w-3 mx-1" />
+              {triggerText}
+            </div>
+          </Button>
+        ) : (
+          <Button variant="outline" size="sm">
+            <PlusIcon className="h-4 w-4" />
+            {triggerText}
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="h-screen min-w-screen p-6 overflow-y-auto ">
         <div className=" w-full max-w-[800px]  flex flex-col mx-auto">
