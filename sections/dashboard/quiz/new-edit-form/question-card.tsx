@@ -50,7 +50,7 @@ export default function QuestionCard({
     : undefined;
 
   return (
-    <Card className="shadow-sm border py-1 rounded-sm">
+    <Card className="shadow-sm border py-1 rounded-sm w-full">
       <CardHeader className="flex justify-between pt-3">
         <div className="flex justify-between">
           <div className="flex items-center gap-2">

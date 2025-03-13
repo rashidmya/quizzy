@@ -13,10 +13,14 @@ import {
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 // lucide icons
-import { Loader2, ChevronsLeftIcon, Pencil } from "lucide-react";
+import {
+  Loader2,
+  ChevronsLeftIcon,
+  ChevronUp,
+  ChevronDown,
+} from "lucide-react";
 // shadcn/ui components
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 // actions
 import { newQuiz, saveQuiz } from "@/actions/quiz";
 // paths
@@ -26,6 +30,7 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 // sections
 import QuestionCard from "./question-card";
 import QuestionEditorDialog from "./question-editor-dialog";
+import QuizSettingsDialog from "./quiz-settings-dialog";
 // types
 import { QUESTION_TYPES } from "@/types/question";
 
@@ -56,9 +61,9 @@ const questionSchema = z.object({
 const quizFormSchema = z.object({
   title: z
     .string()
-    .min(1, { message: "Title is required" })
-    .max(30, { message: "Title must be at most 30 characters" })
-    .default("Untitled"),
+    .min(4, { message: "Title is required" })
+    .max(80, { message: "Title must be at most 80 characters" })
+    .default("Untitled Quiz"),
   questions: z
     .array(questionSchema)
     .min(1, { message: "At least one question is required" }),
@@ -83,78 +88,6 @@ const DEFAULT_QUESTION = {
   points: 1,
   choices: [{ text: "", isCorrect: false }],
 };
-
-// EditableQuizTitle component – toggles between a <p> and an <Input>.
-function EditableQuizTitle() {
-  const {
-    watch,
-    setValue,
-    formState: { errors },
-  } = useFormContext<QuizFormValues>();
-  const titleValue = watch("title");
-  const [isEditing, setIsEditing] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  // Determine if the title is invalid: empty or longer than 30 characters.
-  const isInvalid = titleValue.trim() === "" || titleValue.length > 30;
-
-  useEffect(() => {
-    if (isEditing && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isEditing]);
-
-  const handleBlur = () => {
-    // Only exit edit mode if the title is valid.
-    if (!isInvalid) {
-      setIsEditing(false);
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      // Only exit edit mode if the title is valid.
-      if (!isInvalid) {
-        setIsEditing(false);
-      }
-    }
-  };
-
-  return (
-    <div className="flex-1">
-      <div
-        className="flex items-center gap-2 cursor-pointer"
-        onClick={() => setIsEditing(true)}
-      >
-        {isEditing ? (
-          <Input
-            ref={inputRef}
-            value={titleValue}
-            onChange={(e) => setValue("title", e.target.value)}
-            onBlur={handleBlur}
-            onKeyDown={handleKeyDown}
-            className={`text-2xl font-bold ${
-              isInvalid ? "border-red-500" : ""
-            }`}
-          />
-        ) : (
-          <p className="text-2xl font-bold">{titleValue || "Untitled Quiz"}</p>
-        )}
-        <Pencil className="h-4 w-4 text-muted-foreground my-2" />
-      </div>
-      {isInvalid && (
-        <p className="text-red-500 text-sm">
-          {titleValue.trim() === ""
-            ? "Title is required."
-            : titleValue.length > 30
-            ? "Title must be at most 30 characters."
-            : ""}
-        </p>
-      )}
-    </div>
-  );
-}
 
 export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
   const { push } = useRouter();
@@ -193,6 +126,7 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
     control,
     handleSubmit,
     formState: { errors },
+    watch,
   } = methods;
 
   // Manage questions array
@@ -201,10 +135,13 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
     append: appendQuestion,
     remove: removeQuestion,
     update: updateQuestion,
+    move,
   } = useFieldArray({
     control,
     name: "questions",
   });
+
+  const titleValue = watch("title") || "";
 
   const onSubmit = (data: QuizFormValues) => {
     const formData = new FormData();
@@ -249,16 +186,19 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
                 >
                   <ChevronsLeftIcon />
                 </Button>
-                <EditableQuizTitle />
+                <p className="text-2xl font-bold">{titleValue}</p>
               </div>
 
-              <Button type="submit">
-                {isSavePending || isNewPending ? (
-                  <Loader2 className="size-5 animate-spin" />
-                ) : (
-                  <span>Save Quiz</span>
-                )}
-              </Button>
+              <div className="flex gap-2">
+                <QuizSettingsDialog />
+                <Button type="submit">
+                  {isSavePending || isNewPending ? (
+                    <Loader2 className="size-5 animate-spin" />
+                  ) : (
+                    <span>Save Changes</span>
+                  )}
+                </Button>
+              </div>
             </div>
             <div className="flex justify-end w-full pt-2">
               {saveState.message && (
@@ -275,31 +215,55 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
           <div className="space-y-4 p-4">
             <div className="flex w-full justify-between">
               <h2 className="text-xl font-bold">Questions</h2>
-              <QuestionEditorDialog
-                onSave={(newQuestionData) => {
-                  const completeQuestion = {
-                    ...DEFAULT_QUESTION,
-                    text: newQuestionData.text,
-                    choices: newQuestionData.choices,
-                  };
-                  appendQuestion(completeQuestion);
-                }}
-                triggerText="Add new question"
-              />
+              <div className="pr-11">
+                <QuestionEditorDialog
+                  onSave={(newQuestionData) => {
+                    const completeQuestion = {
+                      ...DEFAULT_QUESTION,
+                      text: newQuestionData.text,
+                      choices: newQuestionData.choices,
+                    };
+                    appendQuestion(completeQuestion);
+                  }}
+                  triggerText="Add new question"
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
               {questionFields.map((field, index) => (
-                <QuestionCard
-                  key={field.id}
-                  questionIndex={index}
-                  question={field}
-                  quizHasIndividualTimers={true}
-                  onUpdate={(updatedQuestion) => {
-                    updateQuestion(index, updatedQuestion);
-                  }}
-                  onDelete={() => removeQuestion(index)}
-                />
+                <div key={field.id} className="flex flex-row gap-2">
+                  <QuestionCard
+                    questionIndex={index}
+                    question={field}
+                    quizHasIndividualTimers={true}
+                    onUpdate={(updatedQuestion) => {
+                      updateQuestion(index, updatedQuestion);
+                    }}
+                    onDelete={() => removeQuestion(index)}
+                  />
+                  {/* Reorder Buttons Outside the Card */}
+                  <div className="flex flex-col justify-end">
+                    <Button
+                      type="button"
+                      onClick={() => move(index, index - 1)}
+                      disabled={index === 0}
+                      variant="ghost"
+                      size="icon"
+                    >
+                      <ChevronUp className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={() => move(index, index + 1)}
+                      disabled={index === questionFields.length - 1}
+                      variant="ghost"
+                      size="icon"
+                    >
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
               ))}
             </div>
             {errors.questions &&
