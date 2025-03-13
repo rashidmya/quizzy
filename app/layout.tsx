@@ -5,6 +5,7 @@ import "./globals.css";
 //
 import { SessionProvider } from "@/components/providers/session-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { NotistackProvider } from "@/components/providers/notistack-provider";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -33,9 +34,11 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <div className="flex min-h-screen w-full flex-col">
-              <main>{children}</main>
-            </div>
+            <NotistackProvider>
+              <div className="flex min-h-screen w-full flex-col">
+                <main>{children}</main>
+              </div>
+            </NotistackProvider>
           </ThemeProvider>
         </SessionProvider>
       </body>
