@@ -91,8 +91,7 @@ export default function QuizForm({ quiz, isEdit = false }: Props) {
 
   // Prepare default form values (using DEFAULT_QUESTION when no quiz is provided)
   const defaultValues: QuizFormValues = {
-    title: quiz?.title || "",
-    description: quiz?.description || "",
+    title: quiz?.title || "Untitled Quiz",
     timer: quiz?.timer,
     questions: quiz?.questions?.map((q: any) => ({
       text: q.text,
@@ -132,7 +131,6 @@ export default function QuizForm({ quiz, isEdit = false }: Props) {
   const onSubmit = (data: QuizFormValues) => {
     const formData = new FormData();
     formData.append("title", data.title);
-    formData.append("description", data.description ?? "");
     if (data.timer !== undefined) {
       formData.append("timer", data.timer.toString());
     }
@@ -159,7 +157,6 @@ export default function QuizForm({ quiz, isEdit = false }: Props) {
   }, [newState.quizId, isNewPending, push]);
 
   const titleValue = watch("title") || "";
-  const descriptionValue = watch("description") || "";
 
   return (
     <div>
@@ -179,25 +176,6 @@ export default function QuizForm({ quiz, isEdit = false }: Props) {
             />
             {errors.title && (
               <p className="text-red-500 text-sm">{errors.title.message}</p>
-            )}
-          </div>
-
-          {/* Quiz Description */}
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <div className="text-sm text-gray-500">
-              {descriptionValue.length} / 100
-            </div>
-            <Input
-              id="description"
-              {...register("description")}
-              placeholder="Enter quiz description"
-              maxLength={100}
-            />
-            {errors.description && (
-              <p className="text-red-500 text-sm">
-                {errors.description.message}
-              </p>
             )}
           </div>
 

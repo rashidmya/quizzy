@@ -8,14 +8,12 @@ import { Pencil, Users } from "lucide-react";
 
 type QuizHeaderProps = {
   title: string;
-  description: string | null;
   participantCount: number;
   onTitleEdit: (newTitle: string) => void;
 };
 
 export function QuizHeader({
   title,
-  description,
   participantCount,
   onTitleEdit,
 }: QuizHeaderProps) {
@@ -34,7 +32,7 @@ export function QuizHeader({
   return (
     <CardHeader>
       <div className="flex justify-between items-start">
-        {/* Quiz Title with Pencil Icon and Description below */}
+        {/* Quiz Title */}
         <div className="flex flex-col">
           <div
             className="flex items-center gap-2 cursor-pointer"
@@ -54,7 +52,6 @@ export function QuizHeader({
             )}
             <Pencil className="h-4 w-4 text-muted-foreground" />
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
         </div>
         {/* Participant Count */}
         <div className="flex items-center gap-1 text-sm text-muted-foreground">

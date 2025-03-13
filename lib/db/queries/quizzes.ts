@@ -9,7 +9,6 @@ export async function getQuizzes(userId: string) {
     .select({
       id: quizzes.id,
       title: quizzes.title,
-      description: quizzes.description,
       createdAt: quizzes.createdAt,
       updatedAt: quizzes.updatedAt,
       // Return createdBy as an object with id and name.
@@ -35,7 +34,6 @@ export async function getQuizWithQuestions(quizId: string) {
     .select({
       id: quizzes.id,
       title: quizzes.title,
-      description: quizzes.description,
       createdAt: quizzes.createdAt,
       updatedAt: quizzes.updatedAt,
       createdBy: quizzes.createdBy,

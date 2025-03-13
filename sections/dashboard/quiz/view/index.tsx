@@ -59,7 +59,6 @@ export default function QuizDashboardCard({
       <Card className="mx-auto shadow-none border-none">
         <QuizHeader
           title={quiz.title}
-          description={quiz.description}
           participantCount={participantCount}
           onTitleEdit={() => console.log('edit titile')}
         />

@@ -10,7 +10,6 @@ export async function newQuiz(_: any, formData: FormData) {
   // Extract form values.
   const userId = formData.get("userId") as string;
   const title = formData.get("title") as string;
-  const description = formData.get("description") as string;
   const timerStr = formData.get("timer") as string; // quiz-level timer
   const timer = timerStr ? Number(timerStr) : undefined;
   const questionsJson = formData.get("questions") as string;
@@ -42,7 +41,6 @@ export async function newQuiz(_: any, formData: FormData) {
     .insert(quizzes)
     .values({
       title,
-      description,
       createdBy: userId,
       timer,
     })
@@ -84,7 +82,6 @@ export async function saveQuiz(_: any, formData: FormData) {
   // Extract form values.
   const quizId = formData.get("quizId") as string;
   const title = formData.get("title") as string;
-  const description = formData.get("description") as string;
   const timerStr = formData.get("timer") as string; // quiz-level timer
   const timer = timerStr ? Number(timerStr) : undefined;
   const questionsJson = formData.get("questions") as string;
@@ -99,7 +96,7 @@ export async function saveQuiz(_: any, formData: FormData) {
   // Update the quiz record.
   await db
     .update(quizzes)
-    .set({ title, description, timer })
+    .set({ title, timer })
     .where(eq(quizzes.id, quizId));
 
   // Parse the questions JSON.

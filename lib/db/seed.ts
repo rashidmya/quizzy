@@ -21,7 +21,6 @@ async function main() {
     .values(
       Array.from({ length: 2 }).map((_, i) => ({
         title: `Quiz Title ${i + 1}`,
-        description: `This is a description for quiz ${i + 1}.`,
         createdBy: insertedUsers[0].id,
         timer: 300, // e.g. 300 seconds for the whole quiz
       }))

@@ -21,7 +21,6 @@ export const users = pgTable("users", {
 export const quizzes = pgTable("quizzes", {
   id: uuid("id").defaultRandom().primaryKey(),
   title: varchar("title", { length: 80 }).notNull(),
-  description: varchar("description", { length: 100 }),
   createdBy: uuid("created_by")
     .references(() => users.id)
     .notNull(),
