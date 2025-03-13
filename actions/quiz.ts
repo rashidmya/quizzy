@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db/drizzle";
 import { quizzes, questions, choices } from "@/lib/db/schema";
+import { error } from "console";
 
 // Create a new quiz.
 export async function newQuiz(_: any, formData: FormData) {
@@ -94,10 +95,7 @@ export async function saveQuiz(_: any, formData: FormData) {
   }
 
   // Update the quiz record.
-  await db
-    .update(quizzes)
-    .set({ title, timer })
-    .where(eq(quizzes.id, quizId));
+  await db.update(quizzes).set({ title, timer }).where(eq(quizzes.id, quizId));
 
   // Parse the questions JSON.
   let quizQuestions;
@@ -147,6 +145,10 @@ export async function saveQuiz(_: any, formData: FormData) {
   return { message: "Quiz updated successfully" };
 }
 
-export async function deleteQuiz(_: any, formData: FormData) {
-  // Implementation for deleting a quiz, if needed.
+export async function deleteQuiz(quizId: string) {
+  if (!quizId.trim()) {
+    return { message: "Quiz ID is required", error: true };
+  }
+  await db.delete(quizzes).where(eq(quizzes.id, quizId));
+  return { message: "Quiz deleted successfully" };
 }

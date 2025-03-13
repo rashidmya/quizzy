@@ -1,5 +1,6 @@
 "use client";
 
+import { useSnackbar } from "notistack";
 import { useMemo, useState } from "react";
 // sections
 import QuizList from "@/sections/dashboard/library/library-list";
@@ -14,6 +15,10 @@ import {
 } from "@/components/ui/select";
 // types
 import { LibraryQuiz } from "@/types/quiz";
+// actions
+import { deleteQuiz } from "@/actions/quiz";
+// hooks
+import { useActionState } from "@/hooks/use-action-state";
 
 type Props = {
   quizzes: LibraryQuiz[];
@@ -27,15 +32,34 @@ export default function LibraryView({ quizzes }: Props) {
   // Local state for sort order.
   const [sortOrder, setSortOrder] = useState("recent");
 
+  const { enqueueSnackbar } = useSnackbar();
+
+  const [deleteState, deleteAction] = useActionState(deleteQuiz, {
+    message: "",
+  });
+
+  // Convert prop quizzes to state so we can update (remove) on deletion.
+  const [quizList, setQuizList] = useState<LibraryQuiz[]>(quizzes);
+
   // Memoized filtered and sorted quizzes.
   const filteredQuizzes = useMemo(() => {
     return applySortFilter({
-      quizzes,
+      quizzes: quizList,
       comparator: getComparator(sortOrder),
       filterName: search,
     });
-  }, [quizzes, search, sortOrder]);
+  }, [quizList, search, sortOrder]);
 
+  // Handler to remove a quiz from local state.
+  const handleDeleteQuiz = async (quizId: string) => {
+    const result = await deleteAction(quizId);
+    if (!result.error) {
+      setQuizList((prev) => prev.filter((quiz) => quiz.id !== quizId));
+      enqueueSnackbar(result.message, { variant: "success" });
+    } else {
+      enqueueSnackbar(result.message, { variant: "error" });
+    }
+  };
   return (
     <div className="relative w-full mx-auto px-5 md:px-0 overflow-hidden p-12 max-w-[890px]">
       <div className="flex flex-col w-full">
@@ -64,12 +88,11 @@ export default function LibraryView({ quizzes }: Props) {
           </Select>
         </div>
         {filteredQuizzes.length === 0 ? (
-          // Fallback content with a fixed min height to prevent collapsing.
           <div className="min-h-[200px] flex items-center justify-center text-muted-foreground">
             No quizzes found.
           </div>
         ) : (
-          <QuizList quizzes={filteredQuizzes} />
+          <QuizList quizzes={filteredQuizzes} onDelete={handleDeleteQuiz} />
         )}
       </div>
     </div>
