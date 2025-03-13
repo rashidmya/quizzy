@@ -1,3 +1,4 @@
+import { QUESTION_TYPES } from "@/types/question";
 import {
   pgTable,
   varchar,
@@ -5,9 +6,8 @@ import {
   uuid,
   boolean,
   integer,
-  pgEnum
+  pgEnum,
 } from "drizzle-orm/pg-core";
-
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -30,11 +30,13 @@ export const quizzes = pgTable("quizzes", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const questionTypeEnum = pgEnum("question_type", QUESTION_TYPES);
+
 export const questions = pgTable("questions", {
   id: uuid("id").defaultRandom().primaryKey(),
   quizId: uuid("quiz_id").references(() => quizzes.id, { onDelete: "cascade" }),
   text: varchar("text", { length: 1024 }).notNull(),
-  type: varchar("type", { length: 20 }).notNull(),
+  type: questionTypeEnum("type").notNull(),
   points: integer("points").notNull(),
   timer: integer("timer"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

@@ -1,5 +1,5 @@
 {
-  "id": "ab17e55c-83b8-4152-982b-4c6bd36fe8bb",
+  "id": "07446c8e-0f56-4b52-a9bb-27fd1127b873",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -82,16 +82,10 @@
         },
         "type": {
           "name": "type",
-          "type": "varchar(20)",
+          "type": "question_type",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
-        },
-        "is_multiple_select": {
-          "name": "is_multiple_select",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": false
         },
         "points": {
           "name": "points",
@@ -231,12 +225,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "description": {
-          "name": "description",
-          "type": "varchar(100)",
-          "primaryKey": false,
-          "notNull": false
-        },
         "created_by": {
           "name": "created_by",
           "type": "uuid",
@@ -352,7 +340,6 @@
       "name": "question_type",
       "schema": "public",
       "values": [
-        "open_ended",
         "multiple_choice"
       ]
     }
