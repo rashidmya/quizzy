@@ -27,7 +27,7 @@ const tabs = [
   { label: "Feedback", value: "feedbacks" },
 ];
 
-export default function QuizDashboardCard({
+export default function QuizView({
   quiz,
   participantCount = 2,
 }: QuizDashboardCardProps) {
