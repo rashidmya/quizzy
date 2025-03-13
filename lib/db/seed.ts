@@ -1,11 +1,9 @@
-// db/seed.ts
 import { hash } from "bcrypt-ts";
 import { db } from "./drizzle";
-import { users, quizzes, questions, choices, quizAttempts } from "./schema";
+import { users, quizzes, questions, choices } from "./schema";
 
 async function main() {
-  // Seed 5 sample users without specifying the id.
-
+  // Seed 1 sample user.
   const defaultPassword = "password";
   const hashedPassword = await hash(defaultPassword, 10);
   const insertedUsers = await db
@@ -17,7 +15,7 @@ async function main() {
     })
     .returning();
 
-  // Seed 2 sample quizzes without specifying the id.
+  // Seed 2 sample quizzes.
   const insertedQuizzes = await db
     .insert(quizzes)
     .values(
@@ -25,6 +23,7 @@ async function main() {
         title: `Quiz Title ${i + 1}`,
         description: `This is a description for quiz ${i + 1}.`,
         createdBy: insertedUsers[0].id,
+        timer: 300, // e.g. 300 seconds for the whole quiz
       }))
     )
     .returning();
@@ -35,6 +34,9 @@ async function main() {
     const questionsForQuiz = Array.from({ length: 3 }).map((_, i) => ({
       quizId: quiz.id,
       text: `Sample question ${i + 1} for quiz "${quiz.title}"?`,
+      type: "multiple_choice", // default type
+      timer: 60, // default timer for each question
+      points: 1, // default points per question
     }));
     const returnedQuestions = await db
       .insert(questions)

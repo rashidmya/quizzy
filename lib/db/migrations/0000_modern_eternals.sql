@@ -1,3 +1,4 @@
+CREATE TYPE "public"."question_type" AS ENUM('open_ended', 'multiple_choice');--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "choices" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"question_id" uuid,
@@ -9,6 +10,10 @@ CREATE TABLE IF NOT EXISTS "questions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"quiz_id" uuid,
 	"text" varchar(1024) NOT NULL,
+	"type" varchar(20) NOT NULL,
+	"is_multiple_select" boolean DEFAULT false,
+	"points" integer NOT NULL,
+	"timer" integer,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -26,6 +31,7 @@ CREATE TABLE IF NOT EXISTS "quizzes" (
 	"title" varchar(80) NOT NULL,
 	"description" varchar(100),
 	"created_by" uuid NOT NULL,
+	"timer" integer,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );

@@ -11,4 +11,3 @@ export type LibraryQuiz = Omit<Quiz, "createdBy"> & {
   };
   questionCount?: number;
 };
-

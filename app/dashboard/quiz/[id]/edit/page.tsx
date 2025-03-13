@@ -6,7 +6,7 @@ import { getQuizWithQuestions} from "@/lib/db/queries/quizzes";
 // paths
 import { PATH_DASHBOARD } from "@/routes/paths";
 // sections
-import QuizNewEdit from "@/sections/dashboard/quiz/quiz-new-edit";
+import QuizNewEdit from "@/sections/dashboard/quiz/new-edit-form";
 
 
 // This will be replaced by 'use cache' soon

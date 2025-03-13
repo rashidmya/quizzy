@@ -1,5 +1,5 @@
 {
-  "id": "8ca6bdba-182d-4aaf-804c-5e9ced68361a",
+  "id": "ab17e55c-83b8-4152-982b-4c6bd36fe8bb",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -79,6 +79,31 @@
           "type": "varchar(1024)",
           "primaryKey": false,
           "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_multiple_select": {
+          "name": "is_multiple_select",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "points": {
+          "name": "points",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "timer": {
+          "name": "timer",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -218,6 +243,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "timer": {
+          "name": "timer",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -316,7 +347,16 @@
       "isRLSEnabled": false
     }
   },
-  "enums": {},
+  "enums": {
+    "public.question_type": {
+      "name": "question_type",
+      "schema": "public",
+      "values": [
+        "open_ended",
+        "multiple_choice"
+      ]
+    }
+  },
   "schemas": {},
   "sequences": {},
   "roles": {},

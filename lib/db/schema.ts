@@ -5,7 +5,9 @@ import {
   uuid,
   boolean,
   integer,
+  pgEnum
 } from "drizzle-orm/pg-core";
+
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -23,6 +25,8 @@ export const quizzes = pgTable("quizzes", {
   createdBy: uuid("created_by")
     .references(() => users.id)
     .notNull(),
+  // Timer for the whole quiz in seconds (optional)
+  timer: integer("timer"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -31,6 +35,10 @@ export const questions = pgTable("questions", {
   id: uuid("id").defaultRandom().primaryKey(),
   quizId: uuid("quiz_id").references(() => quizzes.id, { onDelete: "cascade" }),
   text: varchar("text", { length: 1024 }).notNull(),
+  type: varchar("type", { length: 20 }).notNull(),
+  isMultipleSelect: boolean("is_multiple_select").default(false),
+  points: integer("points").notNull(),
+  timer: integer("timer"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
