@@ -1,7 +1,5 @@
 "use client";
 
-// react-hook-form
-import { useFormContext } from "react-hook-form";
 // components
 import {
   Card,
@@ -26,6 +24,7 @@ export type QuestionCardData = {
 
 export type QuestionCardProps = {
   questionIndex: number;
+  questionError?: any;
   question: QuestionCardData;
   quizHasIndividualTimers: boolean;
   onUpdate: (updatedQuestion: QuestionCardData) => void;
@@ -35,12 +34,11 @@ export type QuestionCardProps = {
 export default function QuestionCard({
   questionIndex,
   question,
+  questionError,
   quizHasIndividualTimers,
   onUpdate,
   onDelete,
 }: QuestionCardProps) {
-  const { control, register } = useFormContext();
-
   return (
     <Card className="shadow-sm border rounded p-4">
       <CardHeader className="flex justify-between items-center">
@@ -70,7 +68,7 @@ export default function QuestionCard({
       <CardFooter className="flex justify-end gap-2">
         <QuestionEditorDialog
           questionIndex={questionIndex}
-          questionError={undefined}
+          questionError={questionError}
           onSave={(updatedData) => {
             const updatedQuestion = {
               ...question,

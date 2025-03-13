@@ -219,6 +219,7 @@ export default function QuizForm({ quiz, isEdit = false }: Props) {
                     // Update question if necessary
                   }}
                   onDelete={() => removeQuestion(index)}
+                  questionError={errors.questions?.[index]}
                 />
               ))}
             </div>

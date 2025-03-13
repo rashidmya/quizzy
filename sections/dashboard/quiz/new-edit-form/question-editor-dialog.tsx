@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 // react-hook-form
-import { useFieldArray, useWatch, useFormContext } from "react-hook-form";
+import {
+  useFieldArray,
+  useWatch,
+  useFormContext,
+  FieldError,
+} from "react-hook-form";
 // components
 import {
   Dialog,
@@ -23,9 +28,16 @@ export type EditQuestionFormValues = {
   choices: { id?: string; text: string; isCorrect: boolean }[];
 };
 
+export interface QuestionError {
+  text?: FieldError;
+  timer?: FieldError;
+  points?: FieldError;
+  choices?: FieldError
+}
+
 export interface QuestionEditorDialogProps {
   questionIndex: number;
-  questionError?: any;
+  questionError?: QuestionError;
   onSave: (updatedData: EditQuestionFormValues) => void;
 }
 
@@ -34,8 +46,16 @@ export default function QuestionEditorDialog({
   questionError,
   onSave,
 }: QuestionEditorDialogProps) {
-  const { getValues, setValue, control, register } = useFormContext();
+  const {
+    getValues,
+    setValue,
+    control,
+    register,
+    formState: { errors },
+  } = useFormContext();
+
   const [open, setOpen] = useState(false);
+
   const [initialData, setInitialData] = useState<EditQuestionFormValues | null>(
     null
   );
@@ -55,6 +75,7 @@ export default function QuestionEditorDialog({
     control,
     name: `questions.${questionIndex}.text`,
   });
+
   const choices = useWatch({
     control,
     name: `questions.${questionIndex}.choices`,
@@ -151,11 +172,21 @@ export default function QuestionEditorDialog({
               </div>
             ))}
             {questionError?.choices &&
-              typeof questionError.choices.message === "string" && (
+              !Array.isArray(questionError.choices) && (
                 <p className="text-red-500 text-sm">
                   {questionError.choices.message}
                 </p>
               )}
+            {Array.isArray(questionError?.choices) &&
+              questionError.choices.map((choiceError, index) => (
+                <div key={index}>
+                  {choiceError?.text?.message && (
+                    <p className="text-red-500 text-sm">
+                      Choice {index + 1}: {choiceError.text.message}
+                    </p>
+                  )}
+                </div>
+              ))}
             <div className="flex justify-end mt-2">
               <Button
                 type="button"
