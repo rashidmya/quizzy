@@ -1,10 +1,5 @@
-import Link from "next/link";
-// components
-import { Button } from "@/components/ui/button";
 // db
 import { getQuizWithQuestions } from "@/lib/db/queries/quizzes";
-// paths
-import { PATH_DASHBOARD } from "@/routes/paths";
 // sections
 import QuizNewEdit from "@/sections/dashboard/quiz/new-edit-form";
 
@@ -27,19 +22,5 @@ export default async function QuizEditPage({
       </h1>
     );
 
-  return (
-    <div className="min-h-screen p-8">
-      <div>
-        <div className="mb-4">
-          <Button variant="link" asChild>
-            <Link href={PATH_DASHBOARD.quiz.view(id)}>Back</Link>
-          </Button>
-        </div>
-
-        <div className="mt-22">
-          <QuizNewEdit isEdit quiz={quiz} />
-        </div>
-      </div>
-    </div>
-  );
+  return <QuizNewEdit isEdit quiz={quiz} />;
 }
