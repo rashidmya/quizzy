@@ -1,15 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { startTransition, useActionState } from "react";
 import { useRouter } from "next/navigation";
 // react-hook-form
-import {
-  useForm,
-  useFieldArray,
-  FormProvider,
-  useFormContext,
-} from "react-hook-form";
+import { useForm, useFieldArray, FormProvider } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 // lucide icons
@@ -33,6 +28,7 @@ import QuestionEditorDialog from "./question-editor-dialog";
 import QuizSettingsDialog from "./quiz-settings-dialog";
 // types
 import { QUESTION_TYPES } from "@/types/question";
+import { QuizWithQuestions } from "@/types/quiz";
 
 // Schema definitions
 const choiceSchema = z.object({
@@ -76,7 +72,7 @@ const quizFormSchema = z.object({
 type QuizFormValues = z.infer<typeof quizFormSchema>;
 
 type Props = {
-  quiz?: any;
+  quiz?: QuizWithQuestions;
   isEdit?: boolean;
 };
 
@@ -107,11 +103,11 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
   // Prepare default form values (using DEFAULT_QUESTION when no quiz is provided)
   const defaultValues: QuizFormValues = {
     title: quiz?.title || "Untitled Quiz",
-    timer: quiz?.timer,
+    timer: quiz?.timer || undefined,
     questions: quiz?.questions?.map((q: any) => ({
       text: q.text,
-      type: q.type || "multiple_choice",
-      timer: q.timer || 60,
+      type: q.type,
+      timer: q.timer || undefined,
       points: q.points || 1,
       choices: q.choices.map((c: any) => ({
         text: c.text,
@@ -187,7 +183,7 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
                   variant="outline"
                   className="shadow-none"
                   onClick={() => {
-                    if (isEdit) {
+                    if (isEdit && quiz) {
                       push(PATH_DASHBOARD.quiz.view(quiz.id));
                       return;
                     }
