@@ -82,11 +82,14 @@ type Props = {
 
 // Reusable default question constant
 const DEFAULT_QUESTION = {
-  text: "",
+  text: "Sample Question",
   type: "multiple_choice" as const,
   timer: undefined,
   points: 1,
-  choices: [{ text: "", isCorrect: false }],
+  choices: [
+    { text: "Choice 1", isCorrect: false },
+    { text: "Choice 2", isCorrect: true },
+  ],
 };
 
 export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
@@ -180,9 +183,16 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
             <div className="flex w-full items-center justify-between">
               <div className="flex flex-row gap-8">
                 <Button
+                  type="button"
                   variant="outline"
                   className="shadow-none"
-                  onClick={() => push(PATH_DASHBOARD.quiz.view(quiz.id))}
+                  onClick={() => {
+                    if (isEdit) {
+                      push(PATH_DASHBOARD.quiz.view(quiz.id));
+                      return;
+                    }
+                    push(PATH_DASHBOARD.library.root);
+                  }}
                 >
                   <ChevronsLeftIcon />
                 </Button>
