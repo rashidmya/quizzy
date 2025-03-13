@@ -35,7 +35,6 @@ export const questions = pgTable("questions", {
   quizId: uuid("quiz_id").references(() => quizzes.id, { onDelete: "cascade" }),
   text: varchar("text", { length: 1024 }).notNull(),
   type: varchar("type", { length: 20 }).notNull(),
-  isMultipleSelect: boolean("is_multiple_select").default(false),
   points: integer("points").notNull(),
   timer: integer("timer"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
