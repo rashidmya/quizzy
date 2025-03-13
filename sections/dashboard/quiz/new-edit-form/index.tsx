@@ -20,6 +20,7 @@ import { PATH_DASHBOARD } from "@/routes/paths";
 import { useCurrentUser } from "@/hooks/use-current-user";
 // sections
 import QuestionCard from "./question-card";
+import QuestionEditorDialog from "./question-editor-dialog";
 
 // Schema definitions
 const choiceSchema = z.object({
@@ -72,7 +73,7 @@ type Props = {
 const DEFAULT_QUESTION = {
   text: "",
   type: "multiple_choice" as const,
-  timer: 60,
+  timer: undefined,
   points: 1,
   choices: [{ text: "", isCorrect: false }],
 };
@@ -123,10 +124,12 @@ export default function QuizForm({ quiz, isEdit = false }: Props) {
     fields: questionFields,
     append: appendQuestion,
     remove: removeQuestion,
+    update: updateQuestion,
   } = useFieldArray({
     control,
     name: "questions",
   });
+
 
   const onSubmit = (data: QuizFormValues) => {
     const formData = new FormData();
@@ -190,7 +193,7 @@ export default function QuizForm({ quiz, isEdit = false }: Props) {
                   question={field}
                   quizHasIndividualTimers={true}
                   onUpdate={(updatedQuestion) => {
-                    // Update question if necessary
+                    updateQuestion(index, updatedQuestion);
                   }}
                   onDelete={() => removeQuestion(index)}
                 />
@@ -202,12 +205,17 @@ export default function QuizForm({ quiz, isEdit = false }: Props) {
                   {errors.questions.message}
                 </p>
               )}
-            <Button
-              type="button"
-              onClick={() => appendQuestion(DEFAULT_QUESTION)}
-            >
-              Add Question
-            </Button>
+            <QuestionEditorDialog
+              onSave={(newQuestionData) => {
+                const completeQuestion = {
+                  ...DEFAULT_QUESTION,
+                  text: newQuestionData.text,
+                  choices: newQuestionData.choices,
+                };
+                appendQuestion(completeQuestion);
+              }}
+              triggerText="Add Question"
+            />
           </div>
 
           <Button type="submit">

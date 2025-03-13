@@ -1,14 +1,9 @@
 "use client";
 
-import { useState } from "react";
-// react-hook-form
-import {
-  useFieldArray,
-  useWatch,
-  useFormContext,
-  FieldError,
-} from "react-hook-form";
-// components
+import { useState, useEffect } from "react";
+import { useForm, useFieldArray, useWatch } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Dialog,
   DialogTrigger,
@@ -20,194 +15,170 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-// lucide icons
 import { Plus, Delete, Pencil } from "lucide-react";
 
-export type EditQuestionFormValues = {
-  text: string;
-  choices: { id?: string; text: string; isCorrect: boolean }[];
+// Define a schema for the question dialog form.
+const questionDialogSchema = z.object({
+  text: z.string().min(5, { message: "Question text is required" }),
+  choices: z
+    .array(
+      z.object({
+        text: z.string().min(1, { message: "Choice text is required" }),
+        isCorrect: z.boolean().default(false),
+      })
+    )
+    .min(1, { message: "At least one choice is required" }),
+});
+
+// Infer the form type.
+export type EditQuestionFormValues = z.infer<typeof questionDialogSchema>;
+
+// Default values for a new question.
+const NEW_QUESTION_DEFAULT: EditQuestionFormValues = {
+  text: "",
+  choices: [{ text: "", isCorrect: false }],
 };
 
-export interface QuestionError {
-  text?: FieldError;
-  timer?: FieldError;
-  points?: FieldError;
-  choices?: FieldError;
-}
-
-export interface QuestionEditorDialogProps {
-  questionIndex: number;
-  questionError?: QuestionError;
-  onSave: (updatedData: EditQuestionFormValues) => void;
+export interface QuestionDialogProps {
+  initialData?: EditQuestionFormValues;
+  onSave: (data: EditQuestionFormValues) => void;
+  triggerText?: string; // e.g. "Edit" or "Add Question"
 }
 
 export default function QuestionEditorDialog({
-  questionIndex,
+  initialData,
   onSave,
-}: QuestionEditorDialogProps) {
+  triggerText = "Edit",
+}: QuestionDialogProps) {
+  // Create a local form instance.
   const {
-    getValues,
-    setValue,
     control,
     register,
+    handleSubmit,
+    reset,
     formState: { errors },
-  } = useFormContext();
+  } = useForm<EditQuestionFormValues>({
+    resolver: zodResolver(questionDialogSchema),
+    defaultValues: initialData || NEW_QUESTION_DEFAULT,
+  });
+
+  // Manage the choices array.
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "choices",
+  });
+
+  // Optional: useWatch to keep track of current values if needed.
+  // const questionText = useWatch({ control, name: "text" });
+  // const choices = useWatch({ control, name: "choices" });
 
   const [open, setOpen] = useState(false);
 
-  const [initialData, setInitialData] = useState<EditQuestionFormValues | null>(
-    null
-  );
-
-  // Access the error for this specific question:
-  const questionError = Array.isArray(errors.questions)
-    ? (errors.questions[questionIndex] as QuestionError)
-    : undefined;
-
-  const {
-    fields: choiceFields,
-    append,
-    remove,
-    replace,
-  } = useFieldArray({
-    control,
-    name: `questions.${questionIndex}.choices` as const,
-  });
-
-  // useWatch to keep track of current values.
-  const questionText = useWatch({
-    control,
-    name: `questions.${questionIndex}.text`,
-  });
-
-  const choices = useWatch({
-    control,
-    name: `questions.${questionIndex}.choices`,
-  });
-
-  // Capture a deep copy of current values when the dialog opens.
-  const handleOpen = (isOpen: boolean) => {
-    if (isOpen) {
-      // Deep clone using JSON to avoid referencing the same object.
-      const currentData = JSON.parse(
-        JSON.stringify(getValues(`questions.${questionIndex}`))
-      ) as EditQuestionFormValues;
-      setInitialData(currentData);
+  // When the dialog opens, reset the form to initial data (or default).
+  useEffect(() => {
+    if (open) {
+      reset(initialData || NEW_QUESTION_DEFAULT);
     }
+  }, [open, initialData, reset]);
 
-    setOpen(isOpen);
-  };
-
-  const handleSave = () => {
-    onSave({
-      text: questionText || "",
-      choices: choices || [],
-    });
+  const handleDialogSave = (data: EditQuestionFormValues) => {
+    onSave(data);
     setOpen(false);
   };
 
-  const handleCancel = () => {
-    // Revert the text field and use replace to revert the choices array.
-    if (initialData) {
-      setValue(`questions.${questionIndex}.text`, initialData.text);
-      replace(initialData.choices);
-    }
+  const handleDialogCancel = () => {
+    reset(initialData || NEW_QUESTION_DEFAULT);
     setOpen(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleOpen}>
+    <Dialog open={open} onOpenChange={(isOpen) => setOpen(isOpen)}>
       <DialogTrigger asChild>
-        <Button variant="outline"  size="sm">
-        <Pencil className="h-4 w-4" />
-          Edit
+        <Button variant="outline" size="sm">
+          <Pencil className="h-4 w-4" />
+          {triggerText}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit Question</DialogTitle>
+          <DialogTitle>
+            {initialData ? "Edit Question" : "Add New Question"}
+          </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          {/* Question Text */}
-          <div className="flex flex-col">
-            <Label htmlFor={`questions.${questionIndex}.text`}>
-              Question Text
-            </Label>
-            <Input
-              id={`questions.${questionIndex}.text`}
-              {...register(`questions.${questionIndex}.text` as const)}
-              placeholder="Enter question text"
-            />
-            {questionError?.text && (
-              <p className="text-red-500 text-sm">
-                {questionError.text.message}
-              </p>
-            )}
-          </div>
-          {/* Choices Section */}
-          <div className="space-y-2">
-            <Label>Choices</Label>
-            {choiceFields.map((choiceField, choiceIndex) => (
-              <div key={choiceField.id} className="flex items-center gap-2">
-                <Input
-                  id={`questions.${questionIndex}.choices.${choiceIndex}.text`}
-                  {...register(
-                    `questions.${questionIndex}.choices.${choiceIndex}.text` as const
-                  )}
-                  placeholder={`Choice ${choiceIndex + 1}`}
-                  className="flex-1"
-                />
-                <label className="flex items-center gap-1">
-                  <Input
-                    type="checkbox"
-                    {...register(
-                      `questions.${questionIndex}.choices.${choiceIndex}.isCorrect` as const
-                    )}
-                  />
-                  <span>Correct</span>
-                </label>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => remove(choiceIndex)}
-                >
-                  <Delete className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-            {questionError?.choices &&
-              !Array.isArray(questionError.choices) && (
-                <p className="text-red-500 text-sm">
-                  {questionError.choices.message}
-                </p>
+        <form onSubmit={handleSubmit(handleDialogSave)}>
+          <div className="space-y-4">
+            {/* Question Text */}
+            <div className="flex flex-col">
+              <Label htmlFor="question-text">Question Text</Label>
+              <Input
+                id="question-text"
+                {...register("text")}
+                placeholder="Enter question text"
+              />
+              {errors.text && (
+                <p className="text-red-500 text-sm">{errors.text.message}</p>
               )}
-            {Array.isArray(questionError?.choices) &&
-              questionError.choices.map((choiceError, index) => (
-                <div key={index}>
-                  {choiceError?.text?.message && (
-                    <p className="text-red-500 text-sm">
-                      Choice {index + 1}: {choiceError.text.message}
-                    </p>
-                  )}
+            </div>
+            {/* Choices Section */}
+            <div className="space-y-2">
+              <Label>Choices</Label>
+              {fields.map((field, index) => (
+                <div key={field.id} className="flex items-center gap-2">
+                  <Input
+                    id={`choices.${index}.text`}
+                    {...register(`choices.${index}.text` as const)}
+                    placeholder={`Choice ${index + 1}`}
+                    className="flex-1"
+                  />
+                  <label className="flex items-center gap-1">
+                    <Input
+                      type="checkbox"
+                      {...register(`choices.${index}.isCorrect` as const)}
+                    />
+                    <span>Correct</span>
+                  </label>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => remove(index)}
+                  >
+                    <Delete className="h-4 w-4" />
+                  </Button>
                 </div>
               ))}
-            <div className="flex justify-end mt-2">
-              <Button
-                type="button"
-                onClick={() => append({ text: "", isCorrect: false })}
-              >
-                <Plus />
-              </Button>
+              {errors.choices && !Array.isArray(errors.choices) && (
+                <p className="text-red-500 text-sm">
+                  {(errors.choices as any).message}
+                </p>
+              )}
+              {Array.isArray(errors.choices) &&
+                errors.choices.map((choiceError, index) => (
+                  <div key={index}>
+                    {choiceError?.text && (
+                      <p className="text-red-500 text-sm">
+                        Choice {index + 1}: {choiceError.text.message}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              <div className="flex justify-end mt-2">
+                <Button
+                  type="button"
+                  onClick={() => append({ text: "", isCorrect: false })}
+                >
+                  <Plus />
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={handleCancel}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave}>Save</Button>
-        </DialogFooter>
+          <DialogFooter>
+            <Button variant="outline" type="button" onClick={handleDialogCancel}>
+              Cancel
+            </Button>
+            <Button type="submit">Save</Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

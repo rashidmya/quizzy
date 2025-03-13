@@ -12,12 +12,13 @@ import { Button } from "@/components/ui/button";
 // lucide icons
 import { Trash2 } from "lucide-react";
 // sections
-import QuestionEditorDialog, { QuestionError } from "./question-editor-dialog";
+import QuestionEditorDialog from "./question-editor-dialog";
 import { useFormContext } from "react-hook-form";
 
 export type QuestionCardData = {
   id: string;
   type: "open_ended" | "multiple_choice";
+  choices: { text: string; isCorrect: boolean }[];
   text: string;
   timer?: number;
   points: number;
@@ -43,7 +44,7 @@ export default function QuestionCard({
   } = useFormContext();
 
   const questionError = Array.isArray(errors.questions)
-    ? (errors.questions[questionIndex] as QuestionError)
+    ? errors.questions[questionIndex]
     : undefined;
 
   return (
@@ -83,15 +84,17 @@ export default function QuestionCard({
 
         <div>
           <QuestionEditorDialog
-            questionIndex={questionIndex}
+            initialData={question}
             onSave={(updatedData) => {
-              const updatedQuestion = {
+              // Merge the updated text and choices with the original question
+              const updatedQuestion: QuestionCardData = {
                 ...question,
                 text: updatedData.text,
-                // Optionally update additional fields if necessary
+                choices: updatedData.choices,
               };
               onUpdate(updatedQuestion);
             }}
+            triggerText="Edit"
           />
 
           <Button
