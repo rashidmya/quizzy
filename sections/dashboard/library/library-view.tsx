@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 // sections
-import QuizLibrary from "@/sections/dashboard/library/library-list";
+import QuizList from "@/sections/dashboard/library/library-list";
 // components
 import { Input } from "@/components/ui/input";
 import {
@@ -69,7 +69,7 @@ export default function LibraryView({ quizzes }: Props) {
             No quizzes found.
           </div>
         ) : (
-          <QuizLibrary quizzes={filteredQuizzes} />
+          <QuizList quizzes={filteredQuizzes} />
         )}
       </div>
     </div>
