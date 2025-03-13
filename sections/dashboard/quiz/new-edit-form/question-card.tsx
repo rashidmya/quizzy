@@ -50,8 +50,8 @@ export default function QuestionCard({
     : undefined;
 
   return (
-    <Card className="shadow-sm border rounded-sm">
-      <CardHeader className="flex justify-between">
+    <Card className="shadow-sm border py-1 rounded-sm">
+      <CardHeader className="flex justify-between pt-3">
         <div className="flex justify-between">
           <div className="flex items-center gap-2">
             <QuestionInfo>
@@ -72,8 +72,7 @@ export default function QuestionCard({
               </span>
             </QuestionInfo>
           </div>
-
-          <div>
+          <div className="flex gap-1">
             <QuestionEditorDialog
               initialData={question}
               onSave={(updatedData) => {
@@ -92,7 +91,6 @@ export default function QuestionCard({
               variant="outline"
               size="sm"
               onClick={onDelete}
-              className="mx-1"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -111,7 +109,7 @@ export default function QuestionCard({
                 ) : (
                   <XCircle className="h-4 w-4 text-red-500" />
                 )}
-                <span className="text-sm">{choice.text}</span>
+                <span className="text-xs">{choice.text}</span>
               </div>
             ))}
           </div>
