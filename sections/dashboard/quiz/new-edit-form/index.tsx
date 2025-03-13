@@ -215,7 +215,7 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
   }, [newState.quizId, isNewPending, push]);
 
   return (
-    <div className="min-h-screen overflow-y-auto">
+    <div className=" overflow-y-auto">
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Sticky Navbar with Editable Title and Save Quiz Button */}
