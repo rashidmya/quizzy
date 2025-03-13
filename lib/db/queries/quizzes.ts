@@ -29,7 +29,7 @@ export type Question = InferSelectModel<typeof questions>;
 export type Choice = InferSelectModel<typeof choices>;
 
 export async function getQuizWithQuestions(quizId: string) {
-  // Query the quiz details.
+  // Query the quiz details (including timer).
   const quizResult = await db
     .select({
       id: quizzes.id,
@@ -37,11 +37,11 @@ export async function getQuizWithQuestions(quizId: string) {
       createdAt: quizzes.createdAt,
       updatedAt: quizzes.updatedAt,
       createdBy: quizzes.createdBy,
+      timer: quizzes.timer, // <-- Add this line
     })
     .from(quizzes)
     .where(eq(quizzes.id, quizId));
 
-  // If the quiz doesn't exist, return null.
   if (!quizResult.length) return null;
 
   const quiz = quizResult[0];
@@ -52,6 +52,9 @@ export async function getQuizWithQuestions(quizId: string) {
       id: questions.id,
       quizId: questions.quizId,
       text: questions.text,
+      type: questions.type,
+      timer: questions.timer,
+      points: questions.points,
       createdAt: questions.createdAt,
       updatedAt: questions.updatedAt,
     })
