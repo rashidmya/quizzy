@@ -2,8 +2,12 @@
 
 // components
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-// quizzes
+// queries
 import { Choice, Question } from "@/lib/db/queries/quizzes";
+// types
+import { getQuestionTypeLabel } from "@/types/question";
+// lucide icons
+import { CheckCircle, XCircle } from "lucide-react";
 
 type QuestionWithChoices = Omit<Question, "choices"> & {
   choices: Choice[];
@@ -13,6 +17,7 @@ type Props = {
 };
 
 export default function QuizQuestionList({ questions }: Props) {
+  console.log(questions)
   return (
     <div className="space-y-4">
       {questions.map((question, i) => (
@@ -20,7 +25,7 @@ export default function QuizQuestionList({ questions }: Props) {
           <CardHeader className="flex-row justify-between items-center">
             {/* Display the question type on top (default to "Multiple choice" if not provided) */}
             <div className="text-xs capitalize font-bold">
-              {i + 1}. {"Multiple choice"}
+              {i + 1}. {getQuestionTypeLabel(question.type)}
             </div>
             {/* Points display on the top right side with border */}
             <div className="text-xs border border-gray-300 rounded px-2 py-1">
@@ -29,21 +34,25 @@ export default function QuizQuestionList({ questions }: Props) {
             </div>
           </CardHeader>
           <CardContent>
-            <CardTitle className="my-2 ml-4">
-              {question.text}
-            </CardTitle>
-            <ul className="space-y-2">
-              {question.choices.map((choice) => (
-                <li
-                  key={choice.id}
-                  className={`ml-4 text-sm font-light ${
-                    choice.isCorrect ? " text-green-600" : ""
-                  }`}
-                >
-                  {choice.text}
-                </li>
-              ))}
-            </ul>
+            <CardTitle className="font-medium">{question.text}</CardTitle>
+            <div className="mt-2 space-y-2">
+              <div className="flex items-center">
+                <p className="text-muted-foreground text-xs">answer choices</p>
+                <div className="flex-grow border-t border-gray-300 ml-2" />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {question.choices.map((choice, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    {choice.isCorrect ? (
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <XCircle className="h-4 w-4 text-red-500" />
+                    )}
+                    <span className="text-xs">{choice.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </CardContent>
         </Card>
       ))}
