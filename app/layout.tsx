@@ -8,7 +8,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 
 const roboto = Roboto({
   subsets: ["latin"],
-  weight:  ["100", "300", "500", "700", "900"],
+  weight: ["100", "300", "400", "500", "700", "900"],
 });
 
 export const metadata: Metadata = {
