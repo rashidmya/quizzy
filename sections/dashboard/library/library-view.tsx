@@ -34,7 +34,7 @@ export default function LibraryView({ quizzes }: Props) {
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const [deleteState, deleteAction] = useActionState(deleteQuiz, {
+  const [_, deleteAction] = useActionState(deleteQuiz, {
     message: "",
   });
 
