@@ -15,7 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Delete, Pencil, PlusIcon } from "lucide-react";
+import { Plus, Pencil, PlusIcon, Trash2 } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -104,14 +104,14 @@ export default function QuestionEditorDialog({
     <Dialog open={open} onOpenChange={(isOpen) => setOpen(isOpen)}>
       <DialogTrigger asChild>
         {initialData ? (
-          <Button className="text-xs" variant="outline" size="sm">
+          <Button className="text-xs shadow-none" variant="outline" size="sm">
             <div className="flex px-4">
               <Pencil className="!h-4 !w-3 mx-1" />
               {triggerText}
             </div>
           </Button>
         ) : (
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" className="shadow-none">
             <PlusIcon className="h-4 w-4" />
             {triggerText}
           </Button>
@@ -201,12 +201,12 @@ export default function QuestionEditorDialog({
                     </label>
                     <Button
                       type="button"
-                      variant="destructive"
+                      variant="outline"
                       size="sm"
                       onClick={() => remove(index)}
-                      className="ml-2"
+                      className="ml-2 shadow-none"
                     >
-                      <Delete className="h-4 w-4" />
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 ))}

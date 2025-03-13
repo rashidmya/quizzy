@@ -10,11 +10,12 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 // lucide icons
-import { Trash2 } from "lucide-react";
+import { CheckCircle, Trash2, XCircle } from "lucide-react";
 // sections
 import QuestionEditorDialog from "./question-editor-dialog";
 import { useFormContext } from "react-hook-form";
 import { QuestionType } from "@/types/question";
+import React, { ReactNode } from "react";
 
 export type QuestionCardData = {
   id: string;
@@ -53,23 +54,23 @@ export default function QuestionCard({
       <CardHeader className="flex justify-between">
         <div className="flex justify-between">
           <div className="flex items-center gap-2">
-            <div className="border p-1 rounded">
-              <span className="text-xs capitalize p-2">
+            <QuestionInfo>
+              <span className="text-xs capitalize">
                 {question.type.replace("_", " ")}
               </span>
-            </div>
+            </QuestionInfo>
             {quizHasIndividualTimers && (
-              <div className="border p-1 rounded">
-                <span className="text-xs p-2">
+              <QuestionInfo>
+                <span className="text-xs">
                   {question.timer ? `${question.timer}s` : "No Timer"}
                 </span>
-              </div>
+              </QuestionInfo>
             )}
-            <div className="border p-1 rounded">
-              <span className="text-xs p-2">
+            <QuestionInfo>
+              <span className="text-xs">
                 {question.points} {question.points === 1 ? "point" : "points"}
               </span>
-            </div>
+            </QuestionInfo>
           </div>
 
           <div>
@@ -100,6 +101,21 @@ export default function QuestionCard({
       </CardHeader>
       <CardContent>
         <CardTitle className="font-light">{question.text}</CardTitle>
+        <div className="mt-2 space-y-1">
+          <p className="text-muted-foreground text-xs">Answer choices</p>
+          <div className="grid grid-cols-2 gap-2">
+            {question.choices.map((choice, index) => (
+              <div key={index} className="flex items-center gap-2">
+                {choice.isCorrect ? (
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                ) : (
+                  <XCircle className="h-4 w-4 text-red-500" />
+                )}
+                <span className="text-sm">{choice.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </CardContent>
       <CardFooter className="flex justify-between gap-2">
         <div>
@@ -113,3 +129,9 @@ export default function QuestionCard({
     </Card>
   );
 }
+
+const QuestionInfo = ({ children }: { children: ReactNode }) => (
+  <div className="border rounded px-2">
+    <span className="text-xs capitalize">{children}</span>
+  </div>
+);
