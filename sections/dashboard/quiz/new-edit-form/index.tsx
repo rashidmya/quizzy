@@ -239,25 +239,37 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Sticky Navbar with Editable Title and Save Quiz Button */}
-          <div className="sticky top-0 z-50 bg-white border-b p-4 flex items-center justify-between">
-            <div className="flex flex-row gap-8">
-              <Button
-                variant="outline"
-                className="shadow-none"
-                onClick={() => push(PATH_DASHBOARD.quiz.view(quiz.id))}
-              >
-                <ChevronsLeftIcon />
+          <div className="bg-white border-b p-4">
+            <div className="flex w-full items-center justify-between">
+              <div className="flex flex-row gap-8">
+                <Button
+                  variant="outline"
+                  className="shadow-none"
+                  onClick={() => push(PATH_DASHBOARD.quiz.view(quiz.id))}
+                >
+                  <ChevronsLeftIcon />
+                </Button>
+                <EditableQuizTitle />
+              </div>
+
+              <Button type="submit">
+                {isSavePending || isNewPending ? (
+                  <Loader2 className="size-5 animate-spin" />
+                ) : (
+                  <span>Save Quiz</span>
+                )}
               </Button>
-              <EditableQuizTitle />
             </div>
-            <Button type="submit">
-              {isSavePending || isNewPending ? (
-                <Loader2 className="size-5 animate-spin" />
-              ) : (
-                <span>Save Quiz</span>
+            <div className="flex justify-end w-full pt-2">
+              {saveState.message && (
+                <p className="text-sm text-gray-400">{saveState.message}</p>
               )}
-            </Button>
+              {newState.message && (
+                <p className="text-sm text-gray-400">{newState.message}</p>
+              )}
+            </div>
           </div>
+
           {/* Quiz Title is now in the navbar, so we can remove the title field below */}
           {/* Questions Section */}
           <div className="space-y-4 p-4">
