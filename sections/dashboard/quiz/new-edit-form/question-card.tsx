@@ -1,5 +1,7 @@
 "use client";
 
+import { UseFormReturn } from "react-hook-form";
+// components
 import {
   Card,
   CardHeader,
@@ -8,9 +10,10 @@ import {
   CardTitle,
 } from "@/components/ui/card"; // components
 import { Button } from "@/components/ui/button"; // components
-import { Trash2 } from "lucide-react"; // icons
-import QuestionEditorDialog from "./question-editor-dialog"; // components
-import { UseFormReturn } from "react-hook-form";
+// icons
+import { Trash2 } from "lucide-react";
+// sections
+import QuestionEditorDialog from "./question-editor-dialog";
 
 export type QuestionCardData = {
   id: string;

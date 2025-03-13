@@ -1,6 +1,9 @@
 "use client";
 
-import { useState } from "react"; // react hooks
+import { useState } from "react"; 
+// react-hook-form
+import { useFieldArray, UseFormReturn } from "react-hook-form"; 
+// components
 import {
   Dialog,
   DialogTrigger,
@@ -8,12 +11,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog"; // components
-import { Button } from "@/components/ui/button"; // components
-import { Input } from "@/components/ui/input"; // components
-import { Label } from "@/components/ui/label"; // components
-import { Plus, Delete } from "lucide-react"; // icons
-import { useFieldArray, UseFormReturn } from "react-hook-form"; // react-hook-form
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button"; 
+import { Input } from "@/components/ui/input"; 
+import { Label } from "@/components/ui/label";
+// icons
+import { Plus, Delete } from "lucide-react"; 
 
 export type EditQuestionFormValues = {
   text: string;

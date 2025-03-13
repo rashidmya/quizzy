@@ -1,18 +1,26 @@
 "use client";
 
-import { startTransition, useActionState, useEffect, useState } from "react"; // react hooks
-import { useRouter } from "next/navigation"; // next
-import { useForm, useFieldArray } from "react-hook-form"; // react-hook-form
-import { z } from "zod"; // zod
-import { zodResolver } from "@hookform/resolvers/zod"; // zod resolver
-import { Button } from "@/components/ui/button"; // components
-import { Input } from "@/components/ui/input"; // components
-import { Label } from "@/components/ui/label"; // components
-import { newQuiz, saveQuiz } from "@/actions/quiz"; // actions
-import { Loader2 } from "lucide-react"; // icons
-import { PATH_DASHBOARD } from "@/routes/paths"; // paths
-import { useCurrentUser } from "@/hooks/use-current-user"; // hooks
-import QuestionCard from "./question-card"; // sections
+import { startTransition, useActionState, useEffect } from "react";
+// next
+import { useRouter } from "next/navigation";
+// react-hook-form
+import { useForm, useFieldArray } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+// components
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+//  actions
+import { newQuiz, saveQuiz } from "@/actions/quiz";
+// icons
+import { Loader2 } from "lucide-react";
+// paths
+import { PATH_DASHBOARD } from "@/routes/paths";
+// hooks
+import { useCurrentUser } from "@/hooks/use-current-user";
+// sections
+import QuestionCard from "./question-card";
 
 // Define a schema for a choice.
 const choiceSchema = z.object({
