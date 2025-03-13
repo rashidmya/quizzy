@@ -3,11 +3,7 @@
 import { startTransition, useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 // react-hook-form
-import {
-  useForm,
-  useFieldArray,
-  FormProvider,
-} from "react-hook-form";
+import { useForm, useFieldArray, FormProvider } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 // lucide icons
@@ -32,7 +28,7 @@ const choiceSchema = z.object({
 });
 
 const questionSchema = z.object({
-  text: z.string().min(1, { message: "Question text is required" }),
+  text: z.string().min(5, { message: "Question text is required" }),
   type: z.enum(["open_ended", "multiple_choice"]),
   timer: z
     .number()
@@ -219,7 +215,6 @@ export default function QuizForm({ quiz, isEdit = false }: Props) {
                     // Update question if necessary
                   }}
                   onDelete={() => removeQuestion(index)}
-                  questionError={errors.questions?.[index]}
                 />
               ))}
             </div>

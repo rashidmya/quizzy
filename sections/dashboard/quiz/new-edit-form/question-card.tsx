@@ -12,7 +12,8 @@ import { Button } from "@/components/ui/button";
 // lucide icons
 import { Trash2 } from "lucide-react";
 // sections
-import QuestionEditorDialog from "./question-editor-dialog";
+import QuestionEditorDialog, { QuestionError } from "./question-editor-dialog";
+import { useFormContext } from "react-hook-form";
 
 export type QuestionCardData = {
   id: string;
@@ -24,7 +25,6 @@ export type QuestionCardData = {
 
 export type QuestionCardProps = {
   questionIndex: number;
-  questionError?: any;
   question: QuestionCardData;
   quizHasIndividualTimers: boolean;
   onUpdate: (updatedQuestion: QuestionCardData) => void;
@@ -34,30 +34,37 @@ export type QuestionCardProps = {
 export default function QuestionCard({
   questionIndex,
   question,
-  questionError,
   quizHasIndividualTimers,
   onUpdate,
   onDelete,
 }: QuestionCardProps) {
+  const {
+    formState: { errors },
+  } = useFormContext();
+
+  const questionError = Array.isArray(errors.questions)
+    ? (errors.questions[questionIndex] as QuestionError)
+    : undefined;
+
   return (
-    <Card className="shadow-sm border rounded p-4">
-      <CardHeader className="flex justify-between items-center">
+    <Card className="shadow-sm border rounded-sm p-4">
+      <CardHeader className="flex justify-between">
         <div className="flex items-center gap-2">
           <div className="border p-1 rounded">
-            <span className="text-xs font-bold capitalize">
+            <span className="text-xs capitalize p-2">
               {question.type.replace("_", " ")}
             </span>
           </div>
           {quizHasIndividualTimers && (
             <div className="border p-1 rounded">
-              <span className="text-xs font-bold">
+              <span className="text-xs p-2">
                 {question.timer ? `${question.timer}s` : "No Timer"}
               </span>
             </div>
           )}
           <div className="border p-1 rounded">
-            <span className="text-xs font-bold">
-              {question.points} {question.points === 1 ? "pt" : "pts"}
+            <span className="text-xs p-2">
+              {question.points} {question.points === 1 ? "point" : "points"}
             </span>
           </div>
         </div>
@@ -65,23 +72,38 @@ export default function QuestionCard({
       <CardContent>
         <CardTitle className="font-semibold">{question.text}</CardTitle>
       </CardContent>
-      <CardFooter className="flex justify-end gap-2">
-        <QuestionEditorDialog
-          questionIndex={questionIndex}
-          questionError={questionError}
-          onSave={(updatedData) => {
-            const updatedQuestion = {
-              ...question,
-              text: updatedData.text,
-              // Optionally update additional fields if necessary
-            };
-            onUpdate(updatedQuestion);
-          }}
-        />
-        <Button variant="destructive" size="sm" onClick={onDelete}>
-          <Trash2 className="h-4 w-4" />
-          <span>Delete</span>
-        </Button>
+      <CardFooter className="flex justify-between gap-2">
+        <div>
+          {questionError && (
+            <p className="text-red-500 text-sm">
+              ERROR! <span className="text-xs">click edit for details</span>
+            </p>
+          )}
+        </div>
+
+        <div>
+          <QuestionEditorDialog
+            questionIndex={questionIndex}
+            onSave={(updatedData) => {
+              const updatedQuestion = {
+                ...question,
+                text: updatedData.text,
+                // Optionally update additional fields if necessary
+              };
+              onUpdate(updatedQuestion);
+            }}
+          />
+
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={onDelete}
+            className="mx-1"
+          >
+            <Trash2 className="h-4 w-4" />
+            <span>Delete</span>
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   );

@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 // lucide icons
-import { Plus, Delete } from "lucide-react";
+import { Plus, Delete, Pencil } from "lucide-react";
 
 export type EditQuestionFormValues = {
   text: string;
@@ -32,7 +32,7 @@ export interface QuestionError {
   text?: FieldError;
   timer?: FieldError;
   points?: FieldError;
-  choices?: FieldError
+  choices?: FieldError;
 }
 
 export interface QuestionEditorDialogProps {
@@ -43,7 +43,6 @@ export interface QuestionEditorDialogProps {
 
 export default function QuestionEditorDialog({
   questionIndex,
-  questionError,
   onSave,
 }: QuestionEditorDialogProps) {
   const {
@@ -59,6 +58,11 @@ export default function QuestionEditorDialog({
   const [initialData, setInitialData] = useState<EditQuestionFormValues | null>(
     null
   );
+
+  // Access the error for this specific question:
+  const questionError = Array.isArray(errors.questions)
+    ? (errors.questions[questionIndex] as QuestionError)
+    : undefined;
 
   const {
     fields: choiceFields,
@@ -114,7 +118,8 @@ export default function QuestionEditorDialog({
   return (
     <Dialog open={open} onOpenChange={handleOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button variant="outline"  size="sm">
+        <Pencil className="h-4 w-4" />
           Edit
         </Button>
       </DialogTrigger>
