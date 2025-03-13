@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react"; 
+import { useState } from "react";
 // react-hook-form
-import { useFieldArray, UseFormReturn } from "react-hook-form"; 
+import { useFieldArray, useWatch, useFormContext } from "react-hook-form";
 // components
 import {
   Dialog,
@@ -12,11 +12,11 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button"; 
-import { Input } from "@/components/ui/input"; 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-// icons
-import { Plus, Delete } from "lucide-react"; 
+// lucide icons
+import { Plus, Delete } from "lucide-react";
 
 export type EditQuestionFormValues = {
   text: string;
@@ -25,62 +25,73 @@ export type EditQuestionFormValues = {
 
 export interface QuestionEditorDialogProps {
   questionIndex: number;
-  control: UseFormReturn<any>["control"];
-  register: UseFormReturn<any>["register"];
-  questionError: any; // refine as needed
+  questionError?: any;
   onSave: (updatedData: EditQuestionFormValues) => void;
 }
 
 export default function QuestionEditorDialog({
   questionIndex,
-  control,
-  register,
   questionError,
   onSave,
 }: QuestionEditorDialogProps) {
+  const { getValues, setValue, control, register } = useFormContext();
   const [open, setOpen] = useState(false);
+  const [initialData, setInitialData] = useState<EditQuestionFormValues | null>(
+    null
+  );
 
-  // Manage the choices array for this particular question.
   const {
     fields: choiceFields,
-    append: appendChoice,
-    remove: removeChoice,
+    append,
+    remove,
+    replace,
   } = useFieldArray({
     control,
     name: `questions.${questionIndex}.choices` as const,
   });
 
+  // useWatch to keep track of current values.
+  const questionText = useWatch({
+    control,
+    name: `questions.${questionIndex}.text`,
+  });
+  const choices = useWatch({
+    control,
+    name: `questions.${questionIndex}.choices`,
+  });
+
+  // Capture a deep copy of current values when the dialog opens.
+  const handleOpen = (isOpen: boolean) => {
+    if (isOpen) {
+      // Deep clone using JSON to avoid referencing the same object.
+      const currentData = JSON.parse(
+        JSON.stringify(getValues(`questions.${questionIndex}`))
+      ) as EditQuestionFormValues;
+      setInitialData(currentData);
+    }
+
+    setOpen(isOpen);
+  };
+
   const handleSave = () => {
-    // For this example, we call onSave without further validation.
-    // In a real implementation, you might validate the updated data.
-    const updatedData: EditQuestionFormValues = {
-      text:
-        (
-          document.getElementById(
-            `questions.${questionIndex}.text`
-          ) as HTMLInputElement
-        )?.value || "",
-      choices: choiceFields.map((field, index) => ({
-        text:
-          (
-            document.getElementById(
-              `questions.${questionIndex}.choices.${index}.text`
-            ) as HTMLInputElement
-          )?.value || "",
-        isCorrect:
-          (
-            document.querySelector(
-              `input[name="questions.${questionIndex}.choices.${index}.isCorrect"]`
-            ) as HTMLInputElement
-          )?.checked || false,
-      })),
-    };
-    onSave(updatedData);
+    onSave({
+      text: questionText || "",
+      choices: choices || [],
+    });
+    setOpen(false);
+  };
+
+  const handleCancel = () => {
+    // Revert the text field and use replace to revert the choices array.
+    if (initialData) {
+      setValue(`questions.${questionIndex}.text`, initialData.text);
+      replace(initialData.choices);
+    }
     setOpen(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           Edit
@@ -133,7 +144,7 @@ export default function QuestionEditorDialog({
                   type="button"
                   variant="destructive"
                   size="sm"
-                  onClick={() => removeChoice(choiceIndex)}
+                  onClick={() => remove(choiceIndex)}
                 >
                   <Delete className="h-4 w-4" />
                 </Button>
@@ -148,7 +159,7 @@ export default function QuestionEditorDialog({
             <div className="flex justify-end mt-2">
               <Button
                 type="button"
-                onClick={() => appendChoice({ text: "", isCorrect: false })}
+                onClick={() => append({ text: "", isCorrect: false })}
               >
                 <Plus />
               </Button>
@@ -156,6 +167,9 @@ export default function QuestionEditorDialog({
           </div>
         </div>
         <DialogFooter>
+          <Button variant="outline" onClick={handleCancel}>
+            Cancel
+          </Button>
           <Button onClick={handleSave}>Save</Button>
         </DialogFooter>
       </DialogContent>

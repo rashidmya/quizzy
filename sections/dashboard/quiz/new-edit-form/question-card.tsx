@@ -1,6 +1,7 @@
 "use client";
 
-import { UseFormReturn } from "react-hook-form";
+// react-hook-form
+import { useFormContext } from "react-hook-form";
 // components
 import {
   Card,
@@ -8,9 +9,9 @@ import {
   CardContent,
   CardFooter,
   CardTitle,
-} from "@/components/ui/card"; // components
-import { Button } from "@/components/ui/button"; // components
-// icons
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+// lucide icons
 import { Trash2 } from "lucide-react";
 // sections
 import QuestionEditorDialog from "./question-editor-dialog";
@@ -21,7 +22,6 @@ export type QuestionCardData = {
   text: string;
   timer?: number;
   points: number;
-  // choices are managed in the dialog (and in the parent form)
 };
 
 export type QuestionCardProps = {
@@ -29,24 +29,21 @@ export type QuestionCardProps = {
   question: QuestionCardData;
   quizHasIndividualTimers: boolean;
   onUpdate: (updatedQuestion: QuestionCardData) => void;
-  onDelete: (questionId: string) => void;
-  control: UseFormReturn<any>["control"];
-  register: UseFormReturn<any>["register"];
+  onDelete: () => void;
 };
 
 export default function QuestionCard({
-  control,
-  register,
   questionIndex,
   question,
   quizHasIndividualTimers,
   onUpdate,
   onDelete,
 }: QuestionCardProps) {
+  const { control, register } = useFormContext();
+
   return (
     <Card className="shadow-sm border rounded p-4">
       <CardHeader className="flex justify-between items-center">
-        {/* Left: Display question type, timer, and points */}
         <div className="flex items-center gap-2">
           <div className="border p-1 rounded">
             <span className="text-xs font-bold capitalize">
@@ -71,27 +68,19 @@ export default function QuestionCard({
         <CardTitle className="font-semibold">{question.text}</CardTitle>
       </CardContent>
       <CardFooter className="flex justify-end gap-2">
-        {/* Edit button opens the question editor dialog */}
         <QuestionEditorDialog
           questionIndex={questionIndex}
-          control={control} // now passing the actual control
-          register={register} // now passing the actual register
-          questionError={undefined} // if you have errors for this field, pass them accordingly
+          questionError={undefined}
           onSave={(updatedData) => {
-            const updatedQuestion: QuestionCardData = {
+            const updatedQuestion = {
               ...question,
               text: updatedData.text,
-              // Update additional fields if necessary (timer, points, etc.)
+              // Optionally update additional fields if necessary
             };
             onUpdate(updatedQuestion);
           }}
         />
-
-        <Button
-          variant="destructive"
-          size="sm"
-          onClick={() => onDelete(question.id)}
-        >
+        <Button variant="destructive" size="sm" onClick={onDelete}>
           <Trash2 className="h-4 w-4" />
           <span>Delete</span>
         </Button>
