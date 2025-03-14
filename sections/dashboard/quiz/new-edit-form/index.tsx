@@ -1,29 +1,29 @@
 "use client";
 
-import { useEffect } from "react";
-import { startTransition, useActionState } from "react";
+import { startTransition } from "react";
 import { useRouter } from "next/navigation";
 // react-hook-form
 import { useForm, useFieldArray, FormProvider } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 // lucide icons
-import { Loader2, ChevronLeftIcon, ChevronUp, ChevronDown } from "lucide-react";
+import { ChevronUp, ChevronDown } from "lucide-react";
 // shadcn/ui components
 import { Button } from "@/components/ui/button";
 // actions
-import { newQuiz, saveQuiz } from "@/actions/quiz";
+import { upsertQuiz } from "@/actions/quiz";
 // paths
 import { PATH_DASHBOARD } from "@/routes/paths";
 // hooks
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { useActionState } from "@/hooks/use-action-state";
 // sections
 import QuestionCard from "./question-card";
 import QuizNewEditQuestionDialog from "./quiz-new-edit-question-dialog";
+import QuizNewEditHeader from "./quiz-new-edit-header";
 // types
 import { QUESTION_TYPES } from "@/types/question";
-import { QuizWithQuestions } from "@/types/quiz";
-import QuizNewEditHeader from "./quiz-new-edit-header";
+import { QuizWithQuestions, TIMER_MODES } from "@/types/quiz";
 
 // Schema definitions
 const choiceSchema = z.object({
@@ -55,6 +55,7 @@ const quizFormSchema = z.object({
     .min(4, { message: "Title is required" })
     .max(80, { message: "Title must be at most 80 characters" })
     .default("Untitled Quiz"),
+  timerMode: z.enum(TIMER_MODES).default("quiz"),
   questions: z
     .array(questionSchema)
     .min(1, { message: "At least one question is required" }),
@@ -87,18 +88,16 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
   const { push } = useRouter();
   const user = useCurrentUser();
 
-  const [saveState, saveAction, isSavePending] = useActionState(saveQuiz, {
+  const [upsertState, upsertAction, isUpsertPending] = useActionState(upsertQuiz, {
+    quizId: '',
     message: "",
-  });
-  const [newState, newAction, isNewPending] = useActionState(newQuiz, {
-    message: "",
-    quizId: "",
   });
 
   // Prepare default form values (using DEFAULT_QUESTION when no quiz is provided)
   const defaultValues: QuizFormValues = {
     title: quiz?.title || "Untitled Quiz",
     timer: quiz?.timer || undefined,
+    timerMode: quiz?.timerMode || "quiz",
     questions: quiz?.questions?.map((q: any) => ({
       text: q.text,
       type: q.type,
@@ -138,50 +137,54 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
   const titleValue = watch("title") || "";
 
   const onSubmit = (data: QuizFormValues) => {
+    // Adjust timers based on timerMode:
+    // - If timerMode is "question", clear the global timer (each question has its own timer).
+    // - If timerMode is "quiz", clear each question's timer.
+    if (data.timerMode === "question") {
+      data.timer = undefined;
+    } else if (data.timerMode === "quiz") {
+      data.questions = data.questions.map((q) => ({ ...q, timer: undefined }));
+    }
+  
     const formData = new FormData();
     formData.append("title", data.title);
+    formData.append("timerMode", data.timerMode);
     if (data.timer !== undefined) {
       formData.append("timer", data.timer.toString());
     }
     formData.append("questions", JSON.stringify(data.questions));
-
+  
+    // If editing, append quizId; otherwise, append userId.
     if (isEdit && quiz) {
       formData.append("quizId", quiz.id);
-      startTransition(() => {
-        saveAction(formData);
-      });
-      return push(PATH_DASHBOARD.quiz.view(quiz.id));
+    } else {
+      formData.append("userId", user.id || "");
     }
-
-    formData.append("userId", user.id || "");
+  
     startTransition(() => {
-      newAction(formData);
+      upsertQuiz(formData).then((result) => {
+        if (result.quizId) {
+          push(PATH_DASHBOARD.quiz.view(result.quizId));
+        }
+      });
     });
   };
 
   const handleBack = () => {
     if (isEdit && quiz) {
       return push(PATH_DASHBOARD.quiz.view(quiz.id));
-      
     }
     push(PATH_DASHBOARD.library.root);
   };
-
-  useEffect(() => {
-    if (newState.quizId && !isNewPending) {
-      push(PATH_DASHBOARD.quiz.view(newState.quizId));
-    }
-  }, [newState.quizId, isNewPending, push]);
 
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* Form Header */}
         <QuizNewEditHeader
-          isPending={isSavePending || isNewPending}
+          isPending={isUpsertPending}
           onBack={handleBack}
-          saveState={saveState}
-          newState={newState}
+          upsertState={upsertState}
           title={titleValue}
         />
 
