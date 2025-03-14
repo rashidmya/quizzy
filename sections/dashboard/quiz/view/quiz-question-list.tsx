@@ -17,6 +17,7 @@ type Props = {
 };
 
 export default function QuizQuestionList({ questions }: Props) {
+  console.log(questions);
   return (
     <div className="space-y-4">
       {questions.map((question, i) => (
@@ -27,9 +28,15 @@ export default function QuizQuestionList({ questions }: Props) {
               {i + 1}. {getQuestionTypeLabel(question.type)}
             </div>
             {/* Points display on the top right side with border */}
-            <div className="text-xs border border-gray-300 rounded px-2 py-1">
-              {/* {question.points ? `${question.points} ${question.points === 1 ? "point" : "points"}` : "0 points"} */}
-              1 points
+            <div className="flex gap-2">
+              <div className="text-xs border border-gray-300 rounded px-2 py-1">
+                {question.points} {question.points === 1 ? "point" : "points"}
+              </div>
+              <div className="text-xs border border-gray-300 rounded px-2 py-1">
+                {question.timer
+                  ? `${question.timer} ${question.timer === 1 ? "min" : "mins"}`
+                  : ""}
+              </div>
             </div>
           </CardHeader>
           <CardContent>

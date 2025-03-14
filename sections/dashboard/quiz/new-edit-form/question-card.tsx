@@ -72,11 +72,11 @@ export default function QuizFormQuestionCard({
             </QuestionInfo>
             {timerMode === "question" && (
               <Select
-                value={question.timer ? (question.timer / 60).toString() : "1"}
+                value={question.timer ? question.timer.toString() : "1"}
                 onValueChange={(value) => {
                   const minutes = Number(value);
                   // Update the react-hook-form state
-                  onUpdate({ ...question, timer: minutes * 60 });
+                  onUpdate({ ...question, timer: minutes });
                 }}
               >
                 <SelectTrigger className="w-25 h-6 text-xs rounded justify-center">
