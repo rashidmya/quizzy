@@ -1,6 +1,8 @@
 import { hash } from "bcrypt-ts";
 import { db } from "./drizzle";
-import { users, quizzes, questions, choices } from "./schema";
+import { users, quizzes, questions, choices, timerModeEnum } from "./schema";
+import { QUESTION_TYPES } from "@/types/question";
+import { TIMER_MODES } from "@/types/quiz";
 
 async function main() {
   // Seed 1 sample user.
@@ -22,7 +24,8 @@ async function main() {
       Array.from({ length: 2 }).map((_, i) => ({
         title: `Quiz Title ${i + 1}`,
         createdBy: insertedUsers[0].id,
-        timer: 300, // e.g. 300 seconds for the whole quiz
+        timerMode: TIMER_MODES[0],
+        timer: 300,
       }))
     )
     .returning();
@@ -33,9 +36,8 @@ async function main() {
     const questionsForQuiz = Array.from({ length: 3 }).map((_, i) => ({
       quizId: quiz.id,
       text: `Sample question ${i + 1} for quiz "${quiz.title}"?`,
-      type: "multiple_choice", // default type
-      timer: 60, // default timer for each question
-      points: 1, // default points per question
+      type: QUESTION_TYPES[0],
+      points: 1,
     }));
     const returnedQuestions = await db
       .insert(questions)

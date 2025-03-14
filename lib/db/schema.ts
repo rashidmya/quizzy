@@ -1,4 +1,5 @@
 import { QUESTION_TYPES } from "@/types/question";
+import { TIMER_MODES } from "@/types/quiz";
 import {
   pgTable,
   varchar,
@@ -18,13 +19,15 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const timerModeEnum = pgEnum("timer_mode", TIMER_MODES);
+
 export const quizzes = pgTable("quizzes", {
   id: uuid("id").defaultRandom().primaryKey(),
   title: varchar("title", { length: 80 }).notNull(),
   createdBy: uuid("created_by")
     .references(() => users.id)
     .notNull(),
-  // Timer for the whole quiz in seconds (optional)
+  timerMode: timerModeEnum("timer_mode").notNull().default("quiz"),
   timer: integer("timer"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
