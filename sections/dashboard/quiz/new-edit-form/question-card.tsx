@@ -1,5 +1,8 @@
 "use client";
 
+import React, { ReactNode } from "react";
+// react-hook-form
+import { useFormContext } from "react-hook-form";
 // components
 import {
   Card,
@@ -9,13 +12,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 // lucide icons
 import { CheckCircle, Trash2, XCircle } from "lucide-react";
 // sections
 import QuestionEditorDialog from "./quiz-new-edit-question-dialog";
-import { useFormContext } from "react-hook-form";
+// types
 import { QuestionType } from "@/types/question";
-import React, { ReactNode } from "react";
 
 export type QuestionCardData = {
   id: string;
@@ -29,7 +38,6 @@ export type QuestionCardData = {
 export type QuestionCardProps = {
   questionIndex: number;
   question: QuestionCardData;
-  quizHasIndividualTimers: boolean;
   onUpdate: (updatedQuestion: QuestionCardData) => void;
   onDelete: () => void;
 };
@@ -37,13 +45,16 @@ export type QuestionCardProps = {
 export default function QuizFormQuestionCard({
   questionIndex,
   question,
-  quizHasIndividualTimers,
   onUpdate,
   onDelete,
 }: QuestionCardProps) {
   const {
     formState: { errors },
+    watch,
+    setValue,
   } = useFormContext();
+
+  const timerMode = watch("timerMode");
 
   const questionError = Array.isArray(errors.questions)
     ? errors.questions[questionIndex]
@@ -59,18 +70,46 @@ export default function QuizFormQuestionCard({
                 {question.type.replace("_", " ")}
               </span>
             </QuestionInfo>
-            {quizHasIndividualTimers && (
-              <QuestionInfo>
-                <span className="text-xs">
-                  {question.timer ? `${question.timer}s` : "No Timer"}
-                </span>
-              </QuestionInfo>
+            {timerMode === "question" && (
+              <Select
+                value={question.timer ? (question.timer / 60).toString() : "1"}
+                onValueChange={(value) => {
+                  const minutes = Number(value);
+                  // Update the react-hook-form state
+                  onUpdate({ ...question, timer: minutes * 60 });
+                }}
+              >
+                <SelectTrigger className="w-25 h-6 text-xs rounded justify-center">
+                  <SelectValue placeholder="Select" />
+                </SelectTrigger>
+                <SelectContent>
+                  {[1, 2, 3, 4, 5, 10, 15, 30, 45, 60].map((num) => (
+                    <SelectItem key={num} value={num.toString()}>
+                      {num} {question.timer === 1 ? "min" : "mins"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             )}
-            <QuestionInfo>
-              <span className="text-xs">
-                {question.points} {question.points === 1 ? "point" : "points"}
-              </span>
-            </QuestionInfo>
+            <Select
+              value={question.points ? question.points.toString() : "1"}
+              onValueChange={(value) => {
+                const points = Number(value);
+                // Update the react-hook-form state
+                onUpdate({ ...question, points });
+              }}
+            >
+              <SelectTrigger className="w-25 h-6 text-xs rounded justify-center">
+                <SelectValue placeholder="Select" />
+              </SelectTrigger>
+              <SelectContent>
+                {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
+                  <SelectItem key={num} value={num.toString()}>
+                    {num} {question.points === 1 ? "point" : "points"}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="flex gap-1">
             <QuestionEditorDialog
@@ -87,11 +126,7 @@ export default function QuizFormQuestionCard({
               triggerText="Edit"
             />
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onDelete}
-            >
+            <Button variant="outline" size="sm" onClick={onDelete}>
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>

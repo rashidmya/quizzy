@@ -213,7 +213,6 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
                 <QuestionCard
                   questionIndex={index}
                   question={field}
-                  quizHasIndividualTimers={true}
                   onUpdate={(updatedQuestion) => {
                     updateQuestion(index, updatedQuestion);
                   }}
