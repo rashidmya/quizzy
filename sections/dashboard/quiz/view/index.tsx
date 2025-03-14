@@ -57,11 +57,7 @@ export default function QuizView({
   return (
     <>
       <Card className="mx-auto shadow-none border-none">
-        <QuizHeader
-          title={quiz.title}
-          participantCount={participantCount}
-          onTitleEdit={() => console.log('edit titile')}
-        />
+        <QuizHeader title={quiz.title} participantCount={participantCount} />
         <QuizActions
           isLive={isLive}
           onToggleLive={handleToggleLive}
