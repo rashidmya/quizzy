@@ -35,7 +35,6 @@ export default function QuizNewEditSettingsDialog() {
   useEffect(() => {
     if (open) {
       setTempTitle(currentTitle);
-      inputRef.current?.focus();
     }
   }, [open, currentTitle]);
 
@@ -52,13 +51,13 @@ export default function QuizNewEditSettingsDialog() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog  open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="shadow-none">
           <Settings className="h-5 w-5" /> Settings
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-md p-6 overflow-y-auto">
+      <DialogContent onOpenAutoFocus={(event) => event.preventDefault()} className="max-w-md p-6 overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Quiz Settings</DialogTitle>
         </DialogHeader>
@@ -68,9 +67,10 @@ export default function QuizNewEditSettingsDialog() {
               ref={inputRef}
               value={tempTitle}
               onChange={(e) => setTempTitle(e.target.value)}
-              autoFocus={false}
               placeholder="Enter quiz title"
-              className={`w-full focus:outline-none w-full py-2 text-sm placeholder-sm remove-number-selector pl-3 border border-solid border-dark-6 rounded focus:ring-2 focus:ring-lilac focus:ring-offset-0 bg-light-3 text-dark-2 border-dark-4 placeholder-dark-5 pr-3 !pr-14 h-10 ${errorMessage ? "border-red-500" : ""}`}
+              className={`w-full w-full py-2 text-sm pl-3  rounded    pr-14 h-10 ${
+                errorMessage ? "border-red-500" : ""
+              }`}
               maxLength={80}
             />
             <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-sm text-gray-500">

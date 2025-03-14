@@ -117,7 +117,10 @@ export default function QuizNewEditQuestionDialog({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="h-screen min-w-screen p-6 overflow-y-auto ">
+      <DialogContent
+        onOpenAutoFocus={(event) => event.preventDefault()}
+        className="h-screen min-w-screen p-6 overflow-y-auto "
+      >
         <div className=" w-full max-w-[800px]  flex flex-col mx-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">
