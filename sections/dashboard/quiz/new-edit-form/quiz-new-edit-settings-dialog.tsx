@@ -14,7 +14,7 @@ import { Settings } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
 
-export default function QuizFormSettingsDialog() {
+export default function QuizNewEditSettingsDialog() {
   const { watch, setValue } = useFormContext();
   const currentTitle = watch("title");
   const [open, setOpen] = useState(false);

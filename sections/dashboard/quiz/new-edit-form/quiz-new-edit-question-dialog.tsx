@@ -55,7 +55,7 @@ export interface QuestionDialogProps {
   triggerText?: string; // e.g. "Edit" or "Add Question"
 }
 
-export default function QuizFormQuestionEditorDialog({
+export default function QuizNewEditQuestionDialog({
   initialData,
   onSave,
   triggerText = "Edit",

@@ -8,12 +8,7 @@ import { useForm, useFieldArray, FormProvider } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 // lucide icons
-import {
-  Loader2,
-  ChevronLeftIcon,
-  ChevronUp,
-  ChevronDown,
-} from "lucide-react";
+import { Loader2, ChevronLeftIcon, ChevronUp, ChevronDown } from "lucide-react";
 // shadcn/ui components
 import { Button } from "@/components/ui/button";
 // actions
@@ -23,12 +18,12 @@ import { PATH_DASHBOARD } from "@/routes/paths";
 // hooks
 import { useCurrentUser } from "@/hooks/use-current-user";
 // sections
-import QuestionCard from "./quiz-form-question-card";
-import QuestionEditorDialog from "./quiz-form-question-editor-dialog";
-import QuizSettingsDialog from "./quiz-form-settings-dialog";
+import QuestionCard from "./question-card";
+import QuizNewEditQuestionDialog from "./quiz-new-edit-question-dialog";
 // types
 import { QUESTION_TYPES } from "@/types/question";
 import { QuizWithQuestions } from "@/types/quiz";
+import QuizNewEditHeader from "./quiz-new-edit-header";
 
 // Schema definitions
 const choiceSchema = z.object({
@@ -155,13 +150,21 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
       startTransition(() => {
         saveAction(formData);
       });
-      return;
+      return push(PATH_DASHBOARD.quiz.view(quiz.id));
     }
 
     formData.append("userId", user.id || "");
     startTransition(() => {
       newAction(formData);
     });
+  };
+
+  const handleBack = () => {
+    if (isEdit && quiz) {
+      return push(PATH_DASHBOARD.quiz.view(quiz.id));
+      
+    }
+    push(PATH_DASHBOARD.library.root);
   };
 
   useEffect(() => {
@@ -171,116 +174,78 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
   }, [newState.quizId, isNewPending, push]);
 
   return (
-    <div className=" overflow-y-auto">
-      <FormProvider {...methods}>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Sticky Navbar with Editable Title and Save Quiz Button */}
-          <div className="border-b p-4">
-            <div className="flex w-full items-center justify-between">
-              <div className="flex flex-row gap-8">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="shadow-none"
-                  onClick={() => {
-                    if (isEdit && quiz) {
-                      push(PATH_DASHBOARD.quiz.view(quiz.id));
-                      return;
-                    }
-                    push(PATH_DASHBOARD.library.root);
-                  }}
-                >
-                  <ChevronLeftIcon />
-                </Button>
-                <p className="text-2xl font-bold">{titleValue}</p>
-              </div>
+    <FormProvider {...methods}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {/* Form Header */}
+        <QuizNewEditHeader
+          isPending={isSavePending || isNewPending}
+          onBack={handleBack}
+          saveState={saveState}
+          newState={newState}
+          title={titleValue}
+        />
 
-              <div className="flex gap-2">
-                <QuizSettingsDialog />
-                <Button type="submit">
-                  {isSavePending || isNewPending ? (
-                    <Loader2 className="size-5 animate-spin" />
-                  ) : (
-                    <span>Save Changes</span>
-                  )}
-                </Button>
-              </div>
-            </div>
-            <div className="flex justify-end w-full pt-2">
-              {saveState.message && (
-                <p className="text-sm text-gray-400">{saveState.message}</p>
-              )}
-              {newState.message && (
-                <p className="text-sm text-gray-400">{newState.message}</p>
-              )}
+        {/* Quiz Title is now in the navbar, so we can remove the title field below */}
+        {/* Questions Section */}
+        <div className="space-y-4 p-4">
+          <div className="flex w-full justify-between">
+            <h2 className="text-xl font-bold">Questions</h2>
+            <div className="pr-11">
+              <QuizNewEditQuestionDialog
+                onSave={(newQuestionData) => {
+                  const completeQuestion = {
+                    ...DEFAULT_QUESTION,
+                    text: newQuestionData.text,
+                    choices: newQuestionData.choices,
+                  };
+                  appendQuestion(completeQuestion);
+                }}
+                triggerText="Add new question"
+              />
             </div>
           </div>
 
-          {/* Quiz Title is now in the navbar, so we can remove the title field below */}
-          {/* Questions Section */}
-          <div className="space-y-4 p-4">
-            <div className="flex w-full justify-between">
-              <h2 className="text-xl font-bold">Questions</h2>
-              <div className="pr-11">
-                <QuestionEditorDialog
-                  onSave={(newQuestionData) => {
-                    const completeQuestion = {
-                      ...DEFAULT_QUESTION,
-                      text: newQuestionData.text,
-                      choices: newQuestionData.choices,
-                    };
-                    appendQuestion(completeQuestion);
+          <div className="grid grid-cols-1 gap-4">
+            {questionFields.map((field, index) => (
+              <div key={field.id} className="flex flex-row gap-2">
+                <QuestionCard
+                  questionIndex={index}
+                  question={field}
+                  quizHasIndividualTimers={true}
+                  onUpdate={(updatedQuestion) => {
+                    updateQuestion(index, updatedQuestion);
                   }}
-                  triggerText="Add new question"
+                  onDelete={() => removeQuestion(index)}
                 />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4">
-              {questionFields.map((field, index) => (
-                <div key={field.id} className="flex flex-row gap-2">
-                  <QuestionCard
-                    questionIndex={index}
-                    question={field}
-                    quizHasIndividualTimers={true}
-                    onUpdate={(updatedQuestion) => {
-                      updateQuestion(index, updatedQuestion);
-                    }}
-                    onDelete={() => removeQuestion(index)}
-                  />
-                  {/* Reorder Buttons Outside the Card */}
-                  <div className="flex flex-col justify-end">
-                    <Button
-                      type="button"
-                      onClick={() => move(index, index - 1)}
-                      disabled={index === 0}
-                      variant="ghost"
-                      size="icon"
-                    >
-                      <ChevronUp className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={() => move(index, index + 1)}
-                      disabled={index === questionFields.length - 1}
-                      variant="ghost"
-                      size="icon"
-                    >
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                  </div>
+                {/* Reorder Buttons Outside the Card */}
+                <div className="flex flex-col justify-end">
+                  <Button
+                    type="button"
+                    onClick={() => move(index, index - 1)}
+                    disabled={index === 0}
+                    variant="ghost"
+                    size="icon"
+                  >
+                    <ChevronUp className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => move(index, index + 1)}
+                    disabled={index === questionFields.length - 1}
+                    variant="ghost"
+                    size="icon"
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
                 </div>
-              ))}
-            </div>
-            {errors.questions &&
-              typeof errors.questions.message === "string" && (
-                <p className="text-red-500 text-sm">
-                  {errors.questions.message}
-                </p>
-              )}
+              </div>
+            ))}
           </div>
-        </form>
-      </FormProvider>
-    </div>
+          {errors.questions && typeof errors.questions.message === "string" && (
+            <p className="text-red-500 text-sm">{errors.questions.message}</p>
+          )}
+        </div>
+      </form>
+    </FormProvider>
   );
 }
