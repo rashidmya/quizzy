@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 // lucide icons
 import { CheckCircle, Trash2, XCircle } from "lucide-react";
 // sections
-import QuestionEditorDialog from "./question-editor-dialog";
+import QuestionEditorDialog from "./quiz-form-question-editor-dialog";
 import { useFormContext } from "react-hook-form";
 import { QuestionType } from "@/types/question";
 import React, { ReactNode } from "react";
@@ -34,7 +34,7 @@ export type QuestionCardProps = {
   onDelete: () => void;
 };
 
-export default function QuestionCard({
+export default function QuizFormQuestionCard({
   questionIndex,
   question,
   quizHasIndividualTimers,

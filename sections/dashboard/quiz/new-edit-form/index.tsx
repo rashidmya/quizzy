@@ -23,9 +23,9 @@ import { PATH_DASHBOARD } from "@/routes/paths";
 // hooks
 import { useCurrentUser } from "@/hooks/use-current-user";
 // sections
-import QuestionCard from "./question-card";
-import QuestionEditorDialog from "./question-editor-dialog";
-import QuizSettingsDialog from "./quiz-settings-dialog";
+import QuestionCard from "./quiz-form-question-card";
+import QuestionEditorDialog from "./quiz-form-question-editor-dialog";
+import QuizSettingsDialog from "./quiz-form-settings-dialog";
 // types
 import { QUESTION_TYPES } from "@/types/question";
 import { QuizWithQuestions } from "@/types/quiz";
