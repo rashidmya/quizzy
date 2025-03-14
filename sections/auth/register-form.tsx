@@ -51,6 +51,7 @@ export default function RegisterForm(
     createUser,
     {
       message: "",
+      error: false,
     }
   );
 
@@ -66,19 +67,21 @@ export default function RegisterForm(
       formData.append("lastName", data.lastName);
       formData.append("email", data.email);
       formData.append("password", data.password);
-  
+
       // Call your server action to create the user.
-      startTransition(() => {
-        createAction(formData);
-      });
-  
+
+      const result = await createAction(formData);
+
       // Optionally, sign in the user after successful registration.
-      await signIn("credentials", {
-        email: data.email,
-        password: data.password,
-        redirect: true,
-        callbackUrl: "/dashboard",
-      });
+      if (!result.error) {
+        await signIn("credentials", {
+          email: data.email,
+          password: data.password,
+          redirect: true,
+          callbackUrl: "/dashboard",
+        });
+      }
+      
       setLoading(false);
     } catch (e) {
       console.log(e);
@@ -146,9 +149,7 @@ export default function RegisterForm(
             required
           />
           {errors.email && (
-            <p className="mt-1 text-xs text-red-600">
-              {errors.email.message}
-            </p>
+            <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>
           )}
         </div>
         <div className="grid gap-2">
@@ -181,7 +182,11 @@ export default function RegisterForm(
             </p>
           )}
         </div>
-        <Button type="submit" className="w-full" disabled={isCreatePending || loading}>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={isCreatePending || loading}
+        >
           {isCreatePending || loading ? "Signing up..." : "Sign Up"}
         </Button>
       </div>

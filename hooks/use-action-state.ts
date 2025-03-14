@@ -9,20 +9,16 @@ export function useActionState<T, P>(
   const [isPending, setIsPending] = useState(false);
 
   async function dispatch(payload: P): Promise<T> {
-    return new Promise<T>((resolve, reject) => {
-      startTransition(async () => {
-        setIsPending(true);
-        try {
-          const result = await action(payload);
-          setState(result);
-          resolve(result);
-        } catch (err) {
-          reject(err);
-        } finally {
-          setIsPending(false);
-        }
-      });
-    });
+    setIsPending(true);
+    try {
+      const result = await action(payload);
+      setState(result);
+      return result;
+    } catch (err) {
+      throw err;
+    } finally {
+      setIsPending(false);
+    }
   }
 
   return [state, dispatch, isPending] as const;

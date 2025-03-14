@@ -1,6 +1,5 @@
 "use client";
 
-import { startTransition } from "react";
 import { useRouter } from "next/navigation";
 // react-hook-form
 import { useForm, useFieldArray, FormProvider } from "react-hook-form";
@@ -88,12 +87,13 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
   const { push } = useRouter();
   const user = useCurrentUser();
 
-  const [upsertState, upsertAction, isUpsertPending] = useActionState(upsertQuiz, {
-    quizId: '',
-    message: "",
-  });
-
-  console.log(quiz)
+  const [upsertState, upsertAction, isUpsertPending] = useActionState(
+    upsertQuiz,
+    {
+      quizId: "",
+      message: "",
+    }
+  );
 
   // Prepare default form values (using DEFAULT_QUESTION when no quiz is provided)
   const defaultValues: QuizFormValues = {
@@ -138,7 +138,7 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
 
   const titleValue = watch("title") || "";
 
-  const onSubmit = (data: QuizFormValues) => {
+  const onSubmit = async (data: QuizFormValues) => {
     // Adjust timers based on timerMode:
     // - If timerMode is "question", clear the global timer (each question has its own timer).
     // - If timerMode is "quiz", clear each question's timer.
@@ -147,7 +147,7 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
     } else if (data.timerMode === "quiz") {
       data.questions = data.questions.map((q) => ({ ...q, timer: undefined }));
     }
-  
+
     const formData = new FormData();
     formData.append("title", data.title);
     formData.append("timerMode", data.timerMode);
@@ -155,21 +155,18 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
       formData.append("timer", data.timer.toString());
     }
     formData.append("questions", JSON.stringify(data.questions));
-  
+
     // If editing, append quizId; otherwise, append userId.
     if (isEdit && quiz) {
       formData.append("quizId", quiz.id);
     } else {
       formData.append("userId", user.id || "");
     }
-  
-    startTransition(() => {
-      upsertAction(formData).then((result) => {
-        if (result.quizId) {
-          push(PATH_DASHBOARD.quiz.view(result.quizId));
-        }
-      });
-    });
+
+    const result = await upsertAction(formData);
+    if (result.quizId) {
+      push(PATH_DASHBOARD.quiz.view(result.quizId));
+    }
   };
 
   const handleBack = () => {
