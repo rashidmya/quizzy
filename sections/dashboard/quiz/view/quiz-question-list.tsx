@@ -17,7 +17,6 @@ type Props = {
 };
 
 export default function QuizQuestionList({ questions }: Props) {
-  console.log(questions)
   return (
     <div className="space-y-4">
       {questions.map((question, i) => (
