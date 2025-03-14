@@ -10,7 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 // lucide icons
 import {
   Loader2,
-  ChevronsLeftIcon,
+  ChevronLeftIcon,
   ChevronUp,
   ChevronDown,
 } from "lucide-react";
@@ -175,7 +175,7 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Sticky Navbar with Editable Title and Save Quiz Button */}
-          <div className="bg-white border-b p-4">
+          <div className="border-b p-4">
             <div className="flex w-full items-center justify-between">
               <div className="flex flex-row gap-8">
                 <Button
@@ -190,7 +190,7 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
                     push(PATH_DASHBOARD.library.root);
                   }}
                 >
-                  <ChevronsLeftIcon />
+                  <ChevronLeftIcon />
                 </Button>
                 <p className="text-2xl font-bold">{titleValue}</p>
               </div>
