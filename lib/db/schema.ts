@@ -10,6 +10,10 @@ import {
   pgEnum,
 } from "drizzle-orm/pg-core";
 
+export const timerModeEnum = pgEnum("timer_modes", TIMER_MODES);
+
+export const questionTypeEnum = pgEnum("question_type", QUESTION_TYPES);
+
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: varchar("name", { length: 100 }).notNull(),
@@ -18,8 +22,6 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
-
-export const timerModeEnum = pgEnum("timer_mode", TIMER_MODES);
 
 export const quizzes = pgTable("quizzes", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -32,8 +34,6 @@ export const quizzes = pgTable("quizzes", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
-
-export const questionTypeEnum = pgEnum("question_type", QUESTION_TYPES);
 
 export const questions = pgTable("questions", {
   id: uuid("id").defaultRandom().primaryKey(),

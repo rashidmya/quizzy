@@ -18,6 +18,8 @@ export async function getQuizzes(userId: string) {
       },
       // Compute questionCount using a subquery.
       questionCount: sql<number>`CAST((SELECT COUNT(*) FROM questions WHERE questions.quiz_id = ${quizzes.id}) AS INTEGER)`,
+      timer: quizzes.timer,
+      timerMode: quizzes.timerMode,
     })
     .from(quizzes)
     .innerJoin(users, eq(quizzes.createdBy, users.id))
@@ -37,7 +39,8 @@ export async function getQuizWithQuestions(quizId: string) {
       createdAt: quizzes.createdAt,
       updatedAt: quizzes.updatedAt,
       createdBy: quizzes.createdBy,
-      timer: quizzes.timer, // <-- Add this line
+      timer: quizzes.timer,
+      timerMode: quizzes.timerMode,
     })
     .from(quizzes)
     .where(eq(quizzes.id, quizId));

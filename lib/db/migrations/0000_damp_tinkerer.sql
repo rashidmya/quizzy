@@ -1,4 +1,5 @@
 CREATE TYPE "public"."question_type" AS ENUM('multiple_choice');--> statement-breakpoint
+CREATE TYPE "public"."timer_modes" AS ENUM('quiz', 'question');--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "choices" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"question_id" uuid,
@@ -29,6 +30,7 @@ CREATE TABLE IF NOT EXISTS "quizzes" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"title" varchar(80) NOT NULL,
 	"created_by" uuid NOT NULL,
+	"timer_mode" timer_modes DEFAULT 'quiz' NOT NULL,
 	"timer" integer,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL

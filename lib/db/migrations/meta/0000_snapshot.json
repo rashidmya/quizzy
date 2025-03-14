@@ -1,5 +1,5 @@
 {
-  "id": "07446c8e-0f56-4b52-a9bb-27fd1127b873",
+  "id": "eb5ebcf1-1825-4c09-8074-e1b053151fe1",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -231,6 +231,14 @@
           "primaryKey": false,
           "notNull": true
         },
+        "timer_mode": {
+          "name": "timer_mode",
+          "type": "timer_modes",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'quiz'"
+        },
         "timer": {
           "name": "timer",
           "type": "integer",
@@ -341,6 +349,14 @@
       "schema": "public",
       "values": [
         "multiple_choice"
+      ]
+    },
+    "public.timer_modes": {
+      "name": "timer_modes",
+      "schema": "public",
+      "values": [
+        "quiz",
+        "question"
       ]
     }
   },

@@ -93,6 +93,8 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
     message: "",
   });
 
+  console.log(quiz)
+
   // Prepare default form values (using DEFAULT_QUESTION when no quiz is provided)
   const defaultValues: QuizFormValues = {
     title: quiz?.title || "Untitled Quiz",
@@ -162,7 +164,7 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
     }
   
     startTransition(() => {
-      upsertQuiz(formData).then((result) => {
+      upsertAction(formData).then((result) => {
         if (result.quizId) {
           push(PATH_DASHBOARD.quiz.view(result.quizId));
         }
