@@ -19,7 +19,7 @@ export function QuizActions({
   onEdit,
 }: QuizActionsProps) {
   return (
-    <div className="flex justify-end gap-2 mt-4 px-4">
+    <div className="flex gap-2 place-items-center">
       <Button variant="default" size="sm" onClick={onToggleLive}>
         {isLive ? (
           <>

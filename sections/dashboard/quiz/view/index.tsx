@@ -58,13 +58,20 @@ export default function QuizView({
     <>
       <Card className="mx-auto shadow-none border-none">
         <QuizHeader title={quiz.title} participantCount={participantCount} />
-        <QuizActions
-          isLive={isLive}
-          onToggleLive={handleToggleLive}
-          onSchedule={handleSchedule}
-          onPreview={handlePreview}
-          onEdit={handleEdit}
-        />
+
+        <div className="flex px-4 mt-4 justify-between">
+          <div className="px-2">
+            <h1 className="text-4xl font-bold">{quiz.title}</h1>
+          </div>
+          <QuizActions
+            isLive={isLive}
+            onToggleLive={handleToggleLive}
+            onSchedule={handleSchedule}
+            onPreview={handlePreview}
+            onEdit={handleEdit}
+          />
+        </div>
+
         <CardFooter>
           {/* Tab triggers inside card footer */}
           <Tabs value={currentTab} onValueChange={setCurrentTab}>
@@ -82,6 +89,7 @@ export default function QuizView({
           </Tabs>
         </CardFooter>
       </Card>
+
       {/* Tab content rendered below the card */}
       <div className="mx-auto mt-4">
         {currentTab === "questions" && (
