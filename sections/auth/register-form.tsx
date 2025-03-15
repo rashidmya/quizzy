@@ -5,7 +5,7 @@ import { startTransition, useState } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 // lib
-import { cn } from "@/utils/cn";
+import { cn } from "@/lib/utils";
 import { useActionState } from "@/hooks/use-action-state";
 // components
 import { Button } from "@/components/ui/button";

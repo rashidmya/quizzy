@@ -6,7 +6,7 @@ import Link from "next/link";
 // next-auth
 import { signOut } from "next-auth/react";
 // lib
-import { cn } from "@/utils/cn";
+import { cn } from "@/lib/utils";
 // components
 import {
   NavigationMenu,
