@@ -9,7 +9,6 @@ import { PATH_DASHBOARD } from '@/routes/paths';
 export default function Index() {
   const router = useRouter();
   const pathname = usePathname();
-  console.log(pathname)
 
   useEffect(() => {
     if (pathname == PATH_DASHBOARD.quiz.root) {

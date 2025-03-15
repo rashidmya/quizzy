@@ -27,7 +27,6 @@ export default function Navigation({ user }: {   user: {
   email: string
   name: string
 }}) {
-  console.log(user)
   return (
     <NavigationMenu className="hidden md:flex">
       <NavigationMenuList>
