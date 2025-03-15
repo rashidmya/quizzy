@@ -63,7 +63,7 @@ export default function QuizView({
   console.log(quiz);
 
   return (
-    <>
+    <div className="min-h-screen">
       <Card className="mx-auto shadow-none rounded px-8">
         <QuizHeader title={quiz.title} participantCount={participantCount} />
 
@@ -119,6 +119,6 @@ export default function QuizView({
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }

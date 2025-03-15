@@ -1,6 +1,6 @@
 import { Choice, Question, Quiz } from "@/lib/db/queries/quizzes";
 
-export type QuizWithQuestions = Quiz & {
+export type QuizWithQuestions = Omit<Quiz, "createdBy" | "questions"> & {
   createdBy: {
     id: string;
     name: string;
