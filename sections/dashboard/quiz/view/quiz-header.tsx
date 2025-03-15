@@ -10,7 +10,7 @@ type QuizHeaderProps = {
   participantCount: number;
 };
 
-export function QuizHeader({
+export default function QuizHeader({
   title,
   participantCount,
 }: QuizHeaderProps) {

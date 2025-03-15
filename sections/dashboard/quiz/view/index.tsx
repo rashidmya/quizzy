@@ -6,9 +6,10 @@ import { useRouter } from "next/navigation";
 import { Card, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // sections
-import QuizQuestionList from "@/sections/dashboard/quiz/view/quiz-question-list";
-import { QuizHeader } from "./quiz-header";
+import QuizQuestionList from "./quiz-question-list";
+import QuizHeader from "./quiz-header";
 import { QuizAltActions, QuizMainActions } from "./quiz-actions";
+import QuizCreationInfo from "./quiz-creation-info";
 // types
 import { QuizWithQuestions } from "@/types/quiz";
 // paths
@@ -52,22 +53,33 @@ export default function QuizView({
 
   const handleDelete = () => {
     // preview quiz
-    console.log("Preview quiz");
+    console.log("Delete quiz");
   };
 
   const handleEdit = () => {
     push(PATH_DASHBOARD.quiz.edit(quiz.id));
   };
 
+  console.log(quiz);
+
   return (
     <>
       <Card className="mx-auto shadow-none rounded px-8">
         <QuizHeader title={quiz.title} participantCount={participantCount} />
-        <QuizAltActions
-          onPreview={handlePreview}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+
+        <div className="flex flex-row justify-between items-center">
+          <QuizCreationInfo
+            name={quiz.createdBy.name}
+            createdAt={new Date(quiz.createdAt)}
+          />
+
+          <QuizAltActions
+            onPreview={handlePreview}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        </div>
+
         <QuizMainActions
           isLive={isLive}
           onSchedule={handleSchedule}
@@ -91,6 +103,7 @@ export default function QuizView({
           </Tabs>
         </CardFooter>
       </Card>
+
       {/* Tab content rendered below the card */}
       <div className="mx-auto mt-4">
         {currentTab === "questions" && (

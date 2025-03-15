@@ -38,12 +38,17 @@ export async function getQuizWithQuestions(quizId: string) {
       title: quizzes.title,
       createdAt: quizzes.createdAt,
       updatedAt: quizzes.updatedAt,
-      createdBy: quizzes.createdBy,
+      createdBy: {
+        id: users.id,
+        name: users.name,
+      },
       timer: quizzes.timer,
       timerMode: quizzes.timerMode,
     })
     .from(quizzes)
-    .where(eq(quizzes.id, quizId));
+    .innerJoin(users, eq(quizzes.createdBy, users.id))
+    .where(eq(quizzes.id, quizId))
+    
 
   if (!quizResult.length) return null;
 

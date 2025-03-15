@@ -31,7 +31,7 @@ export function QuizAltActions({
   onDelete,
 }: QuizAltActionsProps) {
   return (
-    <div className="flex justify-end">
+    <div className="gap-2 items-center flex">
       <Button
         className="rounded"
         variant="secondary"

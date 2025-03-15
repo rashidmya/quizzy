@@ -1,6 +1,10 @@
 import { Choice, Question, Quiz } from "@/lib/db/queries/quizzes";
 
 export type QuizWithQuestions = Quiz & {
+  createdBy: {
+    id: string;
+    name: string;
+  };
   questions: Array<Question & { choices: Choice[] }>;
 };
 
