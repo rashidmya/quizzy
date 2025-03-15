@@ -16,10 +16,6 @@ export async function upsertQuiz(formData: FormData) {
   const timer = timerStr ? Number(timerStr) : undefined;
   const questionsJson = formData.get("questions") as string;
 
-  console.log(timerMode)
-  console.log(timerStr)
-  console.log(timer)
-
   // Basic validation.
   if (!title.trim()) {
     return { message: "Title is required", error: true };
@@ -49,12 +45,12 @@ export async function upsertQuiz(formData: FormData) {
     // UPDATE: Quiz exists.
     await db
       .update(quizzes)
-      .set({ title, timer: timer !== undefined ? timer : null , timerMode })
+      .set({ title, timerMode, timer: timer !== undefined ? timer : null })
       .where(eq(quizzes.id, quizId));
 
     // Delete existing questions (cascade deletes choices).
     await db.delete(questions).where(eq(questions.quizId, quizId));
-    
+
     newQuizId = quizId;
   } else {
     // CREATE: New quiz requires a userId.
@@ -66,10 +62,10 @@ export async function upsertQuiz(formData: FormData) {
     const insertedQuiz = await db
       .insert(quizzes)
       .values({
-        title,
         createdBy: userId,
+        title,
         timerMode,
-        timer,
+        timer: timer !== undefined ? timer : null,
       })
       .returning({ id: quizzes.id });
 
