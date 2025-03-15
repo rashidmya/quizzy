@@ -21,7 +21,7 @@ export default function QuizQuestionList({ questions }: Props) {
     <div className="space-y-4">
       {questions.map((question, i) => (
         <Card key={question.id} className="shadow-sm rounded-sm">
-          <CardHeader className="flex-row justify-between items-center">
+          <CardHeader className="flex-row justify-between items-center ">
             {/* Display the question type on top (default to "Multiple choice" if not provided) */}
             <div className="text-xs capitalize font-bold">
               {i + 1}. {getQuestionTypeLabel(question.type)}

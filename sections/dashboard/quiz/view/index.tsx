@@ -105,7 +105,7 @@ export default function QuizView({
       </Card>
 
       {/* Tab content rendered below the card */}
-      <div className="mx-auto mt-4">
+      <div className="mx-auto mt-8">
         {currentTab === "questions" && (
           // Render the questions tab content.
           <QuizQuestionList questions={quiz.questions} />
