@@ -1,8 +1,8 @@
 "use client";
 
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 // react-hook-form
-import { useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 // components
 import {
   Card,
@@ -22,7 +22,7 @@ import {
 // lucide icons
 import { CheckCircle, Trash2, XCircle } from "lucide-react";
 // sections
-import QuestionEditorDialog from "./quiz-new-edit-question-dialog";
+import QuestionNewEditQuestionDialog from "./quiz-new-edit-question-dialog";
 // types
 import { QuestionType } from "@/types/question";
 
@@ -51,7 +51,7 @@ export default function QuizFormQuestionCard({
   const {
     formState: { errors },
     watch,
-    setValue,
+    control,
   } = useFormContext();
 
   const timerMode = watch("timerMode");
@@ -112,7 +112,7 @@ export default function QuizFormQuestionCard({
             </Select>
           </div>
           <div className="flex gap-1">
-            <QuestionEditorDialog
+            <QuestionNewEditQuestionDialog
               initialData={question}
               onSave={(updatedData) => {
                 // Merge the updated text and choices with the original question

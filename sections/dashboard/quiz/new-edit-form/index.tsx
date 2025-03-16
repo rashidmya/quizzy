@@ -56,7 +56,7 @@ const quizFormSchema = z.object({
     .min(4, { message: "Title is required" })
     .max(80, { message: "Title must be at most 80 characters" })
     .default("Untitled Quiz"),
-  timerMode: z.enum(TIMER_MODES).default("quiz"),
+  timerMode: z.enum(TIMER_MODES).default("none"),
   questions: z
     .array(questionSchema)
     .min(1, { message: "At least one question is required" }),
@@ -102,7 +102,7 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
   const defaultValues: QuizFormValues = {
     title: quiz?.title || "Untitled Quiz",
     timer: quiz?.timer || undefined,
-    timerMode: quiz?.timerMode || "quiz",
+    timerMode: quiz?.timerMode || "none",
     questions: quiz?.questions?.map((q: any) => ({
       text: q.text,
       type: q.type,
@@ -142,15 +142,6 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
   const titleValue = watch("title") || "";
 
   const onSubmit = async (data: QuizFormValues) => {
-    // Adjust timers based on timerMode:
-    // - If timerMode is "question", clear the global timer (each question has its own timer).
-    // - If timerMode is "quiz", clear each question's timer.
-    if (data.timerMode === "question") {
-      data.timer = undefined;
-    } else if (data.timerMode === "quiz") {
-      data.questions = data.questions.map((q) => ({ ...q, timer: undefined }));
-    }
-
     const formData = new FormData();
     formData.append("title", data.title);
     formData.append("timerMode", data.timerMode);

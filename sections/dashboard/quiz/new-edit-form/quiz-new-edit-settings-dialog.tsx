@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 // react-hook-form
-import { useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 // components
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,24 +24,23 @@ import {
 import { Label } from "@/components/ui/label";
 // icons
 import { Settings } from "lucide-react";
+// types
+import { TimerMode } from "@/types/quiz";
 
 export default function QuizNewEditSettingsDialog() {
-  const { watch, setValue } = useFormContext();
+  const { setValue, getValues } = useFormContext();
 
-  const currentTitle = watch("title");
-  const currentTimerMode = watch("timerMode");
-  const currentTimer = watch("timer");
-  const questions = watch("questions");
+  const { title, timerMode, timer, questions } = getValues();
 
   const [open, setOpen] = useState(false);
 
-  const [tempTitle, setTempTitle] = useState(currentTitle);
+  const [tempTitle, setTempTitle] = useState(title);
 
-  const [localTimerMode, setLocalTimerMode] = useState<"quiz" | "question">(
-    currentTimerMode || "quiz"
+  const [localTimerMode, setLocalTimerMode] = useState<TimerMode>(
+    timerMode || "none"
   );
 
-  const [tempTimer, setTempTimer] = useState(currentTimer || 0);
+  const [tempTimer, setTempTimer] = useState(timer || 0);
 
   // Title validation: valid if at least 4 and at most 80 characters.
   const minChars = 4;
@@ -62,11 +61,12 @@ export default function QuizNewEditSettingsDialog() {
 
   useEffect(() => {
     if (open) {
-      setTempTitle(currentTitle);
-      setTempTimer(currentTimer || 0);
-      setLocalTimerMode(currentTimerMode || "quiz");
+      const { title, timerMode, timer } = getValues();
+      setTempTitle(title);
+      setLocalTimerMode(timerMode || "none");
+      setTempTimer(timer || 0);
     }
-  }, [open, currentTitle, currentTimer, currentTimerMode]);
+  }, [open, getValues]);
 
   const handleSave = () => {
     // Only save if there are no errors.
@@ -75,20 +75,33 @@ export default function QuizNewEditSettingsDialog() {
     setValue("title", tempTitle);
     setValue("timerMode", localTimerMode);
 
-    // If mode is "quiz", use the provided timer; if "question", clear the global timer.
-    if (localTimerMode === "quiz") {
-      setValue("timer", tempTimer);
-    } else if (localTimerMode === "question") {
-      questions.forEach((_: any, index: number) => {
-        setValue(`questions.${index}.timer`, 60);
-      });
-    }
+    updateQuestionTimers();
 
     setOpen(false);
   };
 
   const handleCancel = () => {
     setOpen(false);
+  };
+
+  const updateQuestionTimers = () => {
+    if (localTimerMode === "none") {
+      setValue("timer", undefined);
+      questions.forEach((_: any, index: number) => {
+        setValue(`questions.${index}.timer`, undefined);
+      });
+    } else if (localTimerMode === "quiz") {
+      setValue("timer", tempTimer);
+      questions.forEach((_: any, index: number) => {
+        setValue(`questions.${index}.timer`, undefined);
+      });
+    } else if (localTimerMode === "question") {
+      setValue("timer", undefined);
+      questions.forEach((_: any, index: number) => {
+        // Set each question's timer to a default value (e.g. 5 minutes)
+        setValue(`questions.${index}.timer`, 5);
+      });
+    }
   };
 
   return (
@@ -130,14 +143,13 @@ export default function QuizNewEditSettingsDialog() {
             <Label className="mb-2 text-sm">Timer Mode</Label>
             <Select
               value={localTimerMode}
-              onValueChange={(value) =>
-                setLocalTimerMode(value as "quiz" | "question")
-              }
+              onValueChange={(value) => setLocalTimerMode(value as TimerMode)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select timer mode" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="none">None</SelectItem>
                 <SelectItem value="quiz">Global Timer</SelectItem>
                 <SelectItem value="question">Per Question Timer</SelectItem>
               </SelectContent>
