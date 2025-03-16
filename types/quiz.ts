@@ -16,4 +16,6 @@ export type LibraryQuiz = Omit<Quiz, "createdBy"> & {
   questionCount?: number;
 };
 
-export const TIMER_MODES = ["quiz", "question"] as const;
+export type TimerMode = "none" | "quiz" | "question";
+
+export const TIMER_MODES = ["none", "quiz", "question"] as const;

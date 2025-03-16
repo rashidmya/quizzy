@@ -5,13 +5,14 @@ import { eq } from "drizzle-orm";
 import { db } from "@/lib/db/drizzle";
 import { quizzes, questions, choices } from "@/lib/db/schema";
 import { QuestionType } from "@/types/question";
+import { TimerMode } from "@/types/quiz";
 
 // Create or update a quiz.
 export async function upsertQuiz(formData: FormData) {
   // Extract common form values.
   const quizId = formData.get("quizId") as string | null;
   const title = formData.get("title") as string;
-  const timerMode = formData.get("timerMode") as "quiz" | "question";
+  const timerMode = formData.get("timerMode") as TimerMode;
   const timerStr = formData.get("timer") as string;
   const timer = timerStr ? Number(timerStr) : null;
   const questionsJson = formData.get("questions") as string;
