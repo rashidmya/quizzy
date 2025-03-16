@@ -4,13 +4,14 @@ import { getQuizzes } from "@/lib/db/queries/quizzes";
 import LibraryView from "@/sections/dashboard/library/library-view";
 // next-auth
 import { getServerSession } from "next-auth/next";
-import { authConfig } from "@/auth/auth.config";
+// lib
+import { authOptions } from "@/lib/auth/auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function QuizListPage() {
   // Fetch the session on the server.
-  const session = await getServerSession(authConfig);
+  const session = await getServerSession(authOptions);
 
   if (!session?.user) {
     // Handle unauthenticated state (e.g., redirect to login).
