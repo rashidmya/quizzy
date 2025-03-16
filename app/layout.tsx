@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
+// fonts
 import { Roboto } from "next/font/google";
 // css
 import "./globals.css";
-//
+//providers
 import { SessionProvider } from "@/components/providers/session-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
-import { NotistackProvider } from "@/components/providers/notistack-provider";
+// toaster
+import { Toaster } from "@/components/toaster";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -34,11 +36,10 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <NotistackProvider>
-              <main className="flex min-h-screen w-full flex-col">
-                {children}
-              </main>
-            </NotistackProvider>
+            <Toaster />
+            <main className="flex min-h-screen w-full flex-col">
+              {children}
+            </main>
           </ThemeProvider>
         </SessionProvider>
       </body>

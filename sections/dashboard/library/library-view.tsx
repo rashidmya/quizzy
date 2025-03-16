@@ -1,7 +1,8 @@
 "use client";
 
-import { useSnackbar } from "notistack";
 import { useMemo, useState } from "react";
+// toast
+import { toast } from "sonner";
 // sections
 import QuizList from "@/sections/dashboard/library/library-list";
 // components
@@ -32,8 +33,6 @@ export default function LibraryView({ quizzes }: Props) {
   // Local state for sort order.
   const [sortOrder, setSortOrder] = useState("recent");
 
-  const { enqueueSnackbar } = useSnackbar();
-
   const [_, deleteAction] = useActionState(deleteQuiz, {
     message: "",
   });
@@ -55,9 +54,9 @@ export default function LibraryView({ quizzes }: Props) {
     const result = await deleteAction(quizId);
     if (!result.error) {
       setQuizList((prev) => prev.filter((quiz) => quiz.id !== quizId));
-      enqueueSnackbar(result.message, { variant: "success" });
+      toast.success(result.message);
     } else {
-      enqueueSnackbar(result.message, { variant: "error" });
+      toast.error(result.message);
     }
   };
   return (

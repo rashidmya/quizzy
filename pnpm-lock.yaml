@@ -98,9 +98,6 @@ importers:
       next-themes:
         specifier: ^0.4.4
         version: 0.4.4(react-dom@19.0.0-rc-2d16326d-20240930(react@19.0.0-rc-2d16326d-20240930))(react@19.0.0-rc-2d16326d-20240930)
-      notistack:
-        specifier: ^3.0.2
-        version: 3.0.2(csstype@3.1.3)(react-dom@19.0.0-rc-2d16326d-20240930(react@19.0.0-rc-2d16326d-20240930))(react@19.0.0-rc-2d16326d-20240930)
       postgres:
         specifier: ^3.4.5
         version: 3.4.5
@@ -116,6 +113,9 @@ importers:
       react-hook-form:
         specifier: ^7.54.2
         version: 7.54.2(react@19.0.0-rc-2d16326d-20240930)
+      sonner:
+        specifier: ^2.0.1
+        version: 2.0.1(react-dom@19.0.0-rc-2d16326d-20240930(react@19.0.0-rc-2d16326d-20240930))(react@19.0.0-rc-2d16326d-20240930)
       tailwind-merge:
         specifier: ^3.0.2
         version: 3.0.2
@@ -1733,10 +1733,6 @@ packages:
   client-only@0.0.1:
     resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
 
-  clsx@1.2.1:
-    resolution: {integrity: sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==}
-    engines: {node: '>=6'}
-
   clsx@2.1.1:
     resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
     engines: {node: '>=6'}
@@ -1923,11 +1919,6 @@ packages:
   get-tsconfig@4.8.1:
     resolution: {integrity: sha512-k9PN+cFBmaLWtVz29SkUoqU5O0slLuHJXt/2P+tMVFT+phsSGXGkp9t3rQIqdz0e+06EHNGs3oM6ZX1s2zHxRg==}
 
-  goober@2.1.16:
-    resolution: {integrity: sha512-erjk19y1U33+XAMe1VTvIONHYoSqE4iS7BYUZfHaqeohLmnC0FdxEh7rQU+6MZ4OajItzjZFSRtVANrQwNq6/g==}
-    peerDependencies:
-      csstype: ^3.0.10
-
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
 
@@ -2066,13 +2057,6 @@ packages:
       sass:
         optional: true
 
-  notistack@3.0.2:
-    resolution: {integrity: sha512-0R+/arLYbK5Hh7mEfR2adt0tyXJcCC9KkA2hc56FeWik2QN6Bm/S4uW+BjzDARsJth5u06nTjelSw/VSnB1YEA==}
-    engines: {node: '>=12.0.0', npm: '>=6.0.0'}
-    peerDependencies:
-      react: ^17.0.0 || ^18.0.0 || ^19.0.0
-      react-dom: ^17.0.0 || ^18.0.0 || ^19.0.0
-
   oauth@0.9.15:
     resolution: {integrity: sha512-a5ERWK1kh38ExDEfoO6qUHJb32rd7aYmPHuyCu3Fta/cnICvYmgd2uhuKXvPD+PXB+gCEYYEaQdIRAjCOwAKNA==}
 
@@ -2198,6 +2182,12 @@ packages:
 
   simple-swizzle@0.2.2:
     resolution: {integrity: sha512-JA//kQgZtbuY83m+xT+tXJkmJncGMTFT+C+g2h2R9uxkYIrE2yy9sgmcLhCnw57/WSD+Eh3J97FPEDFnbXnDUg==}
+
+  sonner@2.0.1:
+    resolution: {integrity: sha512-FRBphaehZ5tLdLcQ8g2WOIRE+Y7BCfWi5Zyd8bCvBjiW8TxxAyoWZIxS661Yz6TGPqFQ4VLzOF89WEYhfynSFQ==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+      react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
 
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
@@ -4165,8 +4155,6 @@ snapshots:
 
   client-only@0.0.1: {}
 
-  clsx@1.2.1: {}
-
   clsx@2.1.1: {}
 
   color-convert@2.0.1:
@@ -4300,10 +4288,6 @@ snapshots:
     dependencies:
       resolve-pkg-maps: 1.0.0
 
-  goober@2.1.16(csstype@3.1.3):
-    dependencies:
-      csstype: 3.1.3
-
   graceful-fs@4.2.11: {}
 
   intl-messageformat@10.7.15:
@@ -4421,15 +4405,6 @@ snapshots:
     transitivePeerDependencies:
       - '@babel/core'
       - babel-plugin-macros
-
-  notistack@3.0.2(csstype@3.1.3)(react-dom@19.0.0-rc-2d16326d-20240930(react@19.0.0-rc-2d16326d-20240930))(react@19.0.0-rc-2d16326d-20240930):
-    dependencies:
-      clsx: 1.2.1
-      goober: 2.1.16(csstype@3.1.3)
-      react: 19.0.0-rc-2d16326d-20240930
-      react-dom: 19.0.0-rc-2d16326d-20240930(react@19.0.0-rc-2d16326d-20240930)
-    transitivePeerDependencies:
-      - csstype
 
   oauth@0.9.15: {}
 
@@ -4661,6 +4636,11 @@ snapshots:
     dependencies:
       is-arrayish: 0.3.2
     optional: true
+
+  sonner@2.0.1(react-dom@19.0.0-rc-2d16326d-20240930(react@19.0.0-rc-2d16326d-20240930))(react@19.0.0-rc-2d16326d-20240930):
+    dependencies:
+      react: 19.0.0-rc-2d16326d-20240930
+      react-dom: 19.0.0-rc-2d16326d-20240930(react@19.0.0-rc-2d16326d-20240930)
 
   source-map-js@1.2.1: {}
 
