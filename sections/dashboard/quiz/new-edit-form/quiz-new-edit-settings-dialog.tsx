@@ -181,10 +181,10 @@ export default function QuizNewEditSettingsDialog() {
           )}
         </div>
         <DialogFooter className="mt-4 flex justify-end gap-2">
-          <Button variant="outline" onClick={handleCancel}>
+          <Button type="button" variant="outline" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button onClick={handleSave}>Save</Button>
+          <Button type="button" onClick={handleSave}>Save</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

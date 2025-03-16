@@ -131,7 +131,13 @@ export default function QuizNewEditQuestionDialog({
             onSubmit={(e) => {
               e.stopPropagation();
               e.preventDefault();
-              handleSubmit(handleDialogSave)(e);
+
+              const onInvalid = (formErrors: any) => {
+                // Log errors or show a toast if needed.
+                console.log(formErrors);
+              };
+
+              handleSubmit(handleDialogSave, onInvalid)(e);
             }}
             className="space-y-6 mt-6"
           >
@@ -213,11 +219,14 @@ export default function QuizNewEditQuestionDialog({
                     </Button>
                   </div>
                 ))}
-                {errors.choices && !Array.isArray(errors.choices) && (
-                  <p className="text-red-500 text-sm">
-                    {(errors.choices as any).message}
-                  </p>
-                )}
+                {errors.choices &&
+                  (errors.choices.root ||
+                    (errors.choices && !Array.isArray(errors.choices))) && (
+                    <p className="text-red-500 text-sm">
+                      {(errors.choices as any).root?.message ||
+                        (errors.choices as any).message}
+                    </p>
+                  )}
                 {Array.isArray(errors.choices) &&
                   errors.choices.map((choiceError, index) => (
                     <div key={index}>
