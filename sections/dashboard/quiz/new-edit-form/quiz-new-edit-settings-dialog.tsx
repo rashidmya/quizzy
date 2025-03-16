@@ -28,7 +28,7 @@ import { Settings } from "lucide-react";
 import { TimerMode } from "@/types/quiz";
 
 export default function QuizNewEditSettingsDialog() {
-  const { setValue, getValues } = useFormContext();
+  const { getValues, reset } = useFormContext();
 
   const { title, timerMode, timer, questions } = getValues();
 
@@ -72,9 +72,6 @@ export default function QuizNewEditSettingsDialog() {
     // Only save if there are no errors.
     if (titleError || timerError) return;
 
-    setValue("title", tempTitle);
-    setValue("timerMode", localTimerMode);
-
     updateQuestionTimers();
 
     setOpen(false);
@@ -85,23 +82,31 @@ export default function QuizNewEditSettingsDialog() {
   };
 
   const updateQuestionTimers = () => {
-    if (localTimerMode === "none") {
-      setValue("timer", undefined);
-      questions.forEach((_: any, index: number) => {
-        setValue(`questions.${index}.timer`, undefined);
-      });
-    } else if (localTimerMode === "quiz") {
-      setValue("timer", tempTimer);
-      questions.forEach((_: any, index: number) => {
-        setValue(`questions.${index}.timer`, undefined);
-      });
-    } else if (localTimerMode === "question") {
-      setValue("timer", undefined);
-      questions.forEach((_: any, index: number) => {
-        // Set each question's timer to a default value (e.g. 5 minutes)
-        setValue(`questions.${index}.timer`, 5);
-      });
-    }
+    const currentValues = getValues();
+
+    const updatedValues = {
+      ...currentValues,
+      title: tempTitle,
+      timerMode: localTimerMode,
+      timer: localTimerMode === "quiz" ? tempTimer : undefined,
+      questions:
+        localTimerMode === "none"
+          ? currentValues.questions.map((q: any) => ({
+              ...q,
+              timer: undefined,
+            }))
+          : localTimerMode === "quiz"
+          ? currentValues.questions.map((q: any) => ({
+              ...q,
+              timer: undefined,
+            }))
+          : localTimerMode === "question"
+          ? currentValues.questions.map((q: any) => ({ ...q, timer: 5 }))
+          : currentValues.questions,
+    };
+
+    // Update the entire form state at once.
+    reset(updatedValues);
   };
 
   return (
