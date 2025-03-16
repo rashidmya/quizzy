@@ -13,7 +13,7 @@ export default function DashboardLayout({
       <SidebarInset>
         <div className="flex justify-center overflow-auto ">
           <div className="flex w-full h-full ">
-            <div className="flex flex-col w-full min-h-screen">{children}</div>
+            <div className="flex flex-col w-full min-h-screen max-w-[1024px] mx-auto p-12">{children}</div>
           </div>
         </div>
       </SidebarInset>

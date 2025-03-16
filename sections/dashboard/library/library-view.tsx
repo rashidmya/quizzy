@@ -61,40 +61,38 @@ export default function LibraryView({ quizzes }: Props) {
     }
   };
   return (
-    <div className="relative w-full mx-auto px-5 md:px-0 overflow-hidden p-12 max-w-[890px]">
-      <div className="flex flex-col w-full">
-        <h1 className="text-2xl font-bold mb-4">Library</h1>
-        {/* Search Bar and Sort Dropdown */}
-        <div className="mb-4 flex items-center gap-4">
-          <Input
-            type="text"
-            placeholder="Search quizzes..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full"
-          />
-          <Select
-            onValueChange={(value) => setSortOrder(value)}
-            defaultValue="recent"
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Sort By" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="recent">Most Recent</SelectItem>
-              <SelectItem value="least">Least Recent</SelectItem>
-              <SelectItem value="alphabetical">Alphabetical</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        {filteredQuizzes.length === 0 ? (
-          <div className="min-h-[200px] flex items-center justify-center text-muted-foreground">
-            No quizzes found.
-          </div>
-        ) : (
-          <QuizList quizzes={filteredQuizzes} onDelete={handleDeleteQuiz} />
-        )}
+    <div className="flex flex-col w-full">
+      <h1 className="text-2xl font-bold mb-4">Library</h1>
+      {/* Search Bar and Sort Dropdown */}
+      <div className="mb-4 flex items-center gap-4">
+        <Input
+          type="text"
+          placeholder="Search quizzes..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full"
+        />
+        <Select
+          onValueChange={(value) => setSortOrder(value)}
+          defaultValue="recent"
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Sort By" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="recent">Most Recent</SelectItem>
+            <SelectItem value="least">Least Recent</SelectItem>
+            <SelectItem value="alphabetical">Alphabetical</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
+      {filteredQuizzes.length === 0 ? (
+        <div className="min-h-[200px] flex items-center justify-center text-muted-foreground">
+          No quizzes found.
+        </div>
+      ) : (
+        <QuizList quizzes={filteredQuizzes} onDelete={handleDeleteQuiz} />
+      )}
     </div>
   );
 }

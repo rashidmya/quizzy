@@ -35,9 +35,9 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <NotistackProvider>
-              <div className="flex min-h-screen w-full flex-col">
-                <main>{children}</main>
-              </div>
+              <main className="flex min-h-screen w-full flex-col">
+                {children}
+              </main>
             </NotistackProvider>
           </ThemeProvider>
         </SessionProvider>
