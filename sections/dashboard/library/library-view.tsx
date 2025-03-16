@@ -52,13 +52,13 @@ export default function LibraryView({ quizzes }: Props) {
   // Handler to remove a quiz from local state.
   const handleDeleteQuiz = async (quizId: string) => {
     const result = await deleteAction(quizId);
-    if (!result.error) {
-      setQuizList((prev) => prev.filter((quiz) => quiz.id !== quizId));
-      toast.success(result.message);
-    } else {
-      toast.error(result.message);
+    if (result.error) {
+      return toast.error(result.message);
     }
+    setQuizList((prev) => prev.filter((quiz) => quiz.id !== quizId));
+    toast.success(result.message);
   };
+  
   return (
     <div className="flex flex-col w-full">
       <h1 className="text-2xl font-bold mb-4">Library</h1>
