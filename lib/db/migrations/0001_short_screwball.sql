@@ -1,0 +1,1 @@
+ALTER TYPE "public"."timer_modes" ADD VALUE 'none' BEFORE 'quiz';

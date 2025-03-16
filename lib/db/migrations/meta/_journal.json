@@ -8,6 +8,13 @@
       "when": 1741993366133,
       "tag": "0000_damp_tinkerer",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1742139117079,
+      "tag": "0001_short_screwball",
+      "breakpoints": true
     }
   ]
 }
