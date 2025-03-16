@@ -19,7 +19,7 @@ declare module "next-auth" {
   }
 }
 
-export const authOptions: NextAuthOptions = {
+const handler = NextAuth({
   ...authConfig,
   providers: [
     CredentialsProvider({
@@ -53,8 +53,6 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     }),
   ],
-};
-
-const handler = NextAuth(authOptions);
+});
 
 export { handler as GET, handler as POST };
