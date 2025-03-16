@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+// react-hook-form
 import { useForm, useFieldArray, useWatch, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+// components
 import {
   Dialog,
   DialogTrigger,
@@ -15,7 +17,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Pencil, PlusIcon, Trash2 } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -23,6 +24,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+// icons
+import { Plus, Pencil, PlusIcon, Trash2 } from "lucide-react";
+// types
 import { getQuestionTypeLabel, QUESTION_TYPES } from "@/types/question";
 
 // Define a schema for the question dialog form.

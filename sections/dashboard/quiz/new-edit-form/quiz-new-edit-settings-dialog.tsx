@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 // react-hook-form
-import { Controller, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 // components
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
