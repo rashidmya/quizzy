@@ -90,13 +90,10 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
 
   const user = useCurrentUser();
 
-  const [_, upsertAction, isUpsertPending] = useActionState(
-    upsertQuiz,
-    {
-      quizId: "",
-      message: "",
-    }
-  );
+  const [_, upsertAction, isUpsertPending] = useActionState(upsertQuiz, {
+    quizId: "",
+    message: "",
+  });
 
   // Prepare default form values (using DEFAULT_QUESTION when no quiz is provided)
   const defaultValues: QuizFormValues = {
@@ -157,16 +154,21 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
       formData.append("userId", user.id || "");
     }
 
-    const result = await upsertAction(formData);
+    const promise = upsertAction(formData).then((result: any) => {
+      if (result.error) {
+        throw new Error(result.message);
+      }
+      return result;
+    });
 
-    if (result.error){
-      return toast.error(result.message);
-    }
-
-    if (result.quizId) {
-      toast.success(result.message);
-      push(PATH_DASHBOARD.quiz.view(result.quizId));
-    }
+    toast.promise(promise, {
+      loading: "Saving...",
+      success: (data: any) => {
+        push(PATH_DASHBOARD.quiz.view(data.quizId));
+        return data.message;
+      },
+      error: (error: any) => error.message || "Error",
+    });
   };
 
   const handleBack = () => {
