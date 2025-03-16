@@ -23,6 +23,8 @@ import QuizNewEditHeader from "./quiz-new-edit-header";
 // types
 import { QUESTION_TYPES } from "@/types/question";
 import { QuizWithQuestions, TIMER_MODES } from "@/types/quiz";
+// toast
+import { toast } from "sonner";
 
 // Schema definitions
 const choiceSchema = z.object({
@@ -87,7 +89,7 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
   const { push } = useRouter();
   const user = useCurrentUser();
 
-  const [upsertState, upsertAction, isUpsertPending] = useActionState(
+  const [_, upsertAction, isUpsertPending] = useActionState(
     upsertQuiz,
     {
       quizId: "",
@@ -164,7 +166,13 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
     }
 
     const result = await upsertAction(formData);
+
+    if (result.error){
+      return toast.error(result.message);
+    }
+
     if (result.quizId) {
+      toast.success(result.message);
       push(PATH_DASHBOARD.quiz.view(result.quizId));
     }
   };
@@ -183,7 +191,6 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
         <QuizNewEditHeader
           isPending={isUpsertPending}
           onBack={handleBack}
-          upsertState={upsertState}
           title={titleValue}
         />
 

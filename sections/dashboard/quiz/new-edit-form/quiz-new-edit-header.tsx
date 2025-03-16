@@ -6,15 +6,11 @@ type Props = {
   onBack: () => void;
   title: string;
   isPending: boolean;
-  upsertState: {
-    message: string;
-  };
 };
 export default function QuizNewEditHeader({
   onBack,
   title,
   isPending,
-  upsertState,
 }: Props) {
   return (
     <div className="border-b p-4">
@@ -41,11 +37,6 @@ export default function QuizNewEditHeader({
             )}
           </Button>
         </div>
-      </div>
-      <div className="flex justify-end w-full pt-2">
-        {upsertState.message && (
-          <p className="text-sm text-gray-400">{upsertState.message}</p>
-        )}
       </div>
     </div>
   );
