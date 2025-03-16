@@ -60,8 +60,6 @@ export default function QuizView({
     push(PATH_DASHBOARD.quiz.edit(quiz.id));
   };
 
-  console.log(quiz);
-
   return (
     <div className="min-h-screen">
       <Card className="mx-auto shadow-none rounded px-8">

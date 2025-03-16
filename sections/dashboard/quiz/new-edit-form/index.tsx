@@ -87,6 +87,7 @@ const DEFAULT_QUESTION = {
 
 export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
   const { push } = useRouter();
+
   const user = useCurrentUser();
 
   const [_, upsertAction, isUpsertPending] = useActionState(
