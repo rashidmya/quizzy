@@ -7,7 +7,7 @@ import "./globals.css";
 import { SessionProvider } from "@/components/providers/session-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 // toaster
-import { Toaster } from "@/components/toaster";
+import { Toaster } from "@/components/ui/sonner";
 
 const roboto = Roboto({
   subsets: ["latin"],
