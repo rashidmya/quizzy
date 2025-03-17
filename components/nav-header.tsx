@@ -22,7 +22,7 @@ export function NavHeader() {
           className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-transparent hover:text-current"
         >
           <Link href={PATH_DASHBOARD.root}>
-            <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+            <div className="bg-sidebar-primary text-sidebar-primary-foreground dark:bg-white dark:text-black flex aspect-square size-8 items-center justify-center rounded-lg">
               <LaunchUI />
             </div>
             <div className="grid flex-1 text-left text-sm leading-tight">
