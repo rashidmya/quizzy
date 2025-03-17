@@ -3,16 +3,24 @@
 // components
 import { CardHeader, CardTitle } from "@/components/ui/card";
 // lucide-react
-import { Users } from "lucide-react";
+import {
+  Users,
+  Timer,
+  TimerReset,
+} from "lucide-react";
 
 type QuizHeaderProps = {
   title: string;
   participantCount: number;
+  timerMode: string;
+  timer?: number | null;
 };
 
 export default function QuizHeader({
   title,
   participantCount,
+  timerMode,
+  timer,
 }: QuizHeaderProps) {
   return (
     <CardHeader className="p-0">
@@ -24,12 +32,30 @@ export default function QuizHeader({
           </div>
         </div>
         {/* Participant Count */}
-        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-          <Users className="h-4 w-4" />
-          <span>
-            {participantCount}{" "}
-            {participantCount === 1 ? "participant" : "participants"}
-          </span>
+        <div>
+          <div className="flex items-center gap-1 text-sm text-muted-foreground justify-end">
+            <Timer className="h-4 w-4" />
+            <div className="flex items-center">
+              <span>
+                Timer mode: <span className="capitalize">{timerMode}</span>
+              </span>
+            </div>
+          </div>
+          {timer && (
+            <div className="flex items-center gap-1 text-sm text-muted-foreground justify-end">
+              <TimerReset className="h-4 w-4" />
+              <div className="flex items-center">
+                <span>Timer: {timer} mins</span>
+              </div>
+            </div>
+          )}
+          <div className="flex items-center gap-1 text-sm text-muted-foreground justify-end">
+            <Users className="h-4 w-4" />
+            <span>
+              {participantCount}{" "}
+              {participantCount === 1 ? "participant" : "participants"}
+            </span>
+          </div>
         </div>
       </div>
     </CardHeader>

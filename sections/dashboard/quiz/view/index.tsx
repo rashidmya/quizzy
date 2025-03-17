@@ -63,7 +63,12 @@ export default function QuizView({
   return (
     <div className="min-h-screen">
       <Card className="mx-auto shadow-none rounded px-8">
-        <QuizHeader title={quiz.title} participantCount={participantCount} />
+        <QuizHeader
+          title={quiz.title}
+          participantCount={participantCount}
+          timerMode={quiz.timerMode}
+          timer={quiz.timer}
+        />
 
         <div className="flex flex-row justify-between items-center">
           <QuizCreationInfo
