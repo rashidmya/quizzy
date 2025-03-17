@@ -192,12 +192,12 @@ export default function QuizNewEditQuestionDialog({
             </div>
             {/* Conditionally Render Choices for Multiple Choice */}
             {questionType === "multiple_choice" ? (
-              <div className="space-y-4">
+              <div className="space-y-4 border rounded-xl p-8">
                 <Label className="block mb-2">Choices</Label>
                 {fields.map((field, index) => (
                   <div
                     key={field.id}
-                    className="flex items-center gap-4 bg-gray-50 p-3 rounded"
+                    className="flex items-center gap-4 p-3 rounded"
                   >
                     <Input
                       id={`choices.${index}.text`}
