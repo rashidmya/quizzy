@@ -17,7 +17,7 @@ import { PATH_DASHBOARD } from "@/routes/paths";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useActionState } from "@/hooks/use-action-state";
 // sections
-import QuestionCard from "./question-card";
+import QuestionCard from "./quiz-new-edit-question-card";
 import QuizNewEditQuestionDialog from "./quiz-new-edit-question-dialog";
 import QuizNewEditHeader from "./quiz-new-edit-header";
 // types

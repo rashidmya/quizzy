@@ -31,7 +31,7 @@ import {
 import { Trash2 } from "lucide-react";
 // hooks
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { DeleteAccountDialog } from "./delete-account-dialog";
+import { DeleteAccountDialog } from "./settings-delete-account-dialog";
 
 export default function AccountSettingsPage() {
   const user = useCurrentUser();

@@ -6,10 +6,10 @@ import { useRouter } from "next/navigation";
 import { Card, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // sections
-import QuizQuestionList from "./quiz-question-list";
-import QuizHeader from "./quiz-header";
-import { QuizAltActions, QuizMainActions } from "./quiz-actions";
-import QuizCreationInfo from "./quiz-creation-info";
+import QuizQuestionList from "./quiz-view-question-list";
+import QuizHeader from "./quiz-view-header";
+import { QuizAltActions, QuizMainActions } from "./quiz-view-actions";
+import QuizCreationInfo from "./quiz-view-creation-info";
 // types
 import { QuizWithQuestions } from "@/types/quiz";
 // paths
