@@ -10,10 +10,7 @@ export const dynamic = "force-static";
 export default async function QuizPage({ params }: PageProps) {
   const { slug } = params;
 
-  const base64 = Buffer.from(slug, "base64").toString("ascii");
-  console.log(base64);
-
-  const quiz = await getQuizWithQuestions(base64);
+  const quiz = await getQuizWithQuestions(slug);
 
   if (!quiz) {
     return <p>Quiz not found.</p>;
