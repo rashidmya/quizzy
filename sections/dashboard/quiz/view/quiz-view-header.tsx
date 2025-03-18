@@ -3,11 +3,7 @@
 // components
 import { CardHeader, CardTitle } from "@/components/ui/card";
 // lucide-react
-import {
-  Users,
-  Timer,
-  TimerReset,
-} from "lucide-react";
+import { Users, Timer, TimerReset } from "lucide-react";
 
 type QuizHeaderProps = {
   title: string;
@@ -37,7 +33,16 @@ export default function QuizHeader({
             <Timer className="h-4 w-4" />
             <div className="flex items-center">
               <span>
-                Timer mode: <span className="capitalize">{timerMode}</span>
+                Timer mode:{" "}
+                <span className="capitalize">
+                  {timerMode === "none"
+                    ? "none"
+                    : timerMode === "global"
+                    ? "global"
+                    : timerMode === "question"
+                    ? "per question"
+                    : timerMode}
+                </span>
               </span>
             </div>
           </div>

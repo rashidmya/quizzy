@@ -31,11 +31,11 @@ export default function QuizQuestionList({ questions }: Props) {
               <div className="text-xs border border-gray-300 rounded px-2 py-1">
                 {question.points} {question.points === 1 ? "point" : "points"}
               </div>
-              <div className="text-xs border border-gray-300 rounded px-2 py-1">
-                {question.timer
-                  ? `${question.timer} ${question.timer === 1 ? "min" : "mins"}`
-                  : ""}
-              </div>
+              {question.timer && (
+                <div className="text-xs border border-gray-300 rounded px-2 py-1">
+                  {question.timer} {question.timer === 1 ? "min" : "mins"}
+                </div>
+              )}
             </div>
           </CardHeader>
           <CardContent>
