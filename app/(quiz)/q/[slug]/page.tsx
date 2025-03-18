@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 // queries
 import { getQuizWithQuestions } from "@/lib/db/queries/quizzes";
 // sections
@@ -19,7 +20,7 @@ export default async function QuizPage({ params }: PageProps) {
   const quiz = await getQuizWithQuestions(decodedId);
 
   if (!quiz) {
-    return <p>Quiz not found.</p>;
+    return notFound();
   }
 
   if (!quiz.isLive) {
