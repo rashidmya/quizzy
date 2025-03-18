@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getQuizWithQuestions } from "@/lib/db/queries/quizzes";
 // sections
 import QuizTakingForm from "@/sections/(quiz)/quiz-taking-form";
+import QuizOffline from "@/sections/(quiz)/quiz-offline";
 // utils
 import { decodeUUID } from "@/utils/encode-uuid";
 
@@ -24,13 +25,7 @@ export default async function QuizPage({ params }: PageProps) {
   }
 
   if (!quiz.isLive) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-xl text-center text-muted-foreground">
-          This quiz is currently offline and not accepting responses.
-        </p>
-      </div>
-    );
+    return <QuizOffline />;
   }
 
   return <QuizTakingForm quiz={quiz} />;

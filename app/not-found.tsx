@@ -33,7 +33,7 @@ export default function NotFound() {
           <Link href="/">
             <Button variant="outline">
               <ArrowLeftIcon className="mr-2 h-4 w-4" />
-              Go Home
+              Homepage
             </Button>
           </Link>
         </CardFooter>
