@@ -61,12 +61,12 @@ export function QuizMainActions({
           <Loader className="!h-4 !w-4 animate-spin" />
         ) : isLive ? (
           <>
-            <StopCircle color="red" className="!h-5 !w-5" />
+            <StopCircle className="!h-4 !w-4" />
             <span>Stop Live</span>
           </>
         ) : (
           <>
-            <PlayCircle color="green" className="!h-5 !w-5" />
+            <PlayCircle className="!h-4 !w-4" />
             <span>Go Live</span>
           </>
         )}
