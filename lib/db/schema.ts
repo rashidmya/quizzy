@@ -29,8 +29,9 @@ export const quizzes = pgTable("quizzes", {
   createdBy: uuid("created_by")
     .references(() => users.id)
     .notNull(),
-  timerMode: timerModeEnum("timer_mode").notNull().default('global'),
+  timerMode: timerModeEnum("timer_mode").notNull().default("global"),
   timer: integer("timer"),
+  isLive: boolean("is_live").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -52,7 +53,6 @@ export const choices = pgTable("choices", {
     onDelete: "cascade",
   }),
   text: varchar("text", { length: 1024 }).notNull(),
-  // Mark the correct choice (if needed)
   isCorrect: boolean("is_correct").default(false).notNull(),
 });
 
