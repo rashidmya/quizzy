@@ -36,19 +36,19 @@ export async function getQuizWithQuestions(quizId: string) {
     .select({
       id: quizzes.id,
       title: quizzes.title,
-      createdAt: quizzes.createdAt,
-      updatedAt: quizzes.updatedAt,
       createdBy: {
         id: users.id,
         name: users.name,
       },
       timer: quizzes.timer,
       timerMode: quizzes.timerMode,
+      isLive: quizzes.isLive,
+      createdAt: quizzes.createdAt,
+      updatedAt: quizzes.updatedAt,
     })
     .from(quizzes)
     .innerJoin(users, eq(quizzes.createdBy, users.id))
-    .where(eq(quizzes.id, quizId))
-    
+    .where(eq(quizzes.id, quizId));
 
   if (!quizResult.length) return null;
 

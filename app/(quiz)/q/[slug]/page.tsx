@@ -16,5 +16,15 @@ export default async function QuizPage({ params }: PageProps) {
     return <p>Quiz not found.</p>;
   }
 
+  if (!quiz.isLive) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-xl text-center text-muted-foreground">
+          This quiz is currently offline and not accepting responses.
+        </p>
+      </div>
+    );
+  }
+
   return <QuizTakingForm quiz={quiz} />;
 }
