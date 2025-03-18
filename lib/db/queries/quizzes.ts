@@ -20,6 +20,7 @@ export async function getQuizzes(userId: string) {
       questionCount: sql<number>`CAST((SELECT COUNT(*) FROM questions WHERE questions.quiz_id = ${quizzes.id}) AS INTEGER)`,
       timer: quizzes.timer,
       timerMode: quizzes.timerMode,
+      isLive: quizzes.isLive, 
     })
     .from(quizzes)
     .innerJoin(users, eq(quizzes.createdBy, users.id))
