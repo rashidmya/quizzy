@@ -2,6 +2,7 @@
 
 // components
 import { CardHeader, CardTitle } from "@/components/ui/card";
+import { LiveStatus } from "@/components/ui/live-status";
 // lucide-react
 import { Users, Timer, TimerReset } from "lucide-react";
 
@@ -27,17 +28,8 @@ export default function QuizHeader({
         <div className="flex flex-col">
           <div className="flex items-center">
             <CardTitle className="text-2xl font-bold">{title}</CardTitle>
-            {isLive && (
-              <div className="flex items-center ml-4">
-                <div className="relative flex h-2 w-2">
-                  <div className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75"></div>
-                  <div className="relative inline-flex h-2 w-2 rounded-full bg-green-600"></div>
-                </div>
-                <span className="ml-1 text-xs font-semibold text-green-600 uppercase tracking-wider">
-                  Live
-                </span>
-              </div>
-            )}
+            <div className="mx-4 h-6 border-l border-gray-300"></div>
+            <LiveStatus isLive={isLive} />
           </div>
         </div>
         {/* Participant Count and Timer Info */}
