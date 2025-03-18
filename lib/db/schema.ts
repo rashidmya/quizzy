@@ -29,7 +29,7 @@ export const quizzes = pgTable("quizzes", {
   createdBy: uuid("created_by")
     .references(() => users.id)
     .notNull(),
-  timerMode: timerModeEnum("timer_mode").notNull().default("quiz"),
+  timerMode: timerModeEnum("timer_mode").notNull().default('global'),
   timer: integer("timer"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

@@ -55,7 +55,7 @@ export default function QuizNewEditSettingsDialog() {
 
   // Timer validation: simple validation if in global mode.
   const timerError =
-    localTimerMode === "quiz" && tempTimer < 0
+    localTimerMode === "global" && tempTimer < 0
       ? "Please enter a valid timer."
       : "";
 
@@ -88,14 +88,14 @@ export default function QuizNewEditSettingsDialog() {
       ...currentValues,
       title: tempTitle,
       timerMode: localTimerMode,
-      timer: localTimerMode === "quiz" ? tempTimer : undefined,
+      timer: localTimerMode === "global" ? tempTimer : undefined,
       questions:
         localTimerMode === "none"
           ? currentValues.questions.map((q: any) => ({
               ...q,
               timer: undefined,
             }))
-          : localTimerMode === "quiz"
+          : localTimerMode === "global"
           ? currentValues.questions.map((q: any) => ({
               ...q,
               timer: undefined,
@@ -155,14 +155,14 @@ export default function QuizNewEditSettingsDialog() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">None</SelectItem>
-                <SelectItem value="quiz">Global Timer</SelectItem>
+                <SelectItem value="global">Global Timer</SelectItem>
                 <SelectItem value="question">Per Question Timer</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* Global Timer Input (only if mode is "quiz") */}
-          {localTimerMode === "quiz" && (
+          {localTimerMode === "global" && (
             <div className="flex flex-col">
               <Label className="mb-2 text-sm">Quiz Timer (minutes)</Label>
               <Input

@@ -25,7 +25,7 @@ async function main() {
         title: `Quiz Title ${i + 1}`,
         createdBy: insertedUsers[0].id,
         timerMode: TIMER_MODES[0],
-        timer: 300,
+        timer: null,
       }))
     )
     .returning();
