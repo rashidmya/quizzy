@@ -71,7 +71,7 @@ export default function QuizView({
       success: (result) => {
         if (!result.error) {
           setIsLive(newLive);
-          return "Quiz status updated successfully";
+          return newLive ? "Quiz is online" : "Quiz is offline";
         } else {
           throw new Error(result.message || "Failed to update quiz status");
         }
