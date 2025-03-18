@@ -1,5 +1,9 @@
-import { getQuizWithQuestions } from "@/lib/db/queries/quizzes"; // Your DB query function
-import QuizTakingForm from "@/sections/(quiz)/quiz-taking-form"; // Client component for taking quiz
+// queries
+import { getQuizWithQuestions } from "@/lib/db/queries/quizzes";
+// sections
+import QuizTakingForm from "@/sections/(quiz)/quiz-taking-form";
+// utils
+import { decodeUUID } from "@/utils/encode-uuid";
 
 type PageProps = {
   params: { slug: string };
@@ -10,7 +14,9 @@ export const dynamic = "force-static";
 export default async function QuizPage({ params }: PageProps) {
   const { slug } = params;
 
-  const quiz = await getQuizWithQuestions(slug);
+  const decodedId = decodeUUID(slug);
+
+  const quiz = await getQuizWithQuestions(decodedId);
 
   if (!quiz) {
     return <p>Quiz not found.</p>;

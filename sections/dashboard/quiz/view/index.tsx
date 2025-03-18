@@ -14,6 +14,14 @@ import QuizCreationInfo from "./quiz-view-creation-info";
 import { QuizWithQuestions } from "@/types/quiz";
 // paths
 import { PATH_DASHBOARD } from "@/routes/paths";
+// hooks
+import { useActionState } from "@/hooks/use-action-state";
+// actions
+import { setQuizLive } from "@/actions/quiz";
+// sonner
+import { toast } from "sonner";
+// utils
+import { encodeUUID } from "@/utils/encode-uuid";
 
 // This will be replaced by 'use cache' soon
 export const dynamic = "force-static";
@@ -34,11 +42,42 @@ export default function QuizView({
 }: QuizDashboardCardProps) {
   const { push } = useRouter();
 
-  const [isLive, setIsLive] = useState(false);
+  const [isLive, setIsLive] = useState(quiz.isLive);
+
+  const [_, setLiveAction, isSetLivePending] = useActionState(setQuizLive, {
+    message: "",
+    error: false,
+  });
+
   const [currentTab, setCurrentTab] = useState("questions");
 
-  const handleToggleLive = () => {
-    setIsLive((prev) => !prev);
+  const quizUrl =
+    process.env.NEXT_PUBLIC_HOSTNAME + "/q/" + encodeUUID(quiz.id);
+
+  const handleToggleLive = async () => {
+    const newLive = !isLive;
+
+    const promise = setLiveAction({ quizId: quiz.id, isLive: newLive }).then(
+      (result: any) => {
+        if (result.error) {
+          throw new Error(result.message);
+        }
+        return result;
+      }
+    );
+
+    toast.promise(promise, {
+      loading: newLive ? "Enabling quiz..." : "Disabling quiz...",
+      success: (result) => {
+        if (!result.error) {
+          setIsLive(newLive);
+          return "Quiz status updated successfully";
+        } else {
+          throw new Error(result.message || "Failed to update quiz status");
+        }
+      },
+      error: (err) => err.message || "Failed to update quiz status",
+    });
   };
 
   const handleSchedule = () => {
@@ -77,6 +116,7 @@ export default function QuizView({
           />
 
           <QuizAltActions
+            quizUrl={quizUrl}
             onPreview={handlePreview}
             onEdit={handleEdit}
             onDelete={handleDelete}
@@ -85,6 +125,7 @@ export default function QuizView({
 
         <QuizMainActions
           isLive={isLive}
+          isSetLivePending={isSetLivePending}
           onSchedule={handleSchedule}
           onToggleLive={handleToggleLive}
         />

@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 // lucide icons
 import {
   PlayCircle,
@@ -10,22 +9,90 @@ import {
   Edit,
   MoreVertical,
   Trash2,
+  Loader,
+  Share2Icon,
+  Copy,
 } from "lucide-react";
-// shadcn dropdown components
+// components
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+// sonner
+import { toast } from "sonner";
+
+type QuizMainActionsProps = {
+  isLive: boolean;
+  isSetLivePending: boolean;
+  onToggleLive: () => void;
+  onSchedule: () => void;
+};
+
+export function QuizMainActions({
+  isLive,
+  isSetLivePending,
+  onToggleLive,
+  onSchedule,
+}: QuizMainActionsProps) {
+  return (
+    <div className="flex flex-row gap-2">
+      <Button
+        className="rounded flex-2 h-14"
+        variant="default"
+        size="lg"
+        onClick={onToggleLive}
+      >
+        {isSetLivePending ? (
+          <Loader className="!h-4 !w-4 animate-spin" />
+        ) : isLive ? (
+          <>
+            <StopCircle color="red" className="!h-5 !w-5" />
+            <span>Stop Live</span>
+          </>
+        ) : (
+          <>
+            <PlayCircle color="green" className="!h-5 !w-5" />
+            <span>Go Live</span>
+          </>
+        )}
+      </Button>
+      <Button
+        className="rounded flex-1 h-14"
+        variant="default"
+        size="sm"
+        onClick={onSchedule}
+      >
+        <Calendar className="h-4 w-4" />
+        <span>Schedule</span>
+      </Button>
+    </div>
+  );
+}
 
 type QuizAltActionsProps = {
+  quizUrl: string;
   onPreview: () => void;
   onEdit: () => void;
   onDelete: () => void;
 };
 
 export function QuizAltActions({
+  quizUrl,
   onPreview,
   onEdit,
   onDelete,
@@ -41,6 +108,7 @@ export function QuizAltActions({
         <Eye className="h-4 w-4" />
         <span>Preview</span>
       </Button>
+      <ShareDialog quizUrl={quizUrl} />
       <Button
         className="rounded"
         variant="secondary"
@@ -67,46 +135,54 @@ export function QuizAltActions({
   );
 }
 
-type QuizMainActionsProps = {
-  isLive: boolean;
-  onToggleLive: () => void;
-  onSchedule: () => void;
-};
-
-export function QuizMainActions({
-  isLive,
-  onToggleLive,
-  onSchedule,
-}: QuizMainActionsProps) {
+function ShareDialog({ quizUrl }: { quizUrl: string }) {
   return (
-    <div className="flex flex-row gap-2">
-      <Button
-        className="rounded flex-1 h-14"
-        variant="default"
-        size="sm"
-        onClick={onToggleLive}
-      >
-        {isLive ? (
-          <>
-            <StopCircle className="h-4 w-4" />
-            <span>Stop Live</span>
-          </>
-        ) : (
-          <>
-            <PlayCircle className="h-4 w-4" />
-            <span>Go Live</span>
-          </>
-        )}
-      </Button>
-      <Button
-        className="rounded flex-1 h-14"
-        variant="default"
-        size="sm"
-        onClick={onSchedule}
-      >
-        <Calendar className="h-4 w-4" />
-        <span>Schedule</span>
-      </Button>
-    </div>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button className="rounded" variant="secondary" size="sm">
+          <Share2Icon />
+          Share
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Share link</DialogTitle>
+          <DialogDescription>
+            Anyone who has this link will be able to take the quiz.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex items-center space-x-2">
+          <div className="grid flex-1 gap-2">
+            <Label htmlFor="link" className="sr-only">
+              Link
+            </Label>
+            <Input id="link" defaultValue={quizUrl} readOnly />
+          </div>
+          <Button
+            type="button"
+            size="sm"
+            className="px-3"
+            onClick={() => {
+              const input = document.getElementById("link") as HTMLInputElement;
+              if (input) {
+                navigator.clipboard.writeText(input.value).then(() => {
+                  toast.info("Link copied");
+                });
+              }
+            }}
+          >
+            <span className="sr-only">Copy</span>
+            <Copy />
+          </Button>
+        </div>
+        <DialogFooter className="sm:justify-start">
+          <DialogClose asChild>
+            <Button type="button" variant="secondary">
+              Close
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

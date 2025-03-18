@@ -112,3 +112,20 @@ export async function deleteQuiz(quizId: string) {
   await db.delete(quizzes).where(eq(quizzes.id, quizId));
   return { message: "Quiz deleted successfully" };
 }
+
+export async function setQuizLive({
+  quizId,
+  isLive,
+}: {
+  quizId: string;
+  isLive: boolean;
+}) {
+  if (!quizId.trim()) {
+    return { message: "Quiz ID is required", error: true };
+  }
+
+  // Update the quiz record with the new live status.
+  await db.update(quizzes).set({ isLive }).where(eq(quizzes.id, quizId));
+
+  return { message: isLive ? "Quiz is now live" : "Quiz is now offline" };
+}
