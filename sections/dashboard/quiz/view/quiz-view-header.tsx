@@ -10,6 +10,7 @@ type QuizHeaderProps = {
   participantCount: number;
   timerMode: string;
   timer?: number | null;
+  isLive: boolean;
 };
 
 export default function QuizHeader({
@@ -17,17 +18,29 @@ export default function QuizHeader({
   participantCount,
   timerMode,
   timer,
+  isLive,
 }: QuizHeaderProps) {
   return (
     <CardHeader className="p-0">
       <div className="flex justify-between items-start">
-        {/* Quiz Title */}
+        {/* Quiz Title and Live Indicator */}
         <div className="flex flex-col">
           <div className="flex items-center">
             <CardTitle className="text-2xl font-bold">{title}</CardTitle>
+            {isLive && (
+              <div className="flex items-center ml-4">
+                <div className="relative flex h-2 w-2">
+                  <div className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75"></div>
+                  <div className="relative inline-flex h-2 w-2 rounded-full bg-green-600"></div>
+                </div>
+                <span className="ml-1 text-xs font-semibold text-green-600 uppercase tracking-wider">
+                  Live
+                </span>
+              </div>
+            )}
           </div>
         </div>
-        {/* Participant Count */}
+        {/* Participant Count and Timer Info */}
         <div>
           <div className="flex items-center gap-1 text-sm text-muted-foreground justify-end">
             <Timer className="h-4 w-4" />

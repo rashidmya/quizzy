@@ -103,6 +103,7 @@ export default function QuizView({
     <div className="min-h-screen">
       <Card className="mx-auto shadow-none rounded px-8">
         <QuizHeader
+          isLive={isLive}
           title={quiz.title}
           participantCount={participantCount}
           timerMode={quiz.timerMode}
