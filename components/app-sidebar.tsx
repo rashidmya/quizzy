@@ -1,7 +1,7 @@
 "use client";
 
 // icons
-import { HomeIcon, FoldersIcon, ChartLine, Settings } from "lucide-react";
+import { HomeIcon, FoldersIcon, ChartLine } from "lucide-react";
 // components
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -12,7 +12,6 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
 // hooks
 import { useCurrentUser } from "@/hooks/use-current-user";
@@ -36,11 +35,6 @@ const data = {
       title: "Reports",
       url: PATH_DASHBOARD.reports.root,
       icon: ChartLine,
-    },
-    {
-      title: "Settings",
-      url: PATH_DASHBOARD.settings.root,
-      icon: Settings,
     },
   ],
 };

@@ -1,11 +1,12 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 // icons
 import {
-  BadgeCheck,
   ChevronsUpDown,
   LogOut,
   Moon,
+  Settings,
   Sun,
 } from "lucide-react";
 // components
@@ -29,7 +30,8 @@ import {
 import { useTheme } from "next-themes";
 // next-auth
 import { signOut } from "next-auth/react";
-
+// paths
+import { PATH_DASHBOARD } from "@/routes/paths";
 
 export function NavUser({
   user,
@@ -41,8 +43,9 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar();
 
-  const { resolvedTheme, setTheme } = useTheme();
+  const { push } = useRouter();
 
+  const { resolvedTheme, setTheme } = useTheme();
 
   return (
     <SidebarMenu>
@@ -84,9 +87,9 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
+              <DropdownMenuItem onClick={()=> push(PATH_DASHBOARD.settings.root)}>
+                <Settings />
+                Account Settings
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() =>
@@ -105,7 +108,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => signOut({ callbackUrl: '/' })}>
+            <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>
               <LogOut />
               Log out
             </DropdownMenuItem>
