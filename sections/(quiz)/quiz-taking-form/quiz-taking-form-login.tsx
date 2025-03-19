@@ -1,6 +1,6 @@
 "use client";
 
-import { signInQuiz } from "@/lib/auth/quiz-auth";
+import { signIn } from "next-auth/react";
 import { useState } from "react";
 
 interface QuizTakingFormLoginProps {
@@ -14,7 +14,7 @@ export default function QuizTakingFormLogin({
 
   const handleEmailLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const result = await signInQuiz("quiz-login", {
+    const result = await signIn("quiz-login", {
       email,
       callbackUrl: `/q/${quizId}`,
       redirect: false,
@@ -23,7 +23,7 @@ export default function QuizTakingFormLogin({
   };
 
   const handleGoogleLogin = async () => {
-    await signInQuiz("google-quiz-login", {
+    await signIn("google-quiz-login", {
       callbackUrl: `/q/${quizId}`,
       redirect: false,
     });

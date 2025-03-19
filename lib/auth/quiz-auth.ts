@@ -2,7 +2,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import { signIn as nextAuthSignIn } from "next-auth/react";
 
 const handler = NextAuth({
   debug: true,
@@ -70,9 +69,3 @@ const handler = NextAuth({
 });
 
 export { handler as GET, handler as POST };
-
-export const signInQuiz = (provider: string, options?: Record<string, any>) => {
-  const opts = { ...options, basePath: "/api/quiz-auth" };
-  console.log("signInQuiz options:", opts);
-  return nextAuthSignIn(provider, opts);
-};

@@ -10,7 +10,6 @@ import QuizTakingFormMain, {
   QuizTakingFormValues,
 } from "./quiz-taking-form-main";
 import { QuizWithQuestions } from "@/types/quiz";
-import { signInQuiz } from "@/lib/auth/quiz-auth";
 
 type QuizAttempt = {
   id: string;

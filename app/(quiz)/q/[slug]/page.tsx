@@ -6,6 +6,7 @@ import QuizTakingForm from "@/sections/(quiz)/quiz-taking-form";
 import QuizOffline from "@/sections/(quiz)/quiz-offline";
 // utils
 import { decodeUUID } from "@/utils/encode-uuid";
+import { SessionProvider } from "@/components/providers/session-provider";
 
 type PageProps = {
   params: { slug: string };
@@ -28,5 +29,9 @@ export default async function QuizPage({ params }: PageProps) {
     return <QuizOffline />;
   }
 
-  return <QuizTakingForm quiz={quiz} />;
+  return (
+    <SessionProvider basePath="/api/quiz-auth">
+      <QuizTakingForm quiz={quiz} />
+    </SessionProvider>
+  );
 }
