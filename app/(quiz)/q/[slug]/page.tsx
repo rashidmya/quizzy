@@ -14,7 +14,7 @@ type PageProps = {
 export const dynamic = "force-static";
 
 export default async function QuizPage({ params }: PageProps) {
-  const { slug } = params;
+  const { slug } = await params;
 
   const decodedId = decodeUUID(slug);
 

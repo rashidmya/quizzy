@@ -8,6 +8,7 @@ import {
   boolean,
   integer,
   pgEnum,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 export const timerModeEnum = pgEnum("timer_modes", TIMER_MODES);
@@ -56,11 +57,15 @@ export const choices = pgTable("choices", {
   isCorrect: boolean("is_correct").default(false).notNull(),
 });
 
-export const quizAttempts = pgTable("quiz_attempts", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  userId: uuid("user_id").references(() => users.id),
-  quizId: uuid("quiz_id").references(() => quizzes.id),
-  // Score that the user achieved in the quiz attempt
-  score: integer("score").notNull(),
-  takenAt: timestamp("taken_at").defaultNow().notNull(),
-});
+export const quizAttempts = pgTable(
+  "quiz_attempts",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    email: varchar("email", { length: 30 }).notNull(),
+    quizId: uuid("quiz_id").references(() => quizzes.id),
+    score: integer("score").notNull(),
+    startedAt: timestamp("started_at").defaultNow().notNull(),
+    takenAt: timestamp("taken_at").defaultNow().notNull(),
+  },
+  (t) => [uniqueIndex("unique_attempt").on(t.quizId, t.email)]
+);
