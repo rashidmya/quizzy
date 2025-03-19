@@ -8,7 +8,6 @@ import { Mockup, MockupFrame } from "@/components/ui/mockup";
 import Glow from "@/components/ui/glow";
 import Image from "next/image";
 import { useTheme } from "next-themes";
-import Github from "@/components/logos/github";
 import Link from "next/link";
 
 export default function Hero() {
