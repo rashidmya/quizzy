@@ -1,4 +1,4 @@
-import { QUESTION_TYPES } from "@/types/question";
+import { QUESTION_TYPES } from "@/types/quiz";
 import { TIMER_MODES } from "@/types/quiz";
 import {
   pgTable,

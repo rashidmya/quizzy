@@ -1,8 +1,6 @@
 import { db } from "../drizzle";
 import { quizzes, questions, choices, users } from "../schema";
-import { eq, InferSelectModel, sql } from "drizzle-orm";
-
-export type Quiz = InferSelectModel<typeof quizzes>;
+import { eq, sql } from "drizzle-orm";
 
 export async function getQuizzes(userId: string) {
   return db
@@ -20,16 +18,12 @@ export async function getQuizzes(userId: string) {
       questionCount: sql<number>`CAST((SELECT COUNT(*) FROM questions WHERE questions.quiz_id = ${quizzes.id}) AS INTEGER)`,
       timer: quizzes.timer,
       timerMode: quizzes.timerMode,
-      isLive: quizzes.isLive, 
+      isLive: quizzes.isLive,
     })
     .from(quizzes)
     .innerJoin(users, eq(quizzes.createdBy, users.id))
     .where(eq(quizzes.createdBy, userId));
 }
-
-export type Question = InferSelectModel<typeof questions>;
-
-export type Choice = InferSelectModel<typeof choices>;
 
 export async function getQuizWithQuestions(quizId: string) {
   // Query the quiz details (including timer).

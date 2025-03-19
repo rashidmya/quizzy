@@ -21,7 +21,7 @@ import QuizNewEditQuestionCard from "./quiz-new-edit-question-card";
 import QuizNewEditQuestionDialog from "./quiz-new-edit-question-dialog";
 import QuizNewEditHeader from "./quiz-new-edit-header";
 // types
-import { QUESTION_TYPES } from "@/types/question";
+import { QUESTION_TYPES } from "@/types/quiz";
 import { QuizWithQuestions, TIMER_MODES } from "@/types/quiz";
 // toast
 import { toast } from "sonner";

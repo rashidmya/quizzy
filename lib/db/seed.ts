@@ -1,7 +1,7 @@
 import { hash } from "bcrypt-ts";
 import { db } from "./drizzle";
 import { users, quizzes, questions, choices, timerModeEnum } from "./schema";
-import { QUESTION_TYPES } from "@/types/question";
+import { QUESTION_TYPES } from "@/types/quiz";
 import { TIMER_MODES } from "@/types/quiz";
 
 async function main() {

@@ -26,8 +26,10 @@ import {
 } from "@/components/ui/select";
 // icons
 import { Plus, Pencil, PlusIcon, Trash2 } from "lucide-react";
+// utils
+import { getQuestionTypeLabel } from "@/utils/get-question-type-label";
 // types
-import { getQuestionTypeLabel, QUESTION_TYPES } from "@/types/question";
+import { QUESTION_TYPES } from "@/types/quiz";
 
 // Define a schema for the question dialog form.
 const questionDialogSchema = z.object({

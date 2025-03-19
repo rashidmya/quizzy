@@ -24,7 +24,7 @@ import { CheckCircle, Trash2, XCircle } from "lucide-react";
 // sections
 import QuestionNewEditQuestionDialog from "./quiz-new-edit-question-dialog";
 // types
-import { QuestionType } from "@/types/question";
+import { QuestionType } from "@/types/quiz";
 
 export type QuestionCardData = {
   id: string;

@@ -2,10 +2,10 @@
 
 // components
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-// queries
-import { Choice, Question } from "@/lib/db/queries/quizzes";
 // types
-import { getQuestionTypeLabel } from "@/types/question";
+import { Choice, Question } from "@/types/quiz";
+// utils
+import { getQuestionTypeLabel } from "@/utils/get-question-type-label";
 // lucide icons
 import { CheckCircle, XCircle } from "lucide-react";
 
