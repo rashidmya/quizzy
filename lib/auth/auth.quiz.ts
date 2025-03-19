@@ -1,10 +1,9 @@
-// /pages/api/quiz-auth/[...nextauth].ts or /app/api/quiz-auth/[...nextauth]/route.ts
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 
-const handler = NextAuth({
-  debug: true,
+export const authQuizOptions: NextAuthOptions = {
+  debug: true, // Enable debug logs
   session: {
     strategy: "jwt",
   },
@@ -66,6 +65,8 @@ const handler = NextAuth({
       return baseUrl;
     },
   },
-});
+};
+
+const handler = NextAuth(authQuizOptions);
 
 export { handler as GET, handler as POST };
