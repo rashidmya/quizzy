@@ -7,7 +7,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 // logo
-import LaunchUI from "./logos/launch-ui";
+import LaunchUI from "@/components/logos/launch-ui";
 // paths
 import { PATH_DASHBOARD } from "@/routes/paths";
 import Link from "next/link";

@@ -3,9 +3,9 @@
 // icons
 import { HomeIcon, FoldersIcon, ChartLine } from "lucide-react";
 // components
-import { NavMain } from "@/components/nav-main";
-import { NavUser } from "@/components/nav-user";
-import { NavHeader } from "@/components/nav-header";
+import { NavMain } from "@/components/navigation/nav-main";
+import { NavUser } from "@/components/navigation/nav-user";
+import { NavHeader } from "@/components/navigation/nav-header";
 import {
   Sidebar,
   SidebarContent,
