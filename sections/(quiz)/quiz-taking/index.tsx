@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
-import QuizTakingFormLogin from "./quiz-taking-form-login";
-import QuizTakingFormTimer from "./quiz-taking-form-timer";
+import QuizTakingFormLogin from "./quiz-taking-login";
+import QuizTakingFormTimer from "./quiz-taking-timer";
 import QuizTakingFormMain, {
   QuizTakingFormValues,
-} from "./quiz-taking-form-main";
+} from "./quiz-taking-form";
 import { QuizWithQuestions } from "@/types/quiz";
 
 type QuizAttempt = {
@@ -22,7 +22,7 @@ type QuizTakingFormProps = {
   quiz: QuizWithQuestions;
 };
 
-export default function QuizTakingFormIndex({ quiz }: QuizTakingFormProps) {
+export default function QuizTaking({ quiz }: QuizTakingFormProps) {
   const { data: session, status } = useSession();
   const { setTheme } = useTheme();
   const [attempt, setAttempt] = useState<QuizAttempt | null>(null);

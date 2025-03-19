@@ -7,7 +7,7 @@ interface QuizTimerProps {
   totalTime: number | null;
 }
 
-export default function QuizTakingFormTimer({
+export default function QuizTakingTimer({
   attempt,
   totalTime,
 }: QuizTimerProps) {

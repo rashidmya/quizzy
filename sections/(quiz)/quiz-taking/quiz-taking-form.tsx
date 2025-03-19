@@ -18,7 +18,7 @@ interface QuizTakingFormMainProps {
   onSubmit: (data: QuizTakingFormValues) => Promise<void>;
 }
 
-export default function QuizTakingFormMain({ quiz, onSubmit }: QuizTakingFormMainProps) {
+export default function QuizTakingForm({ quiz, onSubmit }: QuizTakingFormMainProps) {
   const { control, handleSubmit } = useForm<QuizTakingFormValues>({
     defaultValues: {
       answers: quiz.questions.map((q) => ({

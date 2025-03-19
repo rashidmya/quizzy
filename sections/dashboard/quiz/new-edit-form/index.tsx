@@ -17,7 +17,7 @@ import { PATH_DASHBOARD } from "@/routes/paths";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useActionState } from "@/hooks/use-action-state";
 // sections
-import QuestionCard from "./quiz-new-edit-question-card";
+import QuizNewEditQuestionCard from "./quiz-new-edit-question-card";
 import QuizNewEditQuestionDialog from "./quiz-new-edit-question-dialog";
 import QuizNewEditHeader from "./quiz-new-edit-header";
 // types
@@ -211,7 +211,7 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
           <div className="grid grid-cols-1 gap-4">
             {questionFields.map((field, index) => (
               <div key={field.id} className="flex flex-row gap-2">
-                <QuestionCard
+                <QuizNewEditQuestionCard
                   questionIndex={index}
                   question={field}
                   onUpdate={(updatedQuestion) => {

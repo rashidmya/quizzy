@@ -43,7 +43,7 @@ type QuizMainActionsProps = {
   onSchedule: () => void;
 };
 
-export function QuizMainActions({
+export function QuizViewMainActions({
   isLive,
   isSetLivePending,
   onToggleLive,
@@ -91,7 +91,7 @@ type QuizAltActionsProps = {
   onDelete: () => void;
 };
 
-export function QuizAltActions({
+export function QuizViewAltActions({
   quizUrl,
   onPreview,
   onEdit,

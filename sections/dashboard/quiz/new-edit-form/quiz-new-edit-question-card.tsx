@@ -42,7 +42,7 @@ export type QuestionCardProps = {
   onDelete: () => void;
 };
 
-export default function QuizFormQuestionCard({
+export default function QuizNewEditQuestionCard({
   questionIndex,
   question,
   onUpdate,

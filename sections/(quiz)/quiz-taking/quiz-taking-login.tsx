@@ -7,7 +7,7 @@ interface QuizTakingFormLoginProps {
   quizId: string;
 }
 
-export default function QuizTakingFormLogin({
+export default function QuizTakingLogin({
   quizId,
 }: QuizTakingFormLoginProps) {
   const [email, setEmail] = useState("");

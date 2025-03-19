@@ -6,10 +6,10 @@ import { useRouter } from "next/navigation";
 import { Card, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // sections
-import QuizQuestionList from "./quiz-view-question-list";
-import QuizHeader from "./quiz-view-header";
-import { QuizAltActions, QuizMainActions } from "./quiz-view-actions";
-import QuizCreationInfo from "./quiz-view-creation-info";
+import QuizViewQuestionList from "./quiz-view-question-list";
+import QuizViewHeader from "./quiz-view-header";
+import { QuizViewAltActions, QuizViewMainActions } from "./quiz-view-actions";
+import QuizViewDetails from "./quiz-view-details";
 // types
 import { QuizWithQuestions } from "@/types/quiz";
 // paths
@@ -102,7 +102,7 @@ export default function QuizView({
   return (
     <div className="min-h-screen">
       <Card className="mx-auto shadow-none rounded px-8">
-        <QuizHeader
+        <QuizViewHeader
           isLive={isLive}
           title={quiz.title}
           participantCount={participantCount}
@@ -111,12 +111,12 @@ export default function QuizView({
         />
 
         <div className="flex flex-row justify-between items-center">
-          <QuizCreationInfo
+          <QuizViewDetails
             name={quiz.createdBy.name}
             createdAt={new Date(quiz.createdAt)}
           />
 
-          <QuizAltActions
+          <QuizViewAltActions
             quizUrl={quizUrl}
             onPreview={handlePreview}
             onEdit={handleEdit}
@@ -124,7 +124,7 @@ export default function QuizView({
           />
         </div>
 
-        <QuizMainActions
+        <QuizViewMainActions
           isLive={isLive}
           isSetLivePending={isSetLivePending}
           onSchedule={handleSchedule}
@@ -153,7 +153,7 @@ export default function QuizView({
       <div className="mx-auto mt-8">
         {currentTab === "questions" && (
           // Render the questions tab content.
-          <QuizQuestionList questions={quiz.questions} />
+          <QuizViewQuestionList questions={quiz.questions} />
         )}
         {currentTab === "feedbacks" && (
           // Render dummy feedback content.

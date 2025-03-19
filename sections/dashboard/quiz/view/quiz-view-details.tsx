@@ -10,7 +10,7 @@ type Props = {
   createdAt: Date;
 };
 
-export default function QuizCreationInfo({ name, createdAt }: Props) {
+export default function QuizViewDetails({ name, createdAt }: Props) {
   return (
     <div className="flex items-center gap-3">
       <div className="p-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800">

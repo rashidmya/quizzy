@@ -5,7 +5,7 @@ import LibraryView from "@/sections/dashboard/library/library-view";
 // next-auth
 import { getServerSession } from "next-auth/next";
 // lib
-import { authMainOptions } from "@/lib/auth/auth.main";
+import { authMainOptions } from "@/lib/auth/main/auth.config";
 
 export const dynamic = "force-dynamic";
 
