@@ -67,9 +67,23 @@ services:
       - "54322:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_DEFAULT_EMAIL: bugadev@proton.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
 
 volumes:
   postgres_data:
+  pgadmin_data:
 `;
 
   await fs.writeFile(
@@ -91,14 +105,39 @@ volumes:
 }
 
 async function writeEnvFile(envVars: Record<string, string>) {
-  console.log('Step 3: Writing environment variables to .env');
-  const envContent = Object.entries(envVars)
-    .map(([key, value]) => `${key}=${value}`)
-    .join('\n');
+  console.log('Step 3: Updating environment variables in .env');
+  const envFilePath = path.join(process.cwd(), '.env');
+  let envContent = '';
 
-  await fs.writeFile(path.join(process.cwd(), '.env'), envContent);
-  console.log('.env file created with the necessary variables.');
+  // Try reading the existing .env file. If it doesn't exist, we'll create a new one.
+  try {
+    envContent = await fs.readFile(envFilePath, 'utf-8');
+  } catch (error) {
+    console.log('.env file does not exist. A new one will be created.');
+  }
+
+  // Split the content into lines (ignoring empty lines)
+  const envLines = envContent.split('\n').filter(line => line.trim() !== '');
+
+  // For each provided environment variable, update or append
+  Object.entries(envVars).forEach(([key, value]) => {
+    const regex = new RegExp(`^${key}=`);
+    const lineIndex = envLines.findIndex(line => regex.test(line));
+    if (lineIndex >= 0) {
+      // Replace existing variable
+      envLines[lineIndex] = `${key}=${value}`;
+    } else {
+      // Append new variable if not found
+      envLines.push(`${key}=${value}`);
+    }
+  });
+
+  // Join all lines and write back to the file
+  const newEnvContent = envLines.join('\n');
+  await fs.writeFile(envFilePath, newEnvContent);
+  console.log('.env file updated with the necessary variables.');
 }
+
 
 async function main() {
   const POSTGRES_URL = await getPostgresURL();
