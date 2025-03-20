@@ -66,10 +66,11 @@ export default function QuizTaking({ quiz }: QuizTakingFormProps) {
           quizId: quiz.id,
         });
         if (result.error) {
-          toast.error(result.message);
+          // If the attempt is already submitted, mark quizTaken as true.
           if (result.message === "Quiz already submitted") {
             setQuizTaken(true);
           }
+          toast.error(result.message);
         } else if (result.attempt) {
           const normalizedAttempt: QuizAttempt = {
             id: result.attempt.id,
@@ -88,8 +89,7 @@ export default function QuizTaking({ quiz }: QuizTakingFormProps) {
 
   const handleTimeUp = async () => {
     if (formRef.current) {
-      const formData = formRef.current.getValues();
-      await handleAutoSave(formData);
+      // Optionally, perform a final auto-save here.
       await handleQuizSubmit();
     }
   };
@@ -126,11 +126,19 @@ export default function QuizTaking({ quiz }: QuizTakingFormProps) {
     content = <div>Loading...</div>;
   } else if (!session || !session.isQuiz) {
     content = <QuizTakingFormLogin quizId={quiz.id} />;
-  } else if (!attempt && !quizTaken) {
+  } else if (quizTaken) {
+    // Check quizTaken before checking for attempt.
+    content = (
+      <div className="max-w-3xl w-3xl m-auto p-4">
+        <p className="text-xl font-semibold">
+          You have already taken this quiz.
+        </p>
+      </div>
+    );
+  } else if (!attempt) {
     content = <div>Loading quiz attempt...</div>;
   } else if (!canContinueQuiz()) {
-    // If time is up, trigger auto submission.
-    // To avoid multiple auto-submit calls, you might disable further submissions.
+    // If time is up (in global mode), auto-submit.
     handleTimeUp();
     content = (
       <div className="max-w-3xl w-3xl m-auto p-4">
@@ -139,20 +147,12 @@ export default function QuizTaking({ quiz }: QuizTakingFormProps) {
         </p>
       </div>
     );
-  } else if (quizTaken) {
-    content = (
-      <div className="max-w-3xl w-3xl m-auto p-4">
-        <p className="text-xl font-semibold">
-          You have already taken this quiz.
-        </p>
-      </div>
-    );
   } else {
     content = (
       <>
         <nav className="flex justify-between items-center p-4 bg-gray-100 mb-4">
           <h1 className="text-xl font-bold">{quiz.title}</h1>
-          {quiz.timerMode === "global" && attempt && (
+          {quiz.timerMode === "global" && (
             <QuizTakingFormTimer
               attempt={attempt}
               totalTime={quiz.timer}

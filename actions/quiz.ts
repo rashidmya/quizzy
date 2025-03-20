@@ -163,11 +163,15 @@ export async function startQuizAttempt({
       );
     if (existing.length > 0) {
       const existingAttempt = existing[0];
-      // If not submitted, resume; if submitted, return a success message.
+      // If not submitted, resume; if submitted, mark as error.
       if (!existingAttempt.submitted) {
         return { message: "Quiz attempt resumed", attempt: existingAttempt };
       } else {
-        return { message: "Quiz already submitted", attempt: existingAttempt };
+        return {
+          message: "Quiz already submitted",
+          attempt: existingAttempt,
+          error: true,
+        };
       }
     }
 
