@@ -5,12 +5,20 @@ import { useEffect, useState } from "react";
 interface QuizTimerProps {
   attempt: { startedAt: string };
   totalTime: number | null;
+  timerMode: string;
+  onTimeUp?: () => void;
 }
 
 export default function QuizTakingTimer({
+  timerMode,
   attempt,
   totalTime,
+  onTimeUp,
 }: QuizTimerProps) {
+  if (timerMode !== "global") {
+    return null;
+  }
+
   const [timeLeft, setTimeLeft] = useState(totalTime);
 
   useEffect(() => {
@@ -21,12 +29,15 @@ export default function QuizTakingTimer({
         const secondsPassed = Math.floor((now - startedTime) / 1000);
         const remaining = totalTime - secondsPassed;
         setTimeLeft(remaining > 0 ? remaining : 0);
+        if (remaining <= 0 && onTimeUp) {
+          onTimeUp();
+        }
       };
 
       const interval = setInterval(updateTimer, 1000);
       return () => clearInterval(interval);
     }
-  }, [attempt, totalTime]);
+  }, [attempt, totalTime, onTimeUp]);
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);

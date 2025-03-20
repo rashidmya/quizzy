@@ -1,6 +1,7 @@
 "use client";
 
-import { useForm, Controller } from "react-hook-form";
+import React, { useImperativeHandle, forwardRef, useEffect } from "react";
+import { useForm, Controller, useWatch, UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -16,10 +17,19 @@ export type QuizTakingFormValues = {
 interface QuizTakingFormMainProps {
   quiz: QuizWithQuestions;
   onSubmit: (data: QuizTakingFormValues) => Promise<void>;
+  onAutoSave?: (data: QuizTakingFormValues) => Promise<void>;
 }
 
-export default function QuizTakingForm({ quiz, onSubmit }: QuizTakingFormMainProps) {
-  const { control, handleSubmit } = useForm<QuizTakingFormValues>({
+export interface QuizTakingFormMainRef {
+  getValues: UseFormReturn<QuizTakingFormValues>["getValues"];
+  triggerSubmit: () => void;
+}
+
+const QuizTakingFormMain = forwardRef<
+  QuizTakingFormMainRef,
+  QuizTakingFormMainProps
+>(({ quiz, onSubmit, onAutoSave }, ref) => {
+  const { control, handleSubmit, getValues } = useForm<QuizTakingFormValues>({
     defaultValues: {
       answers: quiz.questions.map((q) => ({
         questionId: q.id,
@@ -27,6 +37,26 @@ export default function QuizTakingForm({ quiz, onSubmit }: QuizTakingFormMainPro
       })),
     },
   });
+
+  useImperativeHandle(ref, () => ({
+    getValues,
+    triggerSubmit: handleSubmit(onSubmit),
+  }));
+
+  // Watch answers and auto-save.
+  const watchedValues = useWatch({ control });
+
+  useEffect(() => {
+    if (onAutoSave) {
+      const timer = setTimeout(() => {
+        onAutoSave(getValues());
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [watchedValues, onAutoSave, getValues]);
+
+  // Check if all questions are answered.
+  const allAnswered = getValues("answers").every((a) => a.answer.trim() !== "");
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -44,8 +74,14 @@ export default function QuizTakingForm({ quiz, onSubmit }: QuizTakingFormMainPro
                   className="flex flex-col space-y-2"
                 >
                   {question.choices.map((choice) => (
-                    <label key={choice.id} className="flex items-center space-x-2">
-                      <RadioGroupItem value={choice.text} id={`${question.id}-${choice.id}`} />
+                    <label
+                      key={choice.id}
+                      className="flex items-center space-x-2"
+                    >
+                      <RadioGroupItem
+                        value={choice.text}
+                        id={`${question.id}-${choice.id}`}
+                      />
                       <span>{choice.text}</span>
                     </label>
                   ))}
@@ -57,13 +93,20 @@ export default function QuizTakingForm({ quiz, onSubmit }: QuizTakingFormMainPro
               control={control}
               name={`answers.${index}.answer`}
               render={({ field }) => (
-                <Input {...field} placeholder="Your answer" className="w-full" />
+                <Input
+                  {...field}
+                  placeholder="Your answer"
+                  className="w-full"
+                />
               )}
             />
           )}
         </div>
       ))}
-      <Button type="submit">Submit Quiz</Button>
+      {allAnswered && <Button type="submit">Submit Quiz</Button>}
     </form>
   );
-}
+});
+
+QuizTakingFormMain.displayName = "QuizTakingFormMain";
+export default QuizTakingFormMain;
