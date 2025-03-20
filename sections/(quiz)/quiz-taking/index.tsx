@@ -15,7 +15,7 @@ import QuizTakingForm, {
   QuizTakingFormRef,
 } from "./quiz-taking-form";
 // types
-import { QuizWithQuestions } from "@/types/quiz";
+import { QuizAttemp, QuizWithQuestions } from "@/types/quiz";
 // actions
 import {
   startQuizAttempt,
@@ -23,13 +23,6 @@ import {
   autoSaveAnswer,
   getAttemptAnswers,
 } from "@/actions/quiz/quiz-taking";
-
-export type QuizAttempt = {
-  id: string;
-  email: string;
-  quizId: string;
-  startedAt: string; // ISO timestamp from the server
-};
 
 type QuizTakingProps = {
   quiz: QuizWithQuestions & {
@@ -43,7 +36,7 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
   const { data: session, status } = useSession();
   const { setTheme } = useTheme();
 
-  const [attempt, setAttempt] = useState<QuizAttempt | null>(null);
+  const [attempt, setAttempt] = useState<QuizAttemp | null>(null);
   const [initialAnswers, setInitialAnswers] = useState<
     Record<string, string> | undefined
   >(undefined);
@@ -72,9 +65,9 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
     }
     return false;
   }, [quiz.timerMode, quiz.timer, attempt]);
-
+  
   /**
-   * Initialize the quiz attempt once the user is verified.
+   * Check quiz attempt status on initial load
    */
   useEffect(() => {
     const fetchQuizAttempt = async () => {
@@ -93,23 +86,20 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
         }
 
         if (result.attempt) {
-          const startedAt =
-            result.attempt.startedAt instanceof Date
-              ? result.attempt.startedAt.toISOString()
-              : result.attempt.startedAt;
+          // Check if quiz already submitted
+          if (result.attempt.submitted) {
+            return setQuizTaken(true);
+          }
 
           setAttempt({
-            id: result.attempt.id,
-            email: result.attempt.email,
-            quizId: result.attempt.quizId ?? "",
-            startedAt,
+            ...result.attempt,
           });
         }
       }
     };
 
     fetchQuizAttempt();
-  }, [session, attempt, quiz.id]);
+  }, [session, attempt, quiz.id, quiz.timerMode, quiz.timer]);
 
   /**
    * Fetch previously saved answers for the current attempt.

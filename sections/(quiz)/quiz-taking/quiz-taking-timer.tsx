@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 interface QuizTimerProps {
-  attempt: { startedAt: string };
+  attempt: { startedAt: Date };
   totalTime: number | null;
   timerMode: string;
   onTimeUp?: () => void;

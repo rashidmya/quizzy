@@ -7,7 +7,7 @@ export type Question = InferSelectModel<typeof questions>;
 
 export type Choice = InferSelectModel<typeof choices>;
 
-export type QuizAttemps = InferSelectModel<typeof quizAttempts>;
+export type QuizAttemp = InferSelectModel<typeof quizAttempts>;
 
 export type QuizWithQuestions = Omit<Quiz, "createdBy" | "questions"> & {
   createdBy: {

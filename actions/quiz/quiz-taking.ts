@@ -8,7 +8,7 @@ import {
   quizAttempts,
   attemptAnswers,
 } from "@/lib/db/schema";
-import { QuizAttemps } from "@/types/quiz";
+import { QuizAttemp } from "@/types/quiz";
 
 /**
  * Starts or resumes a quiz attempt for a given user/email.
@@ -19,7 +19,7 @@ export async function startQuizAttempt({
 }: {
   email: string;
   quizId: string;
-}): Promise<{ message: string; attempt?: QuizAttemps; error?: boolean }> {
+}): Promise<{ message: string; attempt?: QuizAttemp; error?: boolean }> {
   if (!email?.trim()) {
     return { message: "Email is required", error: true };
   }
