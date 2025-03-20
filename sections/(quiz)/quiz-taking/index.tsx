@@ -38,8 +38,8 @@ export default function QuizTaking({ quiz }: QuizTakingFormProps) {
   const { setTheme } = useTheme();
   const [attempt, setAttempt] = useState<QuizAttempt | null>(null);
   const [initialAnswers, setInitialAnswers] = useState<
-    QuizTakingFormValues["answers"]
-  >([]);
+    QuizTakingFormValues["answers"] | undefined
+  >(undefined);
   const [quizTaken, setQuizTaken] = useState(false);
 
   const formRef = useRef<QuizTakingFormRef>(null);
@@ -95,13 +95,22 @@ export default function QuizTaking({ quiz }: QuizTakingFormProps) {
     if (attempt && !quizTaken) {
       (async () => {
         const result = await getAttemptAnswers({ attemptId: attempt.id });
-        if (result.error) return toast.error(result.message);
-        if (result.answers && result.answers.length > 0) {
-          setInitialAnswers(result.answers);
+        if (result.error) {
+          toast.error(result.message);
+        } else {
+          // Use an empty array if result.answers is undefined.
+          const answers = result.answers ?? [];
+          setInitialAnswers((prev) => {
+            // Update only if not already set or if lengths differ.
+            if (!prev || prev.length !== answers.length) {
+              return answers;
+            }
+            return prev;
+          });
         }
       })();
     }
-  }, [attempt, quizTaken]);
+  }, [attempt?.id, quizTaken]);
 
   const handleTimeUp = async () => {
     if (formRef.current) {
@@ -128,6 +137,10 @@ export default function QuizTaking({ quiz }: QuizTakingFormProps) {
   const handleAutoSave = async (data: QuizTakingFormValues) => {
     if (!attempt) return;
     for (const answerObj of data.answers) {
+      if (!answerObj.questionId) {
+        console.error("Missing questionId for answer", answerObj);
+        continue;
+      }
       const result = await autoSaveAnswer({
         attemptId: attempt.id,
         questionId: answerObj.questionId,
@@ -146,7 +159,6 @@ export default function QuizTaking({ quiz }: QuizTakingFormProps) {
   } else if (!session || !session.isQuiz) {
     content = <QuizTakingLogin quizId={quiz.id} />;
   } else if (quizTaken) {
-    // Check quizTaken before checking for attempt.
     content = (
       <div className="max-w-3xl w-3xl m-auto p-4">
         <p className="text-xl font-semibold">
@@ -156,8 +168,11 @@ export default function QuizTaking({ quiz }: QuizTakingFormProps) {
     );
   } else if (!attempt) {
     content = <div>Loading quiz attempt...</div>;
+  } else if (initialAnswers === undefined) {
+    // Wait until the saved answers have been fetched (even if it's an empty array).
+    content = <div>Loading saved answers...</div>;
   } else if (!canContinueQuiz()) {
-    // If time is up (in global mode), auto-submit.
+    // If time is up, auto-submit.
     handleTimeUp();
     content = (
       <div className="max-w-3xl w-3xl m-auto p-4">

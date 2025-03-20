@@ -199,7 +199,7 @@ export async function startQuizAttempt({
   }
 }
 
-// Auto-save an answer.
+// Updated autoSaveAnswer (allowing saving of empty answers)
 export async function autoSaveAnswer({
   attemptId,
   questionId,
@@ -209,19 +209,15 @@ export async function autoSaveAnswer({
   questionId: string;
   answer: string;
 }): Promise<{ message: string; error?: boolean }> {
-  if (!attemptId.trim() || !questionId.trim() || !answer.trim()) {
-    return { message: "All fields are required", error: true };
+  if (!attemptId.trim() || !questionId.trim()) {
+    return { message: "Attempt ID and Question ID are required", error: true };
   }
-
   try {
     const existing = await db
       .select()
       .from(attemptAnswers)
       .where(
-        and(
-          eq(attemptAnswers.attemptId, attemptId),
-          eq(attemptAnswers.questionId, questionId)
-        )
+        and(eq(attemptAnswers.attemptId, attemptId), eq(attemptAnswers.questionId, questionId))
       );
     if (existing.length > 0) {
       await db
@@ -268,11 +264,7 @@ export async function getAttemptAnswers({
   attemptId,
 }: {
   attemptId: string;
-}): Promise<{
-  message: string;
-  answers?: { questionId: string; answer: string }[];
-  error?: boolean;
-}> {
+}): Promise<{ message: string; answers?: { questionId: string; answer: string }[]; error?: boolean }> {
   if (!attemptId || !attemptId.trim()) {
     return { message: "Attempt ID is required", error: true };
   }
@@ -284,7 +276,8 @@ export async function getAttemptAnswers({
     return {
       message: "Attempt answers fetched successfully",
       answers: answers.map((a) => ({
-        questionId: a.questionId as string,
+        // Force questionId to a string (fallback to empty string if missing)
+        questionId: a.questionId ? (a.questionId as string) : "",
         answer: a.answer,
       })),
     };

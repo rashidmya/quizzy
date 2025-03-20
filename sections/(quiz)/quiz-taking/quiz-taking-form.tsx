@@ -28,7 +28,7 @@ export interface QuizTakingFormRef {
 
 const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
   ({ quiz, onSubmit, onAutoSave, initialAnswers }, ref) => {
-    const { control, handleSubmit, reset, getValues } =
+    const { control, handleSubmit, reset, getValues, register } =
       useForm<QuizTakingFormValues>({
         defaultValues: {
           answers:
@@ -47,28 +47,38 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
       triggerSubmit: handleSubmit(onSubmit),
     }));
 
-    // Reset form when initialAnswers change.
+    // Reset form if initialAnswers change.
     useEffect(() => {
-      if (initialAnswers && initialAnswers.length > 0) {
+      if (initialAnswers !== undefined) {
         reset({ answers: initialAnswers });
       }
     }, [initialAnswers, reset]);
 
-    // Watch for changes.
-    const watchedValues = useWatch({ control });
+    // Watch for changes to the answers.
+    const watchedAnswers = useWatch({ control, name: "answers" });
 
     // Debounce auto-save.
     useEffect(() => {
       if (onAutoSave) {
         const timer = setTimeout(() => {
-          onAutoSave(getValues());
+          // Sanitize answers: ensure questionId is defined.
+          const sanitized = watchedAnswers.map((ans) => ({
+            questionId: ans.questionId ? ans.questionId : "",
+            answer: ans.answer || "",
+          }));
+          // Only call onAutoSave if all answers have a non-empty questionId.
+          if (sanitized.every((a) => a.questionId.trim() !== "")) {
+            onAutoSave({ answers: sanitized });
+          } else {
+            console.error("Auto-save skipped: missing questionId", sanitized);
+          }
         }, 500);
         return () => clearTimeout(timer);
       }
-    }, [watchedValues, onAutoSave, getValues]);
+    }, [watchedAnswers, onAutoSave, getValues]);
 
     const allAnswered = getValues("answers").every(
-      (a) => a.answer.trim() !== ""
+      (a) => (a.answer ?? "").trim() !== ""
     );
 
     return (
@@ -76,6 +86,12 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
         {quiz.questions.map((question, index) => (
           <div key={question.id} className="p-4 border rounded shadow-sm">
             <p className="mb-2 font-semibold">{question.text}</p>
+            {/* Hidden input to register the questionId */}
+            <input
+              type="hidden"
+              {...register(`answers.${index}.questionId`)}
+              defaultValue={question.id}
+            />
             {question.type === "multiple_choice" ? (
               <Controller
                 control={control}
@@ -123,4 +139,4 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
 );
 
 QuizTakingForm.displayName = "QuizTakingForm";
-export default React.forwardRef(QuizTakingForm);
+export default QuizTakingForm;
