@@ -85,7 +85,7 @@ export default function QuizNewEditQuestionCard({
                 <SelectContent>
                   {[1, 2, 3, 4, 5, 10, 15, 30, 45, 60].map((num) => (
                     <SelectItem key={num} value={num.toString()}>
-                      {num} {question.timer === 1 ? "min" : "mins"}
+                      {num / 60} {question.timer === 1 ? "min" : "mins"}
                     </SelectItem>
                   ))}
                 </SelectContent>

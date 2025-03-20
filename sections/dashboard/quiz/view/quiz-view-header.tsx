@@ -55,7 +55,7 @@ export default function QuizHeader({
             <div className="flex items-center gap-1 text-sm text-muted-foreground justify-end">
               <TimerReset className="h-4 w-4" />
               <div className="flex items-center">
-                <span>Timer: {timer} mins</span>
+                <span>Timer: {timer/60} mins</span>
               </div>
             </div>
           )}

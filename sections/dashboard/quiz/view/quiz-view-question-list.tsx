@@ -33,7 +33,7 @@ export default function QuizQuestionList({ questions }: Props) {
               </div>
               {question.timer && (
                 <div className="text-xs border border-gray-300 rounded px-2 py-1">
-                  {question.timer} {question.timer === 1 ? "min" : "mins"}
+                  {question.timer / 60} {question.timer === 1 ? "min" : "mins"}
                 </div>
               )}
             </div>
