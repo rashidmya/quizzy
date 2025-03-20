@@ -38,7 +38,7 @@ export default function QuizTaking({ quiz }: QuizTakingFormProps) {
   const { setTheme } = useTheme();
   const [attempt, setAttempt] = useState<QuizAttempt | null>(null);
   const [initialAnswers, setInitialAnswers] = useState<
-    QuizTakingFormValues["answers"] | undefined
+    Record<string, string> | undefined
   >(undefined);
   const [quizTaken, setQuizTaken] = useState(false);
 
@@ -98,19 +98,23 @@ export default function QuizTaking({ quiz }: QuizTakingFormProps) {
         if (result.error) {
           toast.error(result.message);
         } else {
-          // Use an empty array if result.answers is undefined.
-          const answers = result.answers ?? [];
-          setInitialAnswers((prev) => {
-            // Update only if not already set or if lengths differ.
-            if (!prev || prev.length !== answers.length) {
-              return answers;
-            }
-            return prev;
+          // Convert the fetched answers array to a record keyed by questionId.
+          const record: Record<string, string> = {};
+          result.answers?.forEach(({ questionId, answer }) => {
+            record[questionId] = answer;
           });
+          // Ensure every quiz question has a key.
+          quiz.questions.forEach((q) => {
+            if (!record[q.id]) {
+              record[q.id] = "";
+            }
+          });
+          console.log("Fetched initial answers record:", record);
+          setInitialAnswers(record);
         }
       })();
     }
-  }, [attempt?.id, quizTaken]);
+  }, [attempt, quizTaken, quiz.questions]);
 
   const handleTimeUp = async () => {
     if (formRef.current) {
@@ -136,15 +140,17 @@ export default function QuizTaking({ quiz }: QuizTakingFormProps) {
   // Auto-save callback.
   const handleAutoSave = async (data: QuizTakingFormValues) => {
     if (!attempt) return;
-    for (const answerObj of data.answers) {
-      if (!answerObj.questionId) {
-        console.error("Missing questionId for answer", answerObj);
+    // data.answers is now a record keyed by questionId
+    for (const questionId in data.answers) {
+      const answer = data.answers[questionId];
+      if (!questionId.trim()) {
+        console.error("Missing questionId for answer", { questionId, answer });
         continue;
       }
       const result = await autoSaveAnswer({
         attemptId: attempt.id,
-        questionId: answerObj.questionId,
-        answer: answerObj.answer,
+        questionId,
+        answer,
       });
       if (result.error) {
         toast.error(result.message);

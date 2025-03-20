@@ -7,13 +7,6 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { QuizWithQuestions } from "@/types/quiz";
 
-export type QuizTakingFormValues = {
-  answers: Array<{
-    questionId: string;
-    answer: string;
-  }>;
-};
-
 interface QuizTakingFormProps {
   quiz: QuizWithQuestions;
   onSubmit: (data: QuizTakingFormValues) => Promise<void>;
@@ -26,18 +19,21 @@ export interface QuizTakingFormRef {
   triggerSubmit: () => void;
 }
 
+export type QuizTakingFormValues = {
+  answers: Record<string, string>;
+};
+
 const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
   ({ quiz, onSubmit, onAutoSave, initialAnswers }, ref) => {
     const { control, handleSubmit, reset, getValues, register } =
       useForm<QuizTakingFormValues>({
         defaultValues: {
           answers:
-            initialAnswers && initialAnswers.length > 0
-              ? initialAnswers
-              : quiz.questions.map((q) => ({
-                  questionId: q.id,
-                  answer: "",
-                })),
+            initialAnswers ??
+            quiz.questions.reduce((acc, q) => {
+              acc[q.id] = "";
+              return acc;
+            }, {} as Record<string, string>),
         },
       });
 
@@ -51,76 +47,91 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
     useEffect(() => {
       if (initialAnswers !== undefined) {
         reset({ answers: initialAnswers });
+        console.log("Form reset with initialAnswers:", initialAnswers);
       }
     }, [initialAnswers, reset]);
 
     // Watch for changes to the answers.
     const watchedAnswers = useWatch({ control, name: "answers" });
 
-    // Debounce auto-save.
     useEffect(() => {
       if (onAutoSave) {
         const timer = setTimeout(() => {
-          // Sanitize answers: ensure questionId is defined.
-          const sanitized = watchedAnswers.map((ans) => ({
-            questionId: ans.questionId ? ans.questionId : "",
-            answer: ans.answer || "",
-          }));
-          // Only call onAutoSave if all answers have a non-empty questionId.
-          if (sanitized.every((a) => a.questionId.trim() !== "")) {
-            onAutoSave({ answers: sanitized });
+          const currentValues = getValues();
+          console.log("Auto-saving values:", currentValues);
+          // Ensure each question id exists
+          if (
+            Object.keys(currentValues.answers).length === quiz.questions.length
+          ) {
+            onAutoSave(currentValues);
           } else {
-            console.error("Auto-save skipped: missing questionId", sanitized);
+            console.error(
+              "Auto-save skipped: not all question IDs are present",
+              currentValues.answers
+            );
           }
         }, 500);
         return () => clearTimeout(timer);
       }
-    }, [watchedAnswers, onAutoSave, getValues]);
+    }, [watchedAnswers, onAutoSave, getValues, quiz.questions.length]);
 
-    const allAnswered = getValues("answers").every(
-      (a) => (a.answer ?? "").trim() !== ""
+    const allAnswered = Object.values(getValues("answers")).every(
+      (answer) => answer.trim() !== ""
     );
 
     return (
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {quiz.questions.map((question, index) => (
+        {quiz.questions.map((question) => (
           <div key={question.id} className="p-4 border rounded shadow-sm">
             <p className="mb-2 font-semibold">{question.text}</p>
-            {/* Hidden input to register the questionId */}
-            <input
-              type="hidden"
-              {...register(`answers.${index}.questionId`)}
-              defaultValue={question.id}
-            />
+            {/* Hidden input is no longer needed since we use the question id as key */}
             {question.type === "multiple_choice" ? (
               <Controller
                 control={control}
-                name={`answers.${index}.answer`}
-                render={({ field }) => (
-                  <RadioGroup
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    className="flex flex-col space-y-2"
-                  >
-                    {question.choices.map((choice) => (
-                      <label
-                        key={choice.id}
-                        className="flex items-center space-x-2"
-                      >
-                        <RadioGroupItem
-                          value={choice.text}
-                          id={`${question.id}-${choice.id}`}
-                        />
-                        <span>{choice.text}</span>
-                      </label>
-                    ))}
-                  </RadioGroup>
-                )}
+                name={`answers.${question.id}`}
+                defaultValue={
+                  initialAnswers ? initialAnswers[question.id] ?? "" : ""
+                }
+                render={({ field }) => {
+                  console.log(
+                    `For question ${question.id}, current answer value:`,
+                    field.value
+                  );
+                  return (
+                    <RadioGroup
+                      value={field.value}
+                      onValueChange={(val) => {
+                        console.log(
+                          `For question ${question.id}: onValueChange fired with:`,
+                          val
+                        );
+                        field.onChange(val);
+                      }}
+                      className="flex flex-col space-y-2"
+                    >
+                      {question.choices.map((choice) => (
+                        <label
+                          key={choice.id}
+                          className="flex items-center space-x-2"
+                        >
+                          <RadioGroupItem
+                            value={choice.text}
+                            id={`${question.id}-${choice.id}`}
+                          />
+                          <span>{choice.text}</span>
+                        </label>
+                      ))}
+                    </RadioGroup>
+                  );
+                }}
               />
             ) : (
               <Controller
                 control={control}
-                name={`answers.${index}.answer`}
+                name={`answers.${question.id}`}
+                defaultValue={
+                  initialAnswers ? initialAnswers[question.id] ?? "" : ""
+                }
                 render={({ field }) => (
                   <Input
                     {...field}
@@ -132,6 +143,7 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
             )}
           </div>
         ))}
+
         {allAnswered && <Button type="submit">Submit Quiz</Button>}
       </form>
     );

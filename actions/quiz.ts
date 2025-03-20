@@ -264,10 +264,15 @@ export async function getAttemptAnswers({
   attemptId,
 }: {
   attemptId: string;
-}): Promise<{ message: string; answers?: { questionId: string; answer: string }[]; error?: boolean }> {
+}): Promise<{
+  message: string;
+  answers?: { questionId: string; answer: string }[];
+  error?: boolean;
+}> {
   if (!attemptId || !attemptId.trim()) {
     return { message: "Attempt ID is required", error: true };
   }
+
   try {
     const answers = await db
       .select()
@@ -276,8 +281,7 @@ export async function getAttemptAnswers({
     return {
       message: "Attempt answers fetched successfully",
       answers: answers.map((a) => ({
-        // Force questionId to a string (fallback to empty string if missing)
-        questionId: a.questionId ? (a.questionId as string) : "",
+        questionId: a.questionId as string,
         answer: a.answer,
       })),
     };
