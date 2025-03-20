@@ -1,18 +1,14 @@
 "use client";
 
 import React, { useImperativeHandle, forwardRef, useEffect } from "react";
-import { useForm, Controller, useWatch, UseFormReturn } from "react-hook-form";
+// react-hook-form
+import { useForm, Controller, useWatch } from "react-hook-form";
+// components
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+// types
 import { QuizWithQuestions } from "@/types/quiz";
-
-interface QuizTakingFormProps {
-  quiz: QuizWithQuestions;
-  onSubmit: (data: QuizTakingFormValues) => Promise<void>;
-  onAutoSave?: (data: QuizTakingFormValues) => Promise<void>;
-  initialAnswers?: QuizTakingFormValues["answers"];
-}
 
 export interface QuizTakingFormRef {
   getValues: () => QuizTakingFormValues;
@@ -23,58 +19,64 @@ export type QuizTakingFormValues = {
   answers: Record<string, string>;
 };
 
+interface QuizTakingFormProps {
+  quiz: QuizWithQuestions;
+  onSubmit: (data: QuizTakingFormValues) => Promise<void>;
+  onAutoSave?: (data: QuizTakingFormValues) => Promise<void>;
+  initialAnswers?: QuizTakingFormValues["answers"];
+}
+
+/**
+ * Renders the quiz questions and manages user input via react-hook-form.
+ * Auto-saves changes if `onAutoSave` is provided.
+ * Calls `onSubmit` when the user manually submits.
+ */
 const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
   ({ quiz, onSubmit, onAutoSave, initialAnswers }, ref) => {
-    const { control, handleSubmit, reset, getValues, register } =
+    const { control, handleSubmit, reset, getValues } =
       useForm<QuizTakingFormValues>({
         defaultValues: {
-          answers:
-            initialAnswers ??
-            quiz.questions.reduce((acc, q) => {
-              acc[q.id] = "";
-              return acc;
-            }, {} as Record<string, string>),
+          answers: initialAnswers
+            ? initialAnswers
+            : quiz.questions.reduce((acc, q) => {
+                acc[q.id] = "";
+                return acc;
+              }, {} as Record<string, string>),
         },
       });
 
-    // Expose form methods to parent.
     useImperativeHandle(ref, () => ({
       getValues,
       triggerSubmit: handleSubmit(onSubmit),
     }));
 
-    // Reset form if initialAnswers change.
+    // Reset form if parent's initialAnswers changes
     useEffect(() => {
       if (initialAnswers !== undefined) {
         reset({ answers: initialAnswers });
-        console.log("Form reset with initialAnswers:", initialAnswers);
       }
     }, [initialAnswers, reset]);
 
-    // Watch for changes to the answers.
+    // Debounce-based auto-save for each update in answers
     const watchedAnswers = useWatch({ control, name: "answers" });
-
     useEffect(() => {
-      if (onAutoSave) {
-        const timer = setTimeout(() => {
-          const currentValues = getValues();
-          console.log("Auto-saving values:", currentValues);
-          // Ensure each question id exists
-          if (
-            Object.keys(currentValues.answers).length === quiz.questions.length
-          ) {
-            onAutoSave(currentValues);
-          } else {
-            console.error(
-              "Auto-save skipped: not all question IDs are present",
-              currentValues.answers
-            );
-          }
-        }, 500);
-        return () => clearTimeout(timer);
-      }
+      if (!onAutoSave) return;
+
+      const AUTO_SAVE_DEBOUNCE_MS = 500;
+      const timer = setTimeout(() => {
+        const currentValues = getValues();
+        // Only auto-save if all questions exist in answers
+        if (
+          Object.keys(currentValues.answers).length === quiz.questions.length
+        ) {
+          onAutoSave(currentValues);
+        }
+      }, AUTO_SAVE_DEBOUNCE_MS);
+
+      return () => clearTimeout(timer);
     }, [watchedAnswers, onAutoSave, getValues, quiz.questions.length]);
 
+    // Check if all questions are answered to enable the submit button
     const allAnswered = Object.values(getValues("answers")).every(
       (answer) => answer.trim() !== ""
     );
@@ -84,54 +86,38 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
         {quiz.questions.map((question) => (
           <div key={question.id} className="p-4 border rounded shadow-sm">
             <p className="mb-2 font-semibold">{question.text}</p>
-            {/* Hidden input is no longer needed since we use the question id as key */}
+
             {question.type === "multiple_choice" ? (
               <Controller
                 control={control}
-                name={`answers.${question.id}`}
-                defaultValue={
-                  initialAnswers ? initialAnswers[question.id] ?? "" : ""
-                }
-                render={({ field }) => {
-                  console.log(
-                    `For question ${question.id}, current answer value:`,
-                    field.value
-                  );
-                  return (
-                    <RadioGroup
-                      value={field.value}
-                      onValueChange={(val) => {
-                        console.log(
-                          `For question ${question.id}: onValueChange fired with:`,
-                          val
-                        );
-                        field.onChange(val);
-                      }}
-                      className="flex flex-col space-y-2"
-                    >
-                      {question.choices.map((choice) => (
-                        <label
-                          key={choice.id}
-                          className="flex items-center space-x-2"
-                        >
-                          <RadioGroupItem
-                            value={choice.text}
-                            id={`${question.id}-${choice.id}`}
-                          />
-                          <span>{choice.text}</span>
-                        </label>
-                      ))}
-                    </RadioGroup>
-                  );
-                }}
+                name={`answers.${question.id}` as const}
+                defaultValue={initialAnswers?.[question.id] ?? ""}
+                render={({ field }) => (
+                  <RadioGroup
+                    value={field.value}
+                    onValueChange={(val) => field.onChange(val)}
+                    className="flex flex-col space-y-2"
+                  >
+                    {question.choices.map((choice) => (
+                      <label
+                        key={choice.id}
+                        className="flex items-center space-x-2"
+                      >
+                        <RadioGroupItem
+                          value={choice.text}
+                          id={`${question.id}-${choice.id}`}
+                        />
+                        <span>{choice.text}</span>
+                      </label>
+                    ))}
+                  </RadioGroup>
+                )}
               />
             ) : (
               <Controller
                 control={control}
-                name={`answers.${question.id}`}
-                defaultValue={
-                  initialAnswers ? initialAnswers[question.id] ?? "" : ""
-                }
+                name={`answers.${question.id}` as const}
+                defaultValue={initialAnswers?.[question.id] ?? ""}
                 render={({ field }) => (
                   <Input
                     {...field}
@@ -144,7 +130,11 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
           </div>
         ))}
 
-        {allAnswered && <Button type="submit">Submit Quiz</Button>}
+        {allAnswered && (
+          <Button type="submit" className="mt-4">
+            Submit Quiz
+          </Button>
+        )}
       </form>
     );
   }
