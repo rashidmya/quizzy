@@ -8,7 +8,7 @@ import QuizTakingFormLogin from "./quiz-taking-login";
 import QuizTakingFormTimer from "./quiz-taking-timer";
 import QuizTakingFormMain, {
   QuizTakingFormValues,
-  QuizTakingFormMainRef,
+  QuizTakingFormRef,
 } from "./quiz-taking-form";
 import { QuizWithQuestions } from "@/types/quiz";
 import {
@@ -38,7 +38,7 @@ export default function QuizTaking({ quiz }: QuizTakingFormProps) {
   const [attempt, setAttempt] = useState<QuizAttempt | null>(null);
   const [quizTaken, setQuizTaken] = useState(false);
 
-  const formRef = useRef<QuizTakingFormMainRef>(null);
+  const formRef = useRef<QuizTakingFormRef>(null);
 
   useEffect(() => {
     setTheme("light");
@@ -86,15 +86,15 @@ export default function QuizTaking({ quiz }: QuizTakingFormProps) {
     }
   }, [session, attempt, quiz.id, startQuizAttempt]);
 
-  // Auto-submit when timer is up.
   const handleTimeUp = async () => {
     if (formRef.current) {
       const formData = formRef.current.getValues();
-      await handleQuizSubmit(formData);
+      await handleAutoSave(formData);
+      await handleQuizSubmit();
     }
   };
 
-  const handleQuizSubmit = async (data: QuizTakingFormValues) => {
+  const handleQuizSubmit = async () => {
     if (!session || !attempt) {
       toast.error("Please log in and start the quiz before submitting.");
       return;

@@ -14,20 +14,20 @@ export type QuizTakingFormValues = {
   }>;
 };
 
-interface QuizTakingFormMainProps {
+interface QuizTakingFormProps {
   quiz: QuizWithQuestions;
   onSubmit: (data: QuizTakingFormValues) => Promise<void>;
   onAutoSave?: (data: QuizTakingFormValues) => Promise<void>;
 }
 
-export interface QuizTakingFormMainRef {
+export interface QuizTakingFormRef {
   getValues: UseFormReturn<QuizTakingFormValues>["getValues"];
   triggerSubmit: () => void;
 }
 
-const QuizTakingFormMain = forwardRef<
-  QuizTakingFormMainRef,
-  QuizTakingFormMainProps
+const QuizTakingForm = forwardRef<
+  QuizTakingFormRef,
+  QuizTakingFormProps
 >(({ quiz, onSubmit, onAutoSave }, ref) => {
   const { control, handleSubmit, getValues } = useForm<QuizTakingFormValues>({
     defaultValues: {
@@ -108,5 +108,5 @@ const QuizTakingFormMain = forwardRef<
   );
 });
 
-QuizTakingFormMain.displayName = "QuizTakingFormMain";
-export default QuizTakingFormMain;
+QuizTakingForm.displayName = "QuizTakingForm";
+export default QuizTakingForm;
