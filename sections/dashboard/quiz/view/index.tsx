@@ -17,7 +17,7 @@ import { PATH_DASHBOARD } from "@/routes/paths";
 // hooks
 import { useActionState } from "@/hooks/use-action-state";
 // actions
-import { setQuizLive } from "@/actions/quiz";
+import { setQuizLive } from "@/actions/quiz/quiz-management";
 // sonner
 import { toast } from "sonner";
 // utils

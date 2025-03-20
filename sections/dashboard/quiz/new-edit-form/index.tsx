@@ -10,7 +10,7 @@ import { ChevronUp, ChevronDown } from "lucide-react";
 // shadcn/ui components
 import { Button } from "@/components/ui/button";
 // actions
-import { upsertQuiz } from "@/actions/quiz";
+import { upsertQuiz } from "@/actions/quiz/quiz-management";
 // paths
 import { PATH_DASHBOARD } from "@/routes/paths";
 // hooks

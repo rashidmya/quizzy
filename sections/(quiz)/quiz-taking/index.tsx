@@ -22,7 +22,7 @@ import {
   submitQuizAttempt,
   autoSaveAnswer,
   getAttemptAnswers,
-} from "@/actions/quiz";
+} from "@/actions/quiz/quiz-taking";
 
 export type QuizAttempt = {
   id: string;

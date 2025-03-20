@@ -17,7 +17,7 @@ import {
 // types
 import { LibraryQuiz } from "@/types/quiz";
 // actions
-import { deleteQuiz } from "@/actions/quiz";
+import { deleteQuiz } from "@/actions/quiz/quiz-management";
 // hooks
 import { useActionState } from "@/hooks/use-action-state";
 
@@ -58,7 +58,7 @@ export default function LibraryView({ quizzes }: Props) {
     setQuizList((prev) => prev.filter((quiz) => quiz.id !== quizId));
     toast.success(result.message);
   };
-  
+
   return (
     <div className="flex flex-col w-full">
       <h1 className="text-2xl font-bold mb-4">Library</h1>
