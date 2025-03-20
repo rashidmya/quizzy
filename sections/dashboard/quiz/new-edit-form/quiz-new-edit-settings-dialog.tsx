@@ -167,8 +167,13 @@ export default function QuizNewEditSettingsDialog() {
               <Label className="mb-2 text-sm">Quiz Timer (minutes)</Label>
               <Input
                 type="number"
-                value={tempTimer}
-                onChange={(e) => setTempTimer(Number(e.target.value))}
+                // Display the user's input in minutes but store internally as seconds.
+                // If tempTimer is already in seconds, convert it back to minutes for display:
+                value={tempTimer ? Math.floor(tempTimer / 60) : ""}
+                onChange={(e) => {
+                  const minutes = Number(e.target.value);
+                  setTempTimer(minutes * 60); // store as seconds
+                }}
                 placeholder="Enter timer in minutes"
                 className={`w-full py-2 text-sm pl-3 pr-3 h-10 rounded ${
                   timerError ? "border-red-500" : ""
@@ -184,7 +189,9 @@ export default function QuizNewEditSettingsDialog() {
           <Button type="button" variant="outline" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button type="button" onClick={handleSave}>Save</Button>
+          <Button type="button" onClick={handleSave}>
+            Save
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
