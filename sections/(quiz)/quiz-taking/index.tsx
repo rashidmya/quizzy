@@ -4,9 +4,9 @@ import { useEffect, useState, useRef } from "react";
 import { useTheme } from "next-themes";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
-import QuizTakingFormLogin from "./quiz-taking-login";
-import QuizTakingFormTimer from "./quiz-taking-timer";
-import QuizTakingFormMain, {
+import QuizTakingLogin from "./quiz-taking-login";
+import QuizTakingTimer from "./quiz-taking-timer";
+import QuizTakingForm, {
   QuizTakingFormValues,
   QuizTakingFormRef,
 } from "./quiz-taking-form";
@@ -15,6 +15,7 @@ import {
   startQuizAttempt,
   submitQuizAttempt,
   autoSaveAnswer,
+  getAttemptAnswers,
 } from "@/actions/quiz";
 
 export type QuizAttempt = {
@@ -36,6 +37,9 @@ export default function QuizTaking({ quiz }: QuizTakingFormProps) {
   const { data: session, status } = useSession();
   const { setTheme } = useTheme();
   const [attempt, setAttempt] = useState<QuizAttempt | null>(null);
+  const [initialAnswers, setInitialAnswers] = useState<
+    QuizTakingFormValues["answers"]
+  >([]);
   const [quizTaken, setQuizTaken] = useState(false);
 
   const formRef = useRef<QuizTakingFormRef>(null);
@@ -87,6 +91,18 @@ export default function QuizTaking({ quiz }: QuizTakingFormProps) {
     }
   }, [session, attempt, quiz.id, startQuizAttempt]);
 
+  useEffect(() => {
+    if (attempt && !quizTaken) {
+      (async () => {
+        const result = await getAttemptAnswers({ attemptId: attempt.id });
+        if (result.error) return toast.error(result.message);
+        if (result.answers && result.answers.length > 0) {
+          setInitialAnswers(result.answers);
+        }
+      })();
+    }
+  }, [attempt, quizTaken]);
+
   const handleTimeUp = async () => {
     if (formRef.current) {
       // Optionally, perform a final auto-save here.
@@ -112,11 +128,14 @@ export default function QuizTaking({ quiz }: QuizTakingFormProps) {
   const handleAutoSave = async (data: QuizTakingFormValues) => {
     if (!attempt) return;
     for (const answerObj of data.answers) {
-      await autoSaveAnswer({
+      const result = await autoSaveAnswer({
         attemptId: attempt.id,
         questionId: answerObj.questionId,
         answer: answerObj.answer,
       });
+      if (result.error) {
+        toast.error(result.message);
+      }
     }
   };
 
@@ -125,7 +144,7 @@ export default function QuizTaking({ quiz }: QuizTakingFormProps) {
   if (status === "loading") {
     content = <div>Loading...</div>;
   } else if (!session || !session.isQuiz) {
-    content = <QuizTakingFormLogin quizId={quiz.id} />;
+    content = <QuizTakingLogin quizId={quiz.id} />;
   } else if (quizTaken) {
     // Check quizTaken before checking for attempt.
     content = (
@@ -153,7 +172,7 @@ export default function QuizTaking({ quiz }: QuizTakingFormProps) {
         <nav className="flex justify-between items-center p-4 bg-gray-100 mb-4">
           <h1 className="text-xl font-bold">{quiz.title}</h1>
           {quiz.timerMode === "global" && (
-            <QuizTakingFormTimer
+            <QuizTakingTimer
               attempt={attempt}
               totalTime={quiz.timer}
               timerMode={quiz.timerMode}
@@ -161,11 +180,12 @@ export default function QuizTaking({ quiz }: QuizTakingFormProps) {
             />
           )}
         </nav>
-        <QuizTakingFormMain
+        <QuizTakingForm
           ref={formRef}
           quiz={quiz}
           onSubmit={handleQuizSubmit}
           onAutoSave={handleAutoSave}
+          initialAnswers={initialAnswers}
         />
       </>
     );

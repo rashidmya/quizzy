@@ -263,3 +263,33 @@ export async function submitQuizAttempt({
     return { message: "Failed to submit quiz", error: true };
   }
 }
+
+export async function getAttemptAnswers({
+  attemptId,
+}: {
+  attemptId: string;
+}): Promise<{
+  message: string;
+  answers?: { questionId: string; answer: string }[];
+  error?: boolean;
+}> {
+  if (!attemptId || !attemptId.trim()) {
+    return { message: "Attempt ID is required", error: true };
+  }
+  try {
+    const answers = await db
+      .select()
+      .from(attemptAnswers)
+      .where(eq(attemptAnswers.attemptId, attemptId));
+    return {
+      message: "Attempt answers fetched successfully",
+      answers: answers.map((a) => ({
+        questionId: a.questionId as string,
+        answer: a.answer,
+      })),
+    };
+  } catch (error) {
+    console.error("Error fetching attempt answers:", error);
+    return { message: "Error fetching attempt answers", error: true };
+  }
+}
