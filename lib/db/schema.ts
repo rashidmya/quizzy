@@ -38,7 +38,7 @@ export const quizzes = pgTable("quizzes", {
 
 export const questions = pgTable("questions", {
   id: uuid("id").defaultRandom().primaryKey(),
-  quizId: uuid("quiz_id").references(() => quizzes.id, { onDelete: "cascade" }),
+  quizId: uuid("quiz_id").references(() => quizzes.id, { onDelete: "cascade" }).notNull(),
   text: varchar("text", { length: 1024 }).notNull(),
   type: questionTypeEnum("type").notNull(),
   points: integer("points").notNull(),
@@ -51,7 +51,7 @@ export const choices = pgTable("choices", {
   id: uuid("id").defaultRandom().primaryKey(),
   questionId: uuid("question_id").references(() => questions.id, {
     onDelete: "cascade",
-  }),
+  }).notNull(),
   text: varchar("text", { length: 1024 }).notNull(),
   isCorrect: boolean("is_correct").default(false).notNull(),
 });
@@ -61,7 +61,7 @@ export const quizAttempts = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     email: varchar("email", { length: 30 }).notNull(),
-    quizId: uuid("quiz_id").references(() => quizzes.id),
+    quizId: uuid("quiz_id").references(() => quizzes.id).notNull(),
     score: integer("score").notNull(),
     startedAt: timestamp("started_at").defaultNow().notNull(),
     takenAt: timestamp("taken_at").defaultNow().notNull(),
@@ -74,10 +74,10 @@ export const attemptAnswers = pgTable("attempt_answers", {
   id: uuid("id").defaultRandom().primaryKey(),
   attemptId: uuid("attempt_id").references(() => quizAttempts.id, {
     onDelete: "cascade",
-  }),
+  }).notNull(),
   questionId: uuid("question_id").references(() => questions.id, {
     onDelete: "cascade",
-  }),
+  }).notNull(),
   answer: varchar("answer", { length: 1024 }).notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
