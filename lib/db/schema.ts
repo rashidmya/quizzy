@@ -12,7 +12,6 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const timerModeEnum = pgEnum("timer_modes", TIMER_MODES);
-
 export const questionTypeEnum = pgEnum("question_type", QUESTION_TYPES);
 
 export const users = pgTable("users", {
@@ -66,6 +65,19 @@ export const quizAttempts = pgTable(
     score: integer("score").notNull(),
     startedAt: timestamp("started_at").defaultNow().notNull(),
     takenAt: timestamp("taken_at").defaultNow().notNull(),
+    submitted: boolean("submitted").notNull().default(false),
   },
   (t) => [uniqueIndex("unique_attempt").on(t.quizId, t.email)]
 );
+
+export const attemptAnswers = pgTable("attempt_answers", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  attemptId: uuid("attempt_id").references(() => quizAttempts.id, {
+    onDelete: "cascade",
+  }),
+  questionId: uuid("question_id").references(() => questions.id, {
+    onDelete: "cascade",
+  }),
+  answer: varchar("answer", { length: 1024 }).notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
