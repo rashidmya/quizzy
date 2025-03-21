@@ -23,13 +23,13 @@ import {
   autoSaveAnswer,
   getAttemptAnswers,
 } from "@/actions/quiz/quiz-taking";
+import { Loader2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type QuizTakingProps = {
-  quiz: QuizWithQuestions & {
-    timer: number;
-    timerMode: "global" | "none";
-    id: string;
-  };
+  quiz: QuizWithQuestions;
 };
 
 export default function QuizTaking({ quiz }: QuizTakingProps) {
@@ -56,7 +56,7 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
    */
   const canContinueQuiz = useCallback(() => {
     if (quiz.timerMode === "none") return true;
-    if (quiz.timerMode === "global" && attempt) {
+    if (quiz.timerMode === "global" && attempt && quiz.timer) {
       const totalTime = quiz.timer; // in seconds
       const startedTime = new Date(attempt.startedAt).getTime();
       const now = Date.now();
@@ -65,7 +65,7 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
     }
     return false;
   }, [quiz.timerMode, quiz.timer, attempt]);
-  
+
   /**
    * Check quiz attempt status on initial load
    */
@@ -186,49 +186,99 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
   /**
    * Decide which content to display based on quiz state.
    */
-  let content: JSX.Element;
+  const renderContent = () => {
+    // Loading state
+    if (status === "loading") {
+      return (
+        <div className="flex flex-col items-center justify-center space-y-4 p-8">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-lg text-muted-foreground">Loading quiz...</p>
+        </div>
+      );
+    }
 
-  if (status === "loading") {
-    content = <div>Loading...</div>;
-  } else if (!session?.isQuiz) {
-    content = <QuizTakingLogin quizId={quiz.id} />;
-  } else if (quizTaken) {
-    content = (
-      <div className="max-w-3xl w-3xl m-auto p-4">
-        <p className="text-xl font-semibold">
-          You have already taken this quiz.
-        </p>
-      </div>
-    );
-  } else if (!attempt) {
-    content = <div>Loading quiz attempt...</div>;
-  } else if (initialAnswers === undefined) {
-    content = <div>Loading saved answers...</div>;
-  } else if (!canContinueQuiz()) {
+    // Not logged in
+    if (!session?.isQuiz) {
+      return <QuizTakingLogin quizId={quiz.id} />;
+    }
+
+    // Quiz already taken
+    if (quizTaken) {
+      return (
+        <Alert variant="default" className="max-w-3xl mx-auto">
+          <AlertDescription className="text-lg font-medium">
+            You have already completed this quiz.
+          </AlertDescription>
+        </Alert>
+      );
+    }
+
+    // Loading attempt
+    if (!attempt) {
+      return (
+        <Card className="max-w-3xl mx-auto">
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              <Skeleton className="h-8 w-3/4" />
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-24 w-full" />
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    // Loading saved answers
+    if (initialAnswers === undefined) {
+      return (
+        <Card className="max-w-3xl mx-auto">
+          <CardHeader>
+            <CardTitle>{quiz.title}</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center space-y-4 p-6">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            <p className="text-muted-foreground">
+              Loading your saved answers...
+            </p>
+          </CardContent>
+        </Card>
+      );
+    }
+
     // Time is up
-    handleTimeUp();
-    content = (
-      <div className="max-w-3xl w-3xl m-auto p-4">
-        <p className="text-xl font-semibold">
-          Time's up! Submitting your quiz...
-        </p>
-      </div>
-    );
-  } else {
-    // Quiz in progress
-    content = (
-      <>
-        <nav className="flex justify-between items-center p-4 bg-gray-100 mb-4">
-          <h1 className="text-xl font-bold">{quiz.title}</h1>
-          {quiz.timerMode === "global" && (
-            <QuizTakingTimer
-              attempt={attempt}
-              totalTime={quiz.timer}
-              timerMode={quiz.timerMode}
-              onTimeUp={handleTimeUp}
-            />
-          )}
-        </nav>
+    if (!canContinueQuiz()) {
+      // Call handleTimeUp without rendering it (to avoid infinite loop)
+      setTimeout(handleTimeUp, 0);
+
+      return (
+        <Alert variant="destructive" className="max-w-3xl mx-auto">
+          <AlertDescription className="flex items-center justify-center text-lg font-medium">
+            <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+            Time's up! Submitting your quiz...
+          </AlertDescription>
+        </Alert>
+      );
+    }
+
+    // Quiz in progress - the main form
+    return (
+      <div className="flex flex-col gap-8">
+        <Card className="border border-input mb-4 transition-colors duration-300 p-0 rounded-none shadow-none">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-xl transition-colors duration-300">
+              {quiz.title}
+            </CardTitle>
+            {quiz.timerMode === "global" && (
+              <QuizTakingTimer
+                attempt={attempt}
+                totalTime={quiz.timer}
+                timerMode={quiz.timerMode}
+                onTimeUp={handleTimeUp}
+              />
+            )}
+          </CardHeader>
+        </Card>
+
         <QuizTakingForm
           ref={formRef}
           quiz={quiz}
@@ -236,9 +286,9 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
           onAutoSave={handleAutoSave}
           initialAnswers={initialAnswers}
         />
-      </>
+      </div>
     );
-  }
+  };
 
-  return <div>{content}</div>;
+  return <div className="container mx-auto max-w-full">{renderContent()}</div>;
 }
