@@ -1,6 +1,11 @@
 "use client";
 
-import React, { useImperativeHandle, forwardRef, useEffect } from "react";
+import React, {
+  useImperativeHandle,
+  forwardRef,
+  useEffect,
+  useState,
+} from "react";
 // react-hook-form
 import { useForm, Controller, useWatch } from "react-hook-form";
 // shadcn components
@@ -10,10 +15,17 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 // lucide icons
-import { CheckCircle, Circle, Send, Clock } from "lucide-react";
+import {
+  CheckCircle,
+  Circle,
+  Send,
+  Clock,
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle2,
+  Save,
+} from "lucide-react";
 // types
 import { QuizWithQuestions } from "@/types/quiz";
 
@@ -36,17 +48,25 @@ interface QuizTakingFormProps {
 const AUTO_SAVE_DEBOUNCE_MS = 500;
 
 /**
- * Enhanced quiz form component that renders quiz questions with improved UI
+ * Enhanced quiz form component that renders one question at a time with pagination
  * and manages user input via react-hook-form.
  *
  * Features:
- * - Auto-saves answers after a brief typing delay
- * - Shows progress indicator for question completion
+ * - Navigation between questions with Next/Back buttons
+ * - Clickable question indicators for direct navigation
+ * - Auto-saves answers when they change
+ * - Shows save status feedback
  * - Visually distinguishes answered/unanswered questions
- * - Provides clear visual feedback for form state
  */
 const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
   ({ quiz, onSubmit, onAutoSave, initialAnswers }, ref) => {
+    // Current question index state
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    // Save status state
+    const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">(
+      "idle"
+    );
+
     const { control, handleSubmit, reset, getValues } =
       useForm<QuizTakingFormValues>({
         defaultValues: {
@@ -79,18 +99,24 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
     useEffect(() => {
       if (!onAutoSave) return;
 
+      setSaveStatus("saving");
+
       const timer = setTimeout(() => {
         const currentValues = getValues();
-        // Only auto-save if all questions exist in answers
-        if (
-          Object.keys(currentValues.answers).length === quiz.questions.length
-        ) {
-          onAutoSave(currentValues);
-        }
+        onAutoSave(currentValues).then(() => {
+          setSaveStatus("saved");
+
+          // Reset save status after 2 seconds
+          const resetTimer = setTimeout(() => {
+            setSaveStatus("idle");
+          }, 2000);
+
+          return () => clearTimeout(resetTimer);
+        });
       }, AUTO_SAVE_DEBOUNCE_MS);
 
       return () => clearTimeout(timer);
-    }, [watchedAnswers, onAutoSave, getValues, quiz.questions.length]);
+    }, [watchedAnswers, onAutoSave, getValues]);
 
     // Track quiz completion progress
     const answers = getValues("answers");
@@ -103,147 +129,226 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
     );
     const allAnswered = answeredCount === totalQuestions;
 
-    return (
-      <div className="max-w-3xl mx-auto px-4 pb-16">
-        {/* Progress indicator */}
-        <Card className="mb-6">
-          <CardContent className="pt-6">
-            <div className="flex justify-between items-center mb-2">
-              <div className="text-sm font-medium">
-                Progress: {answeredCount}/{totalQuestions} questions answered
-              </div>
-              <Badge
-                variant={allAnswered ? "default" : "secondary"}
-                className="ml-2"
+    // Navigation functions
+    const goToNextQuestion = () => {
+      if (currentQuestionIndex < totalQuestions - 1) {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+      }
+    };
+
+    const goToPreviousQuestion = () => {
+      if (currentQuestionIndex > 0) {
+        setCurrentQuestionIndex(currentQuestionIndex - 1);
+      }
+    };
+
+    const goToQuestion = (index: number) => {
+      if (index >= 0 && index < totalQuestions) {
+        setCurrentQuestionIndex(index);
+      }
+    };
+
+    // Get current question
+    const currentQuestion = quiz.questions[currentQuestionIndex];
+    const isCurrentQuestionAnswered =
+      answers[currentQuestion.id]?.trim() !== "";
+
+    // Render question pagination indicators
+    const renderQuestionIndicators = () => {
+      return (
+        <div className="flex flex-wrap gap-2 mb-6 justify-center">
+          {quiz.questions.map((question, index) => {
+            const isAnswered = answers[question.id]?.trim() !== "";
+            const isCurrent = index === currentQuestionIndex;
+
+            return (
+              <Button
+                key={index}
+                variant={
+                  isCurrent ? "default" : isAnswered ? "outline" : "secondary"
+                }
+                size="sm"
+                className={`w-10 h-10 p-0 rounded-full ${
+                  isAnswered ? "border-green-500" : ""
+                } ${isCurrent ? "ring-2 ring-offset-2 ring-primary" : ""}`}
+                onClick={() => goToQuestion(index)}
               >
-                {allAnswered ? "Complete" : "In Progress"}
-              </Badge>
-            </div>
-            <Progress value={progressPercentage} className="h-2" />
-          </CardContent>
-        </Card>
+                <span className="sr-only">Question {index + 1}</span>
+                {isAnswered ? (
+                  <CheckCircle2
+                    className={`h-4 w-4 ${
+                      isCurrent ? "text-white" : "text-green-500"
+                    }`}
+                  />
+                ) : (
+                  index + 1
+                )}
+              </Button>
+            );
+          })}
+        </div>
+      );
+    };
+
+    return (
+      <div className="max-w-3xl mx-auto px-4">
+        {/* Progress indicator */}
+        {/* Question navigation */}
+        {renderQuestionIndicators()}
 
         {/* Auto-save indicator */}
         {onAutoSave && (
-          <Alert variant="default" className="mb-6 bg-muted/50">
-            <Clock className="h-4 w-4 mr-2" />
+          <Alert
+            variant="default"
+            className={`mb-6 transition-colors duration-300 ${
+              saveStatus === "idle"
+                ? "bg-muted/50"
+                : saveStatus === "saving"
+                ? "bg-amber-50"
+                : "bg-green-50"
+            }`}
+          >
+            {saveStatus === "idle" && <Clock className="h-4 w-4 mr-2" />}
+            {saveStatus === "saving" && (
+              <Save className="h-4 w-4 mr-2 animate-pulse text-amber-500" />
+            )}
+            {saveStatus === "saved" && (
+              <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+            )}
+
             <AlertDescription>
-              Your answers are automatically saved as you type
+              {saveStatus === "idle" &&
+                "Your answers are automatically saved as you progress"}
+              {saveStatus === "saving" && "Saving your answer..."}
+              {saveStatus === "saved" && "Answer saved successfully"}
             </AlertDescription>
           </Alert>
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {quiz.questions.map((question, index) => {
-            const isAnswered = answers[question.id]?.trim() !== "";
+          {/* Current question card */}
+          <Card
+            key={currentQuestion.id}
+            className={`transition-all duration-200 ${
+              isCurrentQuestionAnswered
+                ? "border-green-200 bg-green-50/30"
+                : "border-gray-200"
+            }`}
+          >
+            <CardHeader className="pb-2">
+              <div className="flex items-start gap-2">
+                <div className="flex items-center justify-center h-6 w-6 rounded-full bg-muted text-sm font-medium">
+                  {currentQuestionIndex + 1}
+                </div>
+                <CardTitle className="text-base font-medium">
+                  {currentQuestion.text}
+                </CardTitle>
+              </div>
+            </CardHeader>
 
-            return (
-              <Card
-                key={question.id}
-                className={`transition-all duration-200 ${
-                  isAnswered
-                    ? "border-green-200 bg-green-50/30"
-                    : "border-gray-200"
-                }`}
-              >
-                <CardHeader className="pb-2">
-                  <div className="flex items-start gap-2">
-                    <div className="flex items-center justify-center h-6 w-6 rounded-full bg-muted text-sm font-medium">
-                      {index + 1}
-                    </div>
-                    <CardTitle className="text-base font-medium">
-                      {question.text}
-                    </CardTitle>
-                  </div>
-                </CardHeader>
-
-                <CardContent>
-                  {question.type === "multiple_choice" ? (
-                    <Controller
-                      control={control}
-                      name={`answers.${question.id}` as const}
-                      defaultValue={initialAnswers?.[question.id] ?? ""}
-                      render={({ field }) => (
-                        <RadioGroup
-                          value={field.value}
-                          onValueChange={(val) => field.onChange(val)}
-                          className="flex flex-col space-y-3 mt-2"
+            <CardContent>
+              {currentQuestion.type === "multiple_choice" ? (
+                <Controller
+                  control={control}
+                  name={`answers.${currentQuestion.id}` as const}
+                  defaultValue={initialAnswers?.[currentQuestion.id] ?? ""}
+                  render={({ field }) => (
+                    <RadioGroup
+                      value={field.value}
+                      onValueChange={(val) => field.onChange(val)}
+                      className="flex flex-col space-y-3 mt-2"
+                    >
+                      {currentQuestion.choices.map((choice) => (
+                        <div
+                          key={choice.id}
+                          className={`flex items-center space-x-2 p-3 rounded-md border ${
+                            field.value === choice.text
+                              ? "bg-primary/5 border-primary"
+                              : "border-gray-200 hover:bg-muted/50"
+                          }`}
                         >
-                          {question.choices.map((choice) => (
-                            <div
-                              key={choice.id}
-                              className={`flex items-center space-x-2 p-3 rounded-md border ${
-                                field.value === choice.text
-                                  ? "bg-primary/5 border-primary"
-                                  : "border-gray-200 hover:bg-muted/50"
-                              }`}
-                            >
-                              <RadioGroupItem
-                                value={choice.text}
-                                id={`${question.id}-${choice.id}`}
-                                className="text-primary"
-                              />
-                              <Label
-                                htmlFor={`${question.id}-${choice.id}`}
-                                className="flex-grow cursor-pointer font-normal"
-                              >
-                                {choice.text}
-                              </Label>
-                            </div>
-                          ))}
-                        </RadioGroup>
-                      )}
-                    />
-                  ) : (
-                    <div className="mt-2">
-                      <Controller
-                        control={control}
-                        name={`answers.${question.id}` as const}
-                        defaultValue={initialAnswers?.[question.id] ?? ""}
-                        render={({ field }) => (
-                          <Input
-                            {...field}
-                            placeholder="Type your answer here..."
-                            className="w-full"
+                          <RadioGroupItem
+                            value={choice.text}
+                            id={`${currentQuestion.id}-${choice.id}`}
+                            className="text-primary"
                           />
-                        )}
-                      />
-                    </div>
+                          <Label
+                            htmlFor={`${currentQuestion.id}-${choice.id}`}
+                            className="flex-grow cursor-pointer font-normal"
+                          >
+                            {choice.text}
+                          </Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
                   )}
-
-                  {/* Answer status indicator */}
-                  <div className="flex items-center justify-end mt-2 text-sm text-muted-foreground">
-                    {isAnswered ? (
-                      <>
-                        <CheckCircle className="h-4 w-4 text-green-600 mr-1" />
-                        <span>Answered</span>
-                      </>
-                    ) : (
-                      <>
-                        <Circle className="h-4 w-4 text-amber-500 mr-1" />
-                        <span>Needs answer</span>
-                      </>
+                />
+              ) : (
+                <div className="mt-2">
+                  <Controller
+                    control={control}
+                    name={`answers.${currentQuestion.id}` as const}
+                    defaultValue={initialAnswers?.[currentQuestion.id] ?? ""}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        placeholder="Type your answer here..."
+                        className="w-full"
+                      />
                     )}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+                  />
+                </div>
+              )}
 
+              {/* Answer status indicator */}
+              <div className="flex items-center justify-end mt-2 text-sm text-muted-foreground">
+                {isCurrentQuestionAnswered ? (
+                  <>
+                    <CheckCircle className="h-4 w-4 text-green-600 mr-1" />
+                    <span>Answered</span>
+                  </>
+                ) : (
+                  <>
+                    <Circle className="h-4 w-4 text-amber-500 mr-1" />
+                    <span>Needs answer</span>
+                  </>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Navigation and submit controls */}
           <div className="sticky bottom-4 pt-4 bg-background/80 backdrop-blur-sm border-t">
-            <Button
-              type="submit"
-              className="w-full"
-              size="lg"
-              disabled={!allAnswered}
-            >
-              <Send className="mr-2 h-4 w-4" />
-              {allAnswered
-                ? "Submit Quiz"
-                : `Answer ${totalQuestions - answeredCount} more question${
-                    totalQuestions - answeredCount !== 1 ? "s" : ""
-                  }`}
-            </Button>
+            <div className="flex justify-between gap-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={goToPreviousQuestion}
+                disabled={currentQuestionIndex === 0}
+                className="w-1/3"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Previous
+              </Button>
+
+              {currentQuestionIndex === totalQuestions - 1 ? (
+                <Button type="submit" className="w-1/3" disabled={!allAnswered}>
+                  <Send className="mr-2 h-4 w-4" />
+                  {allAnswered
+                    ? "Submit Quiz"
+                    : `${totalQuestions - answeredCount} unanswered`}
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={goToNextQuestion}
+                  className="w-1/3"
+                >
+                  Next
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
         </form>
       </div>
