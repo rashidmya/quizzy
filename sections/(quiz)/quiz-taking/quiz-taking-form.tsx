@@ -5,6 +5,7 @@ import React, {
   forwardRef,
   useEffect,
   useState,
+  useRef,
 } from "react";
 // react-hook-form
 import { useForm, Controller, useWatch } from "react-hook-form";
@@ -42,6 +43,7 @@ interface QuizTakingFormProps {
   quiz: QuizWithQuestions;
   onSubmit: (data: QuizTakingFormValues) => Promise<void>;
   onAutoSave?: (data: QuizTakingFormValues) => Promise<void>;
+  isAutoSavePending: boolean;
   initialAnswers?: QuizTakingFormValues["answers"];
 }
 
@@ -54,18 +56,14 @@ const AUTO_SAVE_DEBOUNCE_MS = 500;
  * Features:
  * - Navigation between questions with Next/Back buttons
  * - Clickable question indicators for direct navigation
- * - Auto-saves answers when they change
+ * - Auto-saves answers when a question has been answered or an answer is changed (not on initial load)
  * - Shows save status feedback
  * - Visually distinguishes answered/unanswered questions
  */
 const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
-  ({ quiz, onSubmit, onAutoSave, initialAnswers }, ref) => {
+  ({ quiz, onSubmit, onAutoSave, initialAnswers, isAutoSavePending }, ref) => {
     // Current question index state
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    // Save status state
-    const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">(
-      "idle"
-    );
 
     const { control, handleSubmit, reset, getValues } =
       useForm<QuizTakingFormValues>({
@@ -79,6 +77,15 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
         },
       });
 
+    // Capture initial answers in a ref to avoid auto-saving on initial load.
+    const initialAnswersRef = useRef(
+      initialAnswers ||
+        quiz.questions.reduce((acc, q) => {
+          acc[q.id] = "";
+          return acc;
+        }, {} as Record<string, string>)
+    );
+
     // Expose methods to parent component
     useImperativeHandle(ref, () => ({
       getValues,
@@ -89,34 +96,30 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
     useEffect(() => {
       if (initialAnswers !== undefined) {
         reset({ answers: initialAnswers });
+        // Also update the ref so that subsequent changes are compared to the correct initial state.
+        initialAnswersRef.current = initialAnswers;
       }
     }, [initialAnswers, reset]);
 
     // Watch answers for auto-save functionality
     const watchedAnswers = useWatch({ control, name: "answers" });
 
-    // Implement debounced auto-save
+    // Debounced auto-save: only trigger if at least one answer differs from the initial answers.
     useEffect(() => {
       if (!onAutoSave) return;
 
-      setSaveStatus("saving");
-
       const timer = setTimeout(() => {
         const currentValues = getValues();
-        onAutoSave(currentValues).then(() => {
-          setSaveStatus("saved");
-
-          // Reset save status after 2 seconds
-          const resetTimer = setTimeout(() => {
-            setSaveStatus("idle");
-          }, 2000);
-
-          return () => clearTimeout(resetTimer);
-        });
+        // Check if at least one answer has changed compared to when the quiz was first opened.
+        const hasChanged = quiz.questions.some(
+          (q) => currentValues.answers[q.id] !== initialAnswersRef.current[q.id]
+        );
+        if (!hasChanged) return;
+        onAutoSave(currentValues);
       }, AUTO_SAVE_DEBOUNCE_MS);
 
       return () => clearTimeout(timer);
-    }, [watchedAnswers, onAutoSave, getValues]);
+    }, [watchedAnswers, onAutoSave, getValues, quiz.questions]);
 
     // Track quiz completion progress
     const answers = getValues("answers");
@@ -124,9 +127,6 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
       (answer) => answer.trim() !== ""
     ).length;
     const totalQuestions = quiz.questions.length;
-    const progressPercentage = Math.round(
-      (answeredCount / totalQuestions) * 100
-    );
     const allAnswered = answeredCount === totalQuestions;
 
     // Navigation functions
@@ -192,8 +192,7 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
 
     return (
       <div className="max-w-3xl mx-auto px-4">
-        {/* Progress indicator */}
-        {/* Question navigation */}
+        {/* Question navigation indicators */}
         {renderQuestionIndicators()}
 
         {/* Auto-save indicator */}
@@ -201,26 +200,18 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
           <Alert
             variant="default"
             className={`mb-6 transition-colors duration-300 ${
-              saveStatus === "idle"
-                ? "bg-muted/50"
-                : saveStatus === "saving"
-                ? "bg-amber-50"
-                : "bg-green-50"
+              !isAutoSavePending ? "bg-muted/50" : "bg-amber-50"
             }`}
           >
-            {saveStatus === "idle" && <Clock className="h-4 w-4 mr-2" />}
-            {saveStatus === "saving" && (
+            {!isAutoSavePending && <Clock className="h-4 w-4 mr-2" />}
+            {isAutoSavePending && (
               <Save className="h-4 w-4 mr-2 animate-pulse text-amber-500" />
-            )}
-            {saveStatus === "saved" && (
-              <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
             )}
 
             <AlertDescription>
-              {saveStatus === "idle" &&
-                "Your answers are automatically saved as you progress"}
-              {saveStatus === "saving" && "Saving your answer..."}
-              {saveStatus === "saved" && "Answer saved successfully"}
+              {!isAutoSavePending
+                ? "Your answers are automatically saved as you progress"
+                : "Saving your answer..."}
             </AlertDescription>
           </Alert>
         )}

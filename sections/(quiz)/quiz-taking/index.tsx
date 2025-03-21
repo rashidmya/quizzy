@@ -23,10 +23,14 @@ import {
   autoSaveAnswer,
   getAttemptAnswers,
 } from "@/actions/quiz/quiz-taking";
+// icons
 import { Loader2 } from "lucide-react";
+// components
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+// hooks
+import { useActionState } from "@/hooks/use-action-state";
 
 type QuizTakingProps = {
   quiz: QuizWithQuestions;
@@ -34,15 +38,25 @@ type QuizTakingProps = {
 
 export default function QuizTaking({ quiz }: QuizTakingProps) {
   const { data: session, status } = useSession();
+
   const { setTheme } = useTheme();
 
   const [attempt, setAttempt] = useState<QuizAttempt | null>(null);
+
   const [initialAnswers, setInitialAnswers] = useState<
     Record<string, string> | undefined
   >(undefined);
+
   const [quizTaken, setQuizTaken] = useState(false);
 
   const formRef = useRef<QuizTakingFormRef>(null);
+
+  const [_, autoSaveAction, isAutoSavePending] = useActionState(
+    autoSaveAnswer,
+    {
+      message: "",
+    }
+  );
 
   /**
    * Force light theme for quiz-taking.
@@ -160,7 +174,7 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
       for (const [questionId, answer] of Object.entries(data.answers)) {
         if (!questionId.trim()) continue;
 
-        const result = await autoSaveAnswer({
+        const result = await autoSaveAction({
           attemptId: attempt.id,
           questionId,
           answer,
@@ -299,6 +313,7 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
               setQuizTaken(true);
             }}
             onAutoSave={handleAutoSave}
+            isAutoSavePending={isAutoSavePending}
             initialAnswers={initialAnswers}
           />
         </div>
