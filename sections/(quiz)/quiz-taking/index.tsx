@@ -262,8 +262,8 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
 
     // Quiz in progress - the main form
     return (
-      <div className="flex flex-col gap-8">
-        <Card className="border border-input mb-4 transition-colors duration-300 p-0 rounded-none shadow-none">
+      <>
+        <Card className="fixed z-50 w-full border border-input mb-4 transition-colors duration-300 p-0 rounded-none shadow-none">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-xl transition-colors duration-300">
               {quiz.title}
@@ -279,14 +279,16 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
           </CardHeader>
         </Card>
 
-        <QuizTakingForm
-          ref={formRef}
-          quiz={quiz}
-          onSubmit={handleQuizSubmit}
-          onAutoSave={handleAutoSave}
-          initialAnswers={initialAnswers}
-        />
-      </div>
+        <div className="pt-34">
+          <QuizTakingForm
+            ref={formRef}
+            quiz={quiz}
+            onSubmit={handleQuizSubmit}
+            onAutoSave={handleAutoSave}
+            initialAnswers={initialAnswers}
+          />
+        </div>
+      </>
     );
   };
 
