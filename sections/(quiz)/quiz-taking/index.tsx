@@ -15,7 +15,7 @@ import QuizTakingForm, {
   QuizTakingFormRef,
 } from "./quiz-taking-form";
 // types
-import { QuizAttemp, QuizWithQuestions } from "@/types/quiz";
+import { QuizAttempt, QuizWithQuestions } from "@/types/quiz";
 // actions
 import {
   startQuizAttempt,
@@ -36,7 +36,7 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
   const { data: session, status } = useSession();
   const { setTheme } = useTheme();
 
-  const [attempt, setAttempt] = useState<QuizAttemp | null>(null);
+  const [attempt, setAttempt] = useState<QuizAttempt | null>(null);
   const [initialAnswers, setInitialAnswers] = useState<
     Record<string, string> | undefined
   >(undefined);
@@ -135,6 +135,7 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
    * Final quiz submission.
    */
   const handleQuizSubmit = useCallback(async () => {
+    // console.log(formRef.current?.getValues())
     if (!attempt) {
       toast.error("attempt undefined");
       return;
@@ -147,7 +148,6 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
     }
 
     toast.success(submitResult.message);
-    setQuizTaken(true);
   }, [session, attempt]);
 
   /**
@@ -294,7 +294,10 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
           <QuizTakingForm
             ref={formRef}
             quiz={quiz}
-            onSubmit={handleQuizSubmit}
+            onSubmit={async () => {
+              await handleQuizSubmit();
+              setQuizTaken(true);
+            }}
             onAutoSave={handleAutoSave}
             initialAnswers={initialAnswers}
           />
