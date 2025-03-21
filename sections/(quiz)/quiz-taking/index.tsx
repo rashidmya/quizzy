@@ -132,20 +132,11 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
   }, [attempt, quizTaken, quiz.questions]);
 
   /**
-   * Submits the quiz if time is up.
-   */
-  const handleTimeUp = useCallback(async () => {
-    if (formRef.current) {
-      await handleQuizSubmit();
-    }
-  }, []);
-
-  /**
    * Final quiz submission.
    */
   const handleQuizSubmit = useCallback(async () => {
-    if (!session?.isQuiz || !attempt) {
-      toast.error("Please log in and start the quiz before submitting.");
+    if (!attempt) {
+      toast.error("attempt undefined");
       return;
     }
 
@@ -182,6 +173,15 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
     },
     [attempt]
   );
+
+  /**
+   * Submits the quiz if time is up.
+   */
+  const handleTimeUp = useCallback(async () => {
+    if (formRef.current) {
+      await handleQuizSubmit();
+    }
+  }, [formRef, handleQuizSubmit]);
 
   /**
    * Decide which content to display based on quiz state.
@@ -247,7 +247,18 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
 
     // Time is up
     if (!canContinueQuiz()) {
-      // Call handleTimeUp without rendering it (to avoid infinite loop)
+      // If attempt is null/undefined, maybe wait or show a message
+      if (!attempt) {
+        return (
+          <Alert variant="destructive" className="max-w-3xl mx-auto">
+            <AlertDescription>
+              Could not retrieve your attempt. Please refresh the page.
+            </AlertDescription>
+          </Alert>
+        );
+      }
+
+      // Otherwise, attempt is valid, so schedule the submission
       setTimeout(handleTimeUp, 0);
 
       return (
