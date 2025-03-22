@@ -288,7 +288,7 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
     // Quiz in progress - the main form
     return (
       <>
-        <Card className="fixed z-50 w-full border border-input mb-4 transition-colors duration-300 p-0 rounded-none shadow-none">
+        <Card className="fixed z-50 w-full border border-input mb-4 transition-colors duration-300 p-0 rounded-none shadow-none min-h-[75px]">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-xl transition-colors duration-300">
               {quiz.title}
