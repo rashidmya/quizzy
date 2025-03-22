@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { AlertCircle } from "lucide-react";
 
 interface QuizTimerProps {

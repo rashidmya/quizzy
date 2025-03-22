@@ -26,9 +26,7 @@ import {
 // icons
 import { Loader2 } from "lucide-react";
 // components
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 // hooks
 import { useActionState } from "@/hooks/use-action-state";
 import QuizTakingState from "./quiz-taking-state";
@@ -96,7 +94,6 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
           if (result.message === "Quiz already submitted") {
             setQuizTaken(true);
           }
-          toast.error(result.message);
           return;
         }
 
@@ -151,14 +148,12 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
    */
   const handleQuizSubmit = useCallback(async () => {
     // console.log(formRef.current?.getValues())
-    console.log("submit: before");
     if (!attempt) {
       toast.error("Something went wrong submitting your quiz!");
       return;
     }
 
     const submitResult = await submitQuizAttempt({ attemptId: attempt.id });
-    console.log("submit: after");
     if (submitResult.error) {
       toast.error(submitResult.message);
       return;
@@ -195,10 +190,8 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
    * Submits the quiz if time is up.
    */
   const handleTimeUp = useCallback(async () => {
-    console.log("handletimeup before");
     if (formRef.current) {
       await handleQuizSubmit();
-      console.log("handletimeup after");
     }
   }, [formRef, handleQuizSubmit]);
 
