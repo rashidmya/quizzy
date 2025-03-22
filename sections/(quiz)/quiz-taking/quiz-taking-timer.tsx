@@ -123,7 +123,9 @@ export default function QuizTakingTimer({
                 <span>Time&apos;s up!</span>
               </Badge>
             ) : (
-              <span className={`text-sm font-mono font-semibold ${getTimerStyles()}`}>
+              <span
+                className={`text-sm font-mono font-semibold ${getTimerStyles()}`}
+              >
                 {formatTime(timeLeft)}
               </span>
             )}
