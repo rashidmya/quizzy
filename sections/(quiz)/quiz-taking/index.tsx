@@ -31,6 +31,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 // hooks
 import { useActionState } from "@/hooks/use-action-state";
+import QuizTakingState from "./quiz-taking-state";
 
 type QuizTakingProps = {
   quiz: QuizWithQuestions;
@@ -150,12 +151,14 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
    */
   const handleQuizSubmit = useCallback(async () => {
     // console.log(formRef.current?.getValues())
+    console.log("submit: before");
     if (!attempt) {
-      toast.error("attempt undefined");
+      toast.error("Something went wrong submitting your quiz!");
       return;
     }
 
     const submitResult = await submitQuizAttempt({ attemptId: attempt.id });
+    console.log("submit: after");
     if (submitResult.error) {
       toast.error(submitResult.message);
       return;
@@ -192,8 +195,10 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
    * Submits the quiz if time is up.
    */
   const handleTimeUp = useCallback(async () => {
+    console.log("handletimeup before");
     if (formRef.current) {
       await handleQuizSubmit();
+      console.log("handletimeup after");
     }
   }, [formRef, handleQuizSubmit]);
 
@@ -204,9 +209,8 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
     // Loading state
     if (status === "loading") {
       return (
-        <div className="flex flex-col items-center justify-center space-y-4 p-8">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-lg text-muted-foreground">Loading quiz...</p>
+        <div className="fixed inset-0 flex items-center justify-center z-50 text-center">
+          <Loader2 className="h-8 w-8 mx-auto animate-spin" />
         </div>
       );
     }
@@ -218,45 +222,17 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
 
     // Quiz already taken
     if (quizTaken) {
-      return (
-        <Alert variant="default" className="max-w-3xl mx-auto">
-          <AlertDescription className="text-lg font-medium">
-            You have already completed this quiz.
-          </AlertDescription>
-        </Alert>
-      );
+      return <QuizTakingState text="You have already completed this quiz." />;
     }
 
     // Loading attempt
     if (!attempt) {
-      return (
-        <Card className="max-w-3xl mx-auto">
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              <Skeleton className="h-8 w-3/4" />
-              <Skeleton className="h-24 w-full" />
-              <Skeleton className="h-24 w-full" />
-            </div>
-          </CardContent>
-        </Card>
-      );
+      return <QuizTakingState text="Loading attempt..." />;
     }
 
     // Loading saved answers
     if (initialAnswers === undefined) {
-      return (
-        <Card className="max-w-3xl mx-auto">
-          <CardHeader>
-            <CardTitle>{quiz.title}</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col items-center space-y-4 p-6">
-            <Loader2 className="h-6 w-6 animate-spin text-primary" />
-            <p className="text-muted-foreground">
-              Loading your saved answers...
-            </p>
-          </CardContent>
-        </Card>
-      );
+      return <QuizTakingState text="Loading your saved answers..." />;
     }
 
     // Time is up
@@ -264,25 +240,14 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
       // If attempt is null/undefined, maybe wait or show a message
       if (!attempt) {
         return (
-          <Alert variant="destructive" className="max-w-3xl mx-auto">
-            <AlertDescription>
-              Could not retrieve your attempt. Please refresh the page.
-            </AlertDescription>
-          </Alert>
+          <QuizTakingState text="Could not retrieve your attempt. Please refresh the page." />
         );
       }
 
       // Otherwise, attempt is valid, so schedule the submission
       setTimeout(handleTimeUp, 0);
 
-      return (
-        <Alert variant="destructive" className="max-w-3xl mx-auto">
-          <AlertDescription className="flex items-center justify-center text-lg font-medium">
-            <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-            Time's up! Submitting your quiz...
-          </AlertDescription>
-        </Alert>
-      );
+      return <QuizTakingState text="Time's up! Quiz has been submitted" />;
     }
 
     // Quiz in progress - the main form
