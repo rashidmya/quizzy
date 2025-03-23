@@ -68,7 +68,7 @@ export default async function ReportView({
 
   return (
     <div className="container mx-auto py-10 space-y-8 max-w-6xl">
-      <div className="rounded-lg p-6 shadow-sm">
+      <div className="rounded-lg p-6 shadow-sm border-1">
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <div>
@@ -103,7 +103,7 @@ export default async function ReportView({
       </Suspense>
 
       <Tabs defaultValue="participants" className="w-full">
-        <div className="border-b mb-4">
+        <div className="mb-4">
           <TabsList className="w-full grid grid-cols-2 max-w-full mx-auto">
             <TabsTrigger
               value="participants"
@@ -123,7 +123,7 @@ export default async function ReportView({
         </div>
 
         <TabsContent value="participants" className="mt-0">
-          <Card className="shadow-sm border-slate-200 dark:border-slate-700">
+          <Card className="shadow-sm">
             <CardHeader className="rounded-t-lg border-b pb-5">
               <div className="flex items-center justify-between">
                 <div>
@@ -162,7 +162,7 @@ export default async function ReportView({
         </TabsContent>
 
         <TabsContent value="questions" className="mt-0">
-          <Card className="shadow-sm border-slate-200 dark:border-slate-700">
+          <Card className="shadow-sm">
             <CardHeader className="rounded-t-lg border-b pb-5">
               <div className="flex items-center justify-between">
                 <div>
