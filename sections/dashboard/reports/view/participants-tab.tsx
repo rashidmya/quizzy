@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { QuizAttemptWithAnswers } from "@/types/quiz";
 
 interface ParticipantsTabProps {
   attempts: any[];
@@ -46,16 +47,24 @@ export default function ParticipantsTab({
                 </TableCell>
               </TableRow>
             ) : (
-              sortedAttempts.map((attempt) => {
+              sortedAttempts.map((attempt: QuizAttemptWithAnswers) => {
                 // Calculate number of correct answers
                 const correctAnswers =
                   attempt.answers?.filter((ans: any) => ans.isCorrect).length ||
                   0;
 
+                // Calculate attempt score
+                const attemptScore =
+                  attempt.answers?.reduce((acc, answer) => {
+                    return (
+                      acc + (answer.isCorrect ? answer.questionPoints ?? 0 : 0)
+                    );
+                  }, 0) || 0;
+
                 // Calculate attempt accuracy
                 const attemptAccuracy =
                   totalQuizPoints > 0
-                    ? (attempt.score / totalQuizPoints) * 100
+                    ? (attemptScore / totalQuizPoints) * 100
                     : 0;
 
                 // Calculate completion percentage
@@ -100,7 +109,7 @@ export default function ParticipantsTab({
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      {attempt.score} / {totalQuizPoints}
+                      {attemptScore} / {totalQuizPoints}
                     </TableCell>
                   </TableRow>
                 );

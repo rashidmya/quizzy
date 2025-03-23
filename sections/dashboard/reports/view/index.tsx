@@ -23,9 +23,10 @@ export default async function ReportView({
 
   // Calculate the total points gained by all participants
   const totalPointsGained = attempts.reduce((sum, attempt) => {
-    const attemptScore = attempt.answers?.reduce((acc, answer) => {
-      return acc + (answer.isCorrect ? answer.questionPoints : 0);
-    }, 0) || 0;
+    const attemptScore =
+      attempt.answers?.reduce((acc, answer) => {
+        return acc + (answer.isCorrect ? answer.questionPoints ?? 0 : 0);
+      }, 0) || 0;
     return sum + attemptScore;
   }, 0);
 

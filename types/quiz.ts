@@ -37,6 +37,12 @@ export type LibraryQuiz = Omit<Quiz, "createdBy"> & {
   questionCount?: number;
 };
 
+export type AttemptAnswerWithCorrectness = AttemptAnswer & {
+  isCorrect: boolean;
+  questionPoints: number | null;
+  questionType: string | null;
+};
+
 export type QuizAttemptWithAnswers = Omit<QuizAttempt, "answers"> & {
-  answers: AttemptAnswer[];
+  answers: AttemptAnswerWithCorrectness[];
 };
