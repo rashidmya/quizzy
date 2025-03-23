@@ -1,7 +1,14 @@
 import { hash } from "bcrypt-ts";
 import { db } from "./drizzle";
-import { users, quizzes, questions, choices, timerModeEnum } from "./schema";
-import { TIMER_MODES, QUESTION_TYPES } from  "@/constants";
+import {
+  users,
+  quizzes,
+  questions,
+  choices,
+  quizAttempts,
+  attemptAnswers,
+} from "./schema";
+import { TIMER_MODES, QUESTION_TYPES } from "@/constants";
 
 async function main() {
   // Seed 1 sample user.
@@ -46,13 +53,55 @@ async function main() {
   }
 
   // Seed choices: 4 choices per question.
+  // We'll store the returned choices in a Map for later use in creating answers.
+  const questionChoicesMap = new Map<string, { id: string; isCorrect: boolean }[]>();
   for (const question of insertedQuestions) {
     const choicesForQuestion = Array.from({ length: 4 }).map((_, i) => ({
       questionId: question.id,
       text: `Choice ${i + 1} for question "${question.text}"`,
       isCorrect: i === 0, // Mark the first choice as correct.
     }));
-    await db.insert(choices).values(choicesForQuestion);
+    const returnedChoices = await db
+      .insert(choices)
+      .values(choicesForQuestion)
+      .returning();
+    questionChoicesMap.set(question.id, returnedChoices);
+  }
+
+  // Seed quiz attempts with random attempts for each quiz.
+  for (const quiz of insertedQuizzes) {
+    // Filter questions for this quiz.
+    const quizQuestions = insertedQuestions.filter(q => q.quizId === quiz.id);
+    // Generate a random number of attempts between 5 and 10.
+    const numAttempts = Math.floor(Math.random() * 6) + 5; // random number from 5 to 10
+    for (let i = 0; i < numAttempts; i++) {
+      // Create a unique participant email for each attempt.
+      const attemptEmail = `participant${i + 1}_${quiz.id.slice(0, 4)}@example.com`;
+      const insertedAttempt = await db
+        .insert(quizAttempts)
+        .values({
+          email: attemptEmail,
+          quizId: quiz.id,
+          submitted: Math.random() < 0.8, // 80% chance the attempt is marked as submitted.
+        })
+        .returning();
+      const attemptId = insertedAttempt[0].id;
+
+      // For each question in this quiz, create an answer with a random choice.
+      const attemptAnswerRecords = quizQuestions.map(question => {
+        const choicesForQuestion = questionChoicesMap.get(question.id) || [];
+        const randomIndex = Math.floor(Math.random() * choicesForQuestion.length);
+        const chosenChoice = choicesForQuestion[randomIndex];
+        return {
+          attemptId,
+          questionId: question.id,
+          // Save the chosen choice id as the answer.
+          answer: chosenChoice.id,
+        };
+      });
+
+      await db.insert(attemptAnswers).values(attemptAnswerRecords);
+    }
   }
 
   console.log("Seeding complete!");
