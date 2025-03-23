@@ -172,6 +172,10 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
       for (const [questionId, answer] of Object.entries(data.answers)) {
         if (!questionId.trim()) continue;
 
+        if (!answer.trim()) {
+          return;
+        }
+        
         const result = await autoSaveAction({
           attemptId: attempt.id,
           questionId,
