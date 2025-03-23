@@ -2,7 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 import { and, eq } from "drizzle-orm";
-
 import { db } from "@/lib/db/drizzle";
 import {
   quizAttempts,
@@ -50,7 +49,7 @@ export async function startQuizAttempt({
     // If none found, create a new attempt
     const [attempt] = await db
       .insert(quizAttempts)
-      .values({ email, quizId, score: 0 })
+      .values({ email, quizId })
       .returning();
 
     if (attempt) {
