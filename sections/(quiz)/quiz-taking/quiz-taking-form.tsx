@@ -253,13 +253,13 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
                         <div
                           key={choice.id}
                           className={`flex items-center space-x-2 p-3 rounded-md border ${
-                            field.value === choice.text
+                            field.value === choice.id
                               ? "bg-primary/5 border-primary"
                               : "border-gray-200 hover:bg-muted/50"
                           }`}
                         >
                           <RadioGroupItem
-                            value={choice.text}
+                            value={choice.id}
                             id={`${currentQuestion.id}-${choice.id}`}
                             className="text-primary"
                           />
