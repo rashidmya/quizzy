@@ -1,4 +1,10 @@
-import { choices, questions, quizAttempts, quizzes } from "@/lib/db/schema";
+import {
+  attemptAnswers,
+  choices,
+  questions,
+  quizAttempts,
+  quizzes,
+} from "@/lib/db/schema";
 import { InferSelectModel } from "drizzle-orm";
 
 export type Quiz = InferSelectModel<typeof quizzes>;
@@ -8,6 +14,8 @@ export type Question = InferSelectModel<typeof questions>;
 export type Choice = InferSelectModel<typeof choices>;
 
 export type QuizAttempt = InferSelectModel<typeof quizAttempts>;
+
+export type AttemptAnswer = InferSelectModel<typeof attemptAnswers>;
 
 export type QuizWithQuestions = Omit<Quiz, "createdBy" | "questions"> & {
   createdBy: {
@@ -33,3 +41,6 @@ export type QuestionType = "multiple_choice";
 
 export const QUESTION_TYPES = ["multiple_choice"] as const;
 
+export type QuizAttemptWithAnswers = Omit<QuizAttempt, "answers"> & {
+  answers: AttemptAnswer[];
+};
