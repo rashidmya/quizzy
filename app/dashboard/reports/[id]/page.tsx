@@ -12,7 +12,7 @@ export default async function QuizReportPage({
 }: {
   params: { id: string };
 }) {
-  const { id } = params;
+  const { id } = await params;
 
   if (!id) {
     return notFound();

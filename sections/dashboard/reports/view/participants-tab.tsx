@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { QuizAttemptWithAnswers } from "@/types/quiz";
-import { Users, Medal, Trophy, ChevronUp } from "lucide-react";
+import { Users, Medal, Trophy } from "lucide-react";
 
 interface ParticipantsTabProps {
   attempts: any[];
