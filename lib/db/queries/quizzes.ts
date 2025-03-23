@@ -119,7 +119,7 @@ export async function getQuizAttemptsByQuizId(quizId: string) {
 
             return {
               ...answer,
-              isCorrect: isCorrect.length > 0,
+              isCorrect: isCorrect,
             };
           })
         );

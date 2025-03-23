@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { getQuestionTypeLabel } from "@/utils/get-question-type-label";
 import { CheckCircle, XCircle } from "lucide-react";
 
 interface QuestionsTabProps {
@@ -54,12 +55,6 @@ export default function QuestionsTab({
     };
   }
 
-  // Format question type for display
-  function formatQuestionType(type: string) {
-    return type
-      .replace(/([A-Z])/g, " $1")
-      .replace(/^./, (str) => str.toUpperCase());
-  }
 
   return (
     <div className="space-y-8">
@@ -79,7 +74,7 @@ export default function QuestionsTab({
                     Question {index + 1}
                   </h3>
                   <Badge variant="outline">
-                    {formatQuestionType(question.type)}
+                    {getQuestionTypeLabel(question.type)}
                   </Badge>
                   <Badge>{question.points} points</Badge>
                 </div>

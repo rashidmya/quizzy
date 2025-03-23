@@ -22,10 +22,12 @@ export default async function ReportView({
   const totalQuizPoints = quiz.questions.reduce((acc, q) => acc + q.points, 0);
 
   // Calculate the total points gained by all participants
-  const totalPointsGained = attempts.reduce(
-    (sum, attempt) => sum + attempt.score,
-    0
-  );
+  const totalPointsGained = attempts.reduce((sum, attempt) => {
+    const attemptScore = attempt.answers?.reduce((acc, answer) => {
+      return acc + (answer.isCorrect ? answer.questionPoints : 0);
+    }, 0) || 0;
+    return sum + attemptScore;
+  }, 0);
 
   // Calculate accuracy
   const accuracy =

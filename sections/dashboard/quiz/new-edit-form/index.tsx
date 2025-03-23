@@ -21,10 +21,11 @@ import QuizNewEditQuestionCard from "./quiz-new-edit-question-card";
 import QuizNewEditQuestionDialog from "./quiz-new-edit-question-dialog";
 import QuizNewEditHeader from "./quiz-new-edit-header";
 // types
-import { QUESTION_TYPES } from "@/types/quiz";
-import { QuizWithQuestions, TIMER_MODES } from "@/types/quiz";
+import { QuizWithQuestions } from "@/types/quiz";
 // toast
 import { toast } from "sonner";
+// config
+import { QUESTION_TYPES, TIMER_MODES } from "@/constants";
 
 // Schema definitions
 const choiceSchema = z.object({

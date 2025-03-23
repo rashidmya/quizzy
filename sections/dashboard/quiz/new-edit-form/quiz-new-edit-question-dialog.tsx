@@ -29,7 +29,7 @@ import { Plus, Pencil, PlusIcon, Trash2 } from "lucide-react";
 // utils
 import { getQuestionTypeLabel } from "@/utils/get-question-type-label";
 // types
-import { QUESTION_TYPES } from "@/types/quiz";
+import { QUESTION_TYPES } from "@/constants";
 
 // Define a schema for the question dialog form.
 const questionDialogSchema = z.object({

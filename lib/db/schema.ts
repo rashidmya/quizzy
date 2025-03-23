@@ -1,5 +1,4 @@
-import { QUESTION_TYPES } from "@/types/quiz";
-import { TIMER_MODES } from "@/types/quiz";
+import { QUESTION_TYPES, TIMER_MODES } from "@/constants";
 import {
   pgTable,
   varchar,
@@ -68,7 +67,6 @@ export const quizAttempts = pgTable(
     quizId: uuid("quiz_id")
       .references(() => quizzes.id)
       .notNull(),
-    score: integer("score").notNull(),
     startedAt: timestamp("started_at").defaultNow().notNull(),
     takenAt: timestamp("taken_at").defaultNow().notNull(),
     submitted: boolean("submitted").notNull().default(false),
