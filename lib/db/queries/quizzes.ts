@@ -23,6 +23,7 @@ export async function getQuizzes(userId: string) {
       },
       // Compute questionCount using a subquery.
       questionCount: sql<number>`CAST((SELECT COUNT(*) FROM questions WHERE questions.quiz_id = ${quizzes.id}) AS INTEGER)`,
+      participantCount: sql<number>`CAST((SELECT COUNT(*) FROM quiz_attempts WHERE quiz_attempts.quiz_id = ${quizzes.id}) AS INTEGER)`,
       timer: quizzes.timer,
       timerMode: quizzes.timerMode,
       isLive: quizzes.isLive,
