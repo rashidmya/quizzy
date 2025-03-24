@@ -6,16 +6,16 @@ import { useRouter } from "next/navigation";
 // Components
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { 
-  AlertDialog, 
-  AlertDialogAction, 
-  AlertDialogCancel, 
-  AlertDialogContent, 
-  AlertDialogDescription, 
-  AlertDialogFooter, 
-  AlertDialogHeader, 
-  AlertDialogTitle, 
-  AlertDialogTrigger 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
 // Custom Components
@@ -57,7 +57,7 @@ export default function QuizView({
   quiz,
   participantCount = 0,
 }: QuizDashboardCardProps) {
-  const router = useRouter();
+  const { push } = useRouter();
 
   // State management
   const [isLive, setIsLive] = useState(quiz.isLive);
@@ -65,22 +65,30 @@ export default function QuizView({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Action states
-  const [_, setLiveAction, isSetLivePending] = useActionState(setQuizLive, {
+  const [_liveState, setLiveAction, isSetLivePending] = useActionState(
+    setQuizLive,
+    {
+      message: "",
+      error: false,
+    }
+  );
+
+  const [_deleteState, deleteAction] = useActionState(deleteQuiz, {
     message: "",
-    error: false,
   });
 
   // Quiz URL generation
-  const quizUrl =
-    `${process.env.NEXT_PUBLIC_HOSTNAME}/q/${encodeUUID(quiz.id)}`;
+  const quizUrl = `${process.env.NEXT_PUBLIC_HOSTNAME}/q/${encodeUUID(
+    quiz.id
+  )}`;
 
   // Event Handlers
   const handleToggleLive = async () => {
     const newLive = !isLive;
 
-    const promise = setLiveAction({ 
-      quizId: quiz.id, 
-      isLive: newLive 
+    const promise = setLiveAction({
+      quizId: quiz.id,
+      isLive: newLive,
     }).then((result: any) => {
       if (result.error) {
         throw new Error(result.message);
@@ -112,20 +120,17 @@ export default function QuizView({
   };
 
   const handleDelete = async () => {
-    const promise = deleteQuiz(quiz.id);
+    const result = await deleteAction(quiz.id);
+    if (result.error) {
+      return toast.error(result.message);
+    }
 
-    toast.promise(promise, {
-      loading: "Deleting quiz...",
-      success: () => {
-        router.push(PATH_DASHBOARD.quiz.root);
-        return "Quiz deleted successfully";
-      },
-      error: "Failed to delete quiz",
-    });
+    push(PATH_DASHBOARD.library.root);
+    toast.success(result.message);
   };
 
   const handleEdit = () => {
-    router.push(PATH_DASHBOARD.quiz.edit(quiz.id));
+    push(PATH_DASHBOARD.quiz.edit(quiz.id));
   };
 
   return (
@@ -162,15 +167,15 @@ export default function QuizView({
           />
         </div>
 
-        <Tabs 
-          value={currentTab} 
+        <Tabs
+          value={currentTab}
           onValueChange={setCurrentTab}
           className="border-t"
         >
           <TabsList className="w-full justify-start bg-muted/50 rounded-none">
             {TABS.map((tab) => (
-              <TabsTrigger 
-                key={tab.value} 
+              <TabsTrigger
+                key={tab.value}
                 value={tab.value}
                 className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
               >
@@ -180,11 +185,7 @@ export default function QuizView({
           </TabsList>
 
           {TABS.map((tab) => (
-            <TabsContent 
-              key={tab.value} 
-              value={tab.value}
-              className="p-6"
-            >
+            <TabsContent key={tab.value} value={tab.value} className="p-6">
               {tab.value === "questions" && (
                 <QuizViewQuestionList questions={quiz.questions} />
               )}
@@ -199,23 +200,21 @@ export default function QuizView({
       </Card>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog 
-        open={isDeleteDialogOpen} 
+      <AlertDialog
+        open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              Are you absolutely sure?
-            </AlertDialogTitle>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete this quiz 
-              and remove all associated data.
+              This action cannot be undone. This will permanently delete this
+              quiz and remove all associated data.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >

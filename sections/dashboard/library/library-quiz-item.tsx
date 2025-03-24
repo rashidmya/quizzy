@@ -52,9 +52,14 @@ import { fToNow } from "@/utils/format-time";
 type QuizItemProps = {
   quiz: LibraryQuiz;
   onDelete: (quizId: string) => void;
+  onEdit: (quizId: string) => void;
 };
 
-export default function LibraryQuizItem({ quiz, onDelete }: QuizItemProps) {
+export default function LibraryQuizItem({
+  quiz,
+  onDelete,
+  onEdit,
+}: QuizItemProps) {
   const router = useRouter();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -108,7 +113,7 @@ export default function LibraryQuizItem({ quiz, onDelete }: QuizItemProps) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={handleNavigation}>
+                  <DropdownMenuItem onClick={() => onEdit(quiz.id)}>
                     <Edit className="mr-2 h-4 w-4" />
                     Edit Quiz
                   </DropdownMenuItem>
@@ -129,7 +134,7 @@ export default function LibraryQuizItem({ quiz, onDelete }: QuizItemProps) {
                     className="text-destructive focus:text-destructive"
                     onClick={() => setIsDeleteDialogOpen(true)}
                   >
-                    <Trash2 className="mr-2 h-4 w-4" />
+                    <Trash2 className="mr-2 h-4 w-4 text-destructive" />
                     Delete Quiz
                   </DropdownMenuItem>
                 </DropdownMenuContent>

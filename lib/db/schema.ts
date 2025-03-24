@@ -65,7 +65,7 @@ export const quizAttempts = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     email: varchar("email", { length: 30 }).notNull(),
     quizId: uuid("quiz_id")
-      .references(() => quizzes.id)
+      .references(() => quizzes.id, { onDelete: "cascade" })
       .notNull(),
     startedAt: timestamp("started_at").defaultNow().notNull(),
     takenAt: timestamp("taken_at").defaultNow().notNull(),

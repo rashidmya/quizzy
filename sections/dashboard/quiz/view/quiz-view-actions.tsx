@@ -159,9 +159,9 @@ export function QuizViewAltActions({
         <DropdownMenuContent align="end">
           <DropdownMenuItem
             onSelect={onDelete}
-            className="text-destructive focus:text-destructive-foreground focus:bg-destructive"
+            className="text-destructive focus:text-destructive"
           >
-            <Trash2 className="mr-2 h-4 w-4" />
+            <Trash2 className="mr-2 h-4 w-4 text-destructive" />
             Delete Quiz
           </DropdownMenuItem>
         </DropdownMenuContent>

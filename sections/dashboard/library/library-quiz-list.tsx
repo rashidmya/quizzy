@@ -8,11 +8,13 @@ import { LibraryQuiz } from "@/types/quiz";
 type LibraryQuizListProps = {
   quizzes: LibraryQuiz[];
   onDelete: (quizId: string) => void;
+  onEdit: (quizId: string) => void;
 };
 
 export default function LibraryQuizList({
   quizzes,
   onDelete,
+  onEdit,
 }: LibraryQuizListProps) {
   // Group quizzes by date category
   const today = new Date();
@@ -52,7 +54,12 @@ export default function LibraryQuizList({
   return (
     <div className="space-y-8">
       {todayQuizzes.length > 0 && (
-        <QuizGroup title="Today" quizzes={todayQuizzes} onDelete={onDelete} />
+        <QuizGroup
+          title="Today"
+          quizzes={todayQuizzes}
+          onDelete={onDelete}
+          onEdit={onEdit}
+        />
       )}
 
       {yesterdayQuizzes.length > 0 && (
@@ -60,6 +67,7 @@ export default function LibraryQuizList({
           title="Yesterday"
           quizzes={yesterdayQuizzes}
           onDelete={onDelete}
+          onEdit={onEdit}
         />
       )}
 
@@ -68,11 +76,17 @@ export default function LibraryQuizList({
           title="This Week"
           quizzes={thisWeekQuizzes}
           onDelete={onDelete}
+          onEdit={onEdit}
         />
       )}
 
       {olderQuizzes.length > 0 && (
-        <QuizGroup title="Older" quizzes={olderQuizzes} onDelete={onDelete} />
+        <QuizGroup
+          title="Older"
+          quizzes={olderQuizzes}
+          onDelete={onDelete}
+          onEdit={onEdit}
+        />
       )}
     </div>
   );
@@ -82,15 +96,21 @@ type QuizGroupProps = {
   title: string;
   quizzes: LibraryQuiz[];
   onDelete: (quizId: string) => void;
+  onEdit: (quizId: string) => void;
 };
 
-function QuizGroup({ title, quizzes, onDelete }: QuizGroupProps) {
+function QuizGroup({ title, quizzes, onDelete, onEdit }: QuizGroupProps) {
   return (
     <div className="space-y-3">
       <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {quizzes.map((quiz) => (
-          <LibraryQuizItem key={quiz.id} quiz={quiz} onDelete={onDelete} />
+          <LibraryQuizItem
+            key={quiz.id}
+            quiz={quiz}
+            onDelete={onDelete}
+            onEdit={onEdit}
+          />
         ))}
       </div>
     </div>

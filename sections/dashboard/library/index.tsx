@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+//
+import { useRouter } from "next/navigation";
 // sonner
 import { toast } from "sonner";
 // sections
@@ -14,12 +16,15 @@ import { LibraryQuiz } from "@/types/quiz";
 import { deleteQuiz } from "@/actions/quiz/quiz-management";
 // hooks
 import { useActionState } from "@/hooks/use-action-state";
+import { PATH_DASHBOARD } from "@/routes/paths";
 
 type LibraryProps = {
   quizzes: LibraryQuiz[];
 };
 
 export default function Library({ quizzes }: LibraryProps) {
+  const { push } = useRouter();
+
   // Local state for search input and filters
   const [search, setSearch] = useState("");
   const [sortOrder, setSortOrder] = useState("recent");
@@ -52,6 +57,10 @@ export default function Library({ quizzes }: LibraryProps) {
     toast.success(result.message);
   };
 
+  const handleEditQuiz = async (quizId: string) => {
+    push(PATH_DASHBOARD.quiz.edit(quizId));
+  };
+
   return (
     <div className="flex flex-col w-full space-y-6">
       <LibraryHeader totalQuizzes={quizList.length} />
@@ -71,6 +80,7 @@ export default function Library({ quizzes }: LibraryProps) {
         <LibraryQuizList
           quizzes={filteredQuizzes}
           onDelete={handleDeleteQuiz}
+          onEdit={handleEditQuiz}
         />
       )}
     </div>
