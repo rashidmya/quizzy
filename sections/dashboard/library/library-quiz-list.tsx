@@ -22,7 +22,10 @@ type QuizListProps = {
   onDelete: (quizId: string) => void;
 };
 
-export default function QuizList({ quizzes, onDelete }: QuizListProps) {
+export default function LibraryQuizList({
+  quizzes,
+  onDelete,
+}: QuizListProps) {
   return (
     <div className="space-y-8">
       <div className="space-y-4">

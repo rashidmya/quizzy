@@ -16,9 +16,9 @@ import {
   BarChart3Icon,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import StatsCards from "./stats-cards";
-import ParticipantsTab from "./participants-tab";
-import QuestionsTab from "./questions-tab";
+import StatsCards from "./reports-view-stats-cards";
+import ParticipantsTab from "./reports-view-participants-tab";
+import QuestionsTab from "./reports-view-questions-tab";
 import { QuizAttemptWithAnswers, QuizWithQuestions } from "@/types/quiz";
 import { fDate } from "@/utils/format-time";
 

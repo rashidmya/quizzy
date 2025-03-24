@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 // toast
 import { toast } from "sonner";
 // sections
-import QuizList from "@/sections/dashboard/library/library-list";
+import LibraryQuizList from "@/sections/dashboard/library/library-quiz-list";
 // components
 import { Input } from "@/components/ui/input";
 import {
@@ -27,7 +27,7 @@ type Props = {
 
 export const dynamic = "force-static";
 
-export default function LibraryView({ quizzes }: Props) {
+export default function Library({ quizzes }: Props) {
   // Local state for search input.
   const [search, setSearch] = useState("");
   // Local state for sort order.
@@ -38,7 +38,7 @@ export default function LibraryView({ quizzes }: Props) {
   });
 
   // Convert prop quizzes to state so we can update (remove) on deletion.
-  const [quizList, setQuizList] = useState<LibraryQuiz[]>(quizzes);
+  const [quizList, setLibraryQuizList] = useState<LibraryQuiz[]>(quizzes);
 
   // Memoized filtered and sorted quizzes.
   const filteredQuizzes = useMemo(() => {
@@ -55,7 +55,7 @@ export default function LibraryView({ quizzes }: Props) {
     if (result.error) {
       return toast.error(result.message);
     }
-    setQuizList((prev) => prev.filter((quiz) => quiz.id !== quizId));
+    setLibraryQuizList((prev) => prev.filter((quiz) => quiz.id !== quizId));
     toast.success(result.message);
   };
 
@@ -90,7 +90,10 @@ export default function LibraryView({ quizzes }: Props) {
           No quizzes found.
         </div>
       ) : (
-        <QuizList quizzes={filteredQuizzes} onDelete={handleDeleteQuiz} />
+        <LibraryQuizList
+          quizzes={filteredQuizzes}
+          onDelete={handleDeleteQuiz}
+        />
       )}
     </div>
   );
