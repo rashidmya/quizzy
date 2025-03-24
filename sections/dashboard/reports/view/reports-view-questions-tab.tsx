@@ -1,3 +1,6 @@
+"use client";
+
+// components
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
@@ -8,8 +11,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { getQuestionTypeLabel } from "@/utils/get-question-type-label";
+// icons
 import { CheckCircle, XCircle, HelpCircle, Users } from "lucide-react";
+// utills
+import { getQuestionTypeLabel } from "@/utils/get-question-type-label";
 
 interface QuestionsTabProps {
   questions: any[];

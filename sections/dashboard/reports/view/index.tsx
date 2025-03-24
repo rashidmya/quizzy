@@ -1,5 +1,7 @@
+"use client";
+
 import { Suspense } from "react";
-import { notFound } from "next/navigation";
+// components
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
@@ -9,20 +11,18 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  CalendarIcon,
-  UsersIcon,
-  CheckCircleIcon,
-  BarChart3Icon,
-} from "lucide-react";
-import { Separator } from "@/components/ui/separator";
+// icons
+import { CalendarIcon, UsersIcon, BarChart3Icon } from "lucide-react";
+// sections
 import StatsCards from "./reports-view-stats-cards";
 import ParticipantsTab from "./reports-view-participants-tab";
 import QuestionsTab from "./reports-view-questions-tab";
+// types
 import { QuizAttemptWithAnswers, QuizWithQuestions } from "@/types/quiz";
+// utils
 import { fDate } from "@/utils/format-time";
 
-export default async function ReportView({
+export default function ReportView({
   quiz,
   attempts,
 }: {

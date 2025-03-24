@@ -1,3 +1,6 @@
+"use client";
+
+// components
 import {
   Table,
   TableBody,
@@ -22,7 +25,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+// types
 import { QuizAttemptWithAnswers } from "@/types/quiz";
+// icons
 import { Users, Medal, Trophy } from "lucide-react";
 
 interface ParticipantsTabProps {

@@ -1,4 +1,8 @@
+"use client";
+
+// components
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+// icons
 import { BarChart3, CheckCircle, Users, BookOpen } from "lucide-react";
 
 interface StatsCardsProps {
