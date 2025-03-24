@@ -51,20 +51,20 @@ export type QuestionCardData = {
 
 export type QuestionCardProps = {
   questionIndex: number;
-  questionNumber: number;
   question: QuestionCardData;
   timerMode: string;
   onUpdate: (updatedQuestion: QuestionCardData) => void;
   onDelete: () => void;
+  onDuplicate: (questionData: QuestionCardData) => void;
 };
 
 export default function QuizNewEditQuestionCard({
   questionIndex,
-  questionNumber,
   question,
   timerMode,
   onUpdate,
   onDelete,
+  onDuplicate,
 }: QuestionCardProps) {
   const [isHovering, setIsHovering] = useState(false);
   const {
@@ -77,7 +77,7 @@ export default function QuizNewEditQuestionCard({
 
   // Handle duplication of question
   const handleDuplicate = () => {
-    onUpdate({ ...question });
+    onDuplicate(question);
   };
 
   // Track correct/incorrect answers count for display
@@ -98,7 +98,7 @@ export default function QuizNewEditQuestionCard({
             variant="outline"
             className="h-7 w-7 rounded-full flex items-center justify-center p-0 font-semibold"
           >
-            {questionNumber}
+            {questionIndex + 1}
           </Badge>
           <div className="flex flex-wrap gap-2 items-center">
             <QuestionInfo>

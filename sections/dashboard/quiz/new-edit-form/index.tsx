@@ -32,7 +32,6 @@ import { toast } from "sonner";
 // constants
 import { QUESTION_TYPES, TIMER_MODES } from "@/constants";
 
-
 // Schema definitions
 const choiceSchema = z.object({
   id: z.string().optional(),
@@ -342,7 +341,6 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
                     <QuizNewEditQuestionCard
                       questionIndex={index}
                       question={field}
-                      questionNumber={index + 1}
                       timerMode={timerMode}
                       onUpdate={(updatedQuestion) => {
                         updateQuestion(index, updatedQuestion);
@@ -350,6 +348,18 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
                       }}
                       onDelete={() => {
                         removeQuestion(index);
+                        setHasChanged(true);
+                      }}
+                      onDuplicate={(questionData) => {
+                        const newQuestion = {
+                          ...questionData,
+                          id: undefined,
+                          choices: questionData.choices.map((choice) => ({
+                            ...choice,
+                            id: undefined,
+                          })),
+                        };
+                        appendQuestion(newQuestion);
                         setHasChanged(true);
                       }}
                     />
