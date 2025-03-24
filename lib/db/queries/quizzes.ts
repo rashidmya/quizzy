@@ -33,6 +33,15 @@ export async function getQuizzes(userId: string) {
     .where(eq(quizzes.createdBy, userId));
 }
 
+export async function getParticipantCount(quizId: string): Promise<number> {
+  const result = await db
+    .select({ count: sql<number>`COUNT(*)` })
+    .from(quizAttempts)
+    .where(eq(quizAttempts.quizId, quizId));
+
+  return result[0]?.count || 0;
+}
+
 export async function getQuizWithQuestions(quizId: string) {
   try {
     const quizResult = await db

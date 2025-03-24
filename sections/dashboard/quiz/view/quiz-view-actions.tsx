@@ -1,6 +1,6 @@
 "use client";
 
-// lucide icons
+// Icons
 import {
   PlayCircle,
   StopCircle,
@@ -10,15 +10,19 @@ import {
   MoreVertical,
   Trash2,
   Loader,
-  Share2Icon,
+  Share2,
   Copy,
+  CheckIcon,
 } from "lucide-react";
-// components
+
+// Components
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
   Dialog,
@@ -30,17 +34,34 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-// sonner
+import { Label } from "@/components/ui/label";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+// Hooks
+import { useState } from "react";
+
+// Utilities
 import { toast } from "sonner";
 
+// Types for component props
 type QuizMainActionsProps = {
   isLive: boolean;
   isSetLivePending: boolean;
   onToggleLive: () => void;
   onSchedule: () => void;
+};
+
+type QuizAltActionsProps = {
+  quizUrl: string;
+  onPreview: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
 };
 
 export function QuizViewMainActions({
@@ -50,46 +71,49 @@ export function QuizViewMainActions({
   onSchedule,
 }: QuizMainActionsProps) {
   return (
-    <div className="flex flex-row gap-2">
+    <div className="flex flex-col sm:flex-row gap-2">
       <Button
-        className="rounded flex-2 h-14"
+        className="w-full sm:flex-[2] h-12 sm:h-14"
         variant="default"
         size="lg"
         onClick={onToggleLive}
+        disabled={isSetLivePending}
       >
         {isSetLivePending ? (
-          <Loader className="!h-4 !w-4 animate-spin" />
+          <Loader className="mr-2 h-4 w-4 animate-spin" />
         ) : isLive ? (
           <>
-            <StopCircle className="!h-4 !w-4" />
-            <span>Stop Live</span>
+            <StopCircle className="mr-2 h-4 w-4" />
+            Stop Live
           </>
         ) : (
           <>
-            <PlayCircle className="!h-4 !w-4" />
-            <span>Go Live</span>
+            <PlayCircle className="mr-2 h-4 w-4" />
+            Go Live
           </>
         )}
       </Button>
-      <Button
-        className="rounded flex-1 h-14"
-        variant="default"
-        size="sm"
-        onClick={onSchedule}
-      >
-        <Calendar className="h-4 w-4" />
-        <span>Schedule</span>
-      </Button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className="w-full sm:flex-1 h-12 sm:h-14"
+              variant="secondary"
+              size="lg"
+              onClick={onSchedule}
+            >
+              <Calendar className="mr-2 h-4 w-4" />
+              Schedule
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Set up quiz schedule and time slots</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </div>
   );
 }
-
-type QuizAltActionsProps = {
-  quizUrl: string;
-  onPreview: () => void;
-  onEdit: () => void;
-  onDelete: () => void;
-};
 
 export function QuizViewAltActions({
   quizUrl,
@@ -98,36 +122,47 @@ export function QuizViewAltActions({
   onDelete,
 }: QuizAltActionsProps) {
   return (
-    <div className="gap-2 items-center flex">
-      <Button
-        className="rounded"
-        variant="secondary"
-        size="sm"
-        onClick={onPreview}
-      >
-        <Eye className="h-4 w-4" />
-        <span>Preview</span>
-      </Button>
+    <div className="flex items-center gap-2">
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="secondary" size="icon" onClick={onPreview}>
+              <Eye className="h-4 w-4" />
+              <span className="sr-only">Preview Quiz</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Preview Quiz</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
       <ShareDialog quizUrl={quizUrl} />
-      <Button
-        className="rounded"
-        variant="secondary"
-        size="sm"
-        onClick={onEdit}
-      >
-        <Edit className="h-4 w-4" />
-        <span>Edit</span>
-      </Button>
+
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="secondary" size="icon" onClick={onEdit}>
+              <Edit className="h-4 w-4" />
+              <span className="sr-only">Edit Quiz</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Edit Quiz</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button className="rounded" variant="secondary" size="sm">
+          <Button variant="secondary" size="icon">
             <MoreVertical className="h-4 w-4" />
+            <span className="sr-only">More Actions</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
-          <DropdownMenuItem onClick={onDelete}>
-            <Trash2 className="h-4 w-4" />
-            <span>Delete</span>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem
+            onSelect={onDelete}
+            className="text-destructive focus:text-destructive-foreground focus:bg-destructive"
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete Quiz
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -136,45 +171,69 @@ export function QuizViewAltActions({
 }
 
 function ShareDialog({ quizUrl }: { quizUrl: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(quizUrl).then(() => {
+      setCopied(true);
+      toast.success("Quiz link copied!");
+
+      // Reset copied state after 2 seconds
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button className="rounded" variant="secondary" size="sm">
-          <Share2Icon />
-          Share
-        </Button>
-      </DialogTrigger>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DialogTrigger asChild>
+              <Button variant="secondary" size="icon">
+                <Share2 className="h-4 w-4" />
+                <span className="sr-only">Share Quiz</span>
+              </Button>
+            </DialogTrigger>
+          </TooltipTrigger>
+          <TooltipContent>Share Quiz</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Share link</DialogTitle>
+          <DialogTitle>Share Quiz Link</DialogTitle>
           <DialogDescription>
-            Anyone who has this link will be able to take the quiz.
+            Copy and share this link with participants.
           </DialogDescription>
         </DialogHeader>
+
         <div className="flex items-center space-x-2">
           <div className="grid flex-1 gap-2">
-            <Label htmlFor="link" className="sr-only">
-              Link
+            <Label htmlFor="quiz-link" className="sr-only">
+              Quiz Link
             </Label>
-            <Input id="link" defaultValue={quizUrl} readOnly />
+            <Input
+              id="quiz-link"
+              defaultValue={quizUrl}
+              readOnly
+              className="w-full"
+            />
           </div>
           <Button
             type="button"
-            size="sm"
-            className="px-3"
-            onClick={() => {
-              const input = document.getElementById("link") as HTMLInputElement;
-              if (input) {
-                navigator.clipboard.writeText(input.value).then(() => {
-                  toast.info("Link copied");
-                });
-              }
-            }}
+            size="icon"
+            variant={copied ? "default" : "secondary"}
+            onClick={handleCopyLink}
           >
-            <span className="sr-only">Copy</span>
-            <Copy />
+            {copied ? (
+              <CheckIcon className="h-4 w-4" />
+            ) : (
+              <Copy className="h-4 w-4" />
+            )}
+            <span className="sr-only">{copied ? "Copied" : "Copy"}</span>
           </Button>
         </div>
+
         <DialogFooter className="sm:justify-start">
           <DialogClose asChild>
             <Button type="button" variant="secondary">

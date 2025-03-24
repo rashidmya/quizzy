@@ -1,17 +1,54 @@
 "use client";
 
-// components
-import { CardHeader, CardTitle } from "@/components/ui/card";
-import { LiveStatus } from "@/components/ui/live-status";
-// lucide-react
-import { Users, Timer, TimerReset } from "lucide-react";
+// Icons
+import { Users, Timer } from "lucide-react";
+// Components
+import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
+// Types
 type QuizHeaderProps = {
   title: string;
   participantCount: number;
   timerMode: string;
   timer?: number | null;
   isLive: boolean;
+};
+
+// Helper function to render timer information
+const renderTimerInfo = (timerMode: string, timer?: number | null) => {
+  const timerModeMap = {
+    none: "No Timer",
+    global: "Global Timer",
+    question: "Per Question Timer",
+  };
+
+  const displayMode =
+    timerModeMap[timerMode as keyof typeof timerModeMap] || timerMode;
+
+  return (
+    <div className="flex items-center gap-2">
+      <Timer className="h-4 w-4 text-muted-foreground" />
+      <span className="capitalize">{displayMode}</span>
+      {timer && (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <Badge variant="secondary">
+                {timer / 60} {timer / 60 === 1 ? "min" : "mins"}
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent>Total quiz time allocation</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
+    </div>
+  );
 };
 
 export default function QuizHeader({
@@ -22,52 +59,45 @@ export default function QuizHeader({
   isLive,
 }: QuizHeaderProps) {
   return (
-    <CardHeader className="p-0">
-      <div className="flex justify-between items-start">
-        {/* Quiz Title and Live Indicator */}
-        <div className="flex flex-col">
-          <div className="flex items-center">
-            <CardTitle className="text-2xl font-bold">{title}</CardTitle>
-            <div className="mx-4 h-6 border-l border-gray-300"></div>
-            <LiveStatus isLive={isLive} />
-          </div>
-        </div>
-        {/* Participant Count and Timer Info */}
-        <div>
-          <div className="flex items-center gap-1 text-sm text-muted-foreground justify-end">
-            <Timer className="h-4 w-4" />
-            <div className="flex items-center">
-              <span>
-                Timer mode:{" "}
-                <span className="capitalize">
-                  {timerMode === "none"
-                    ? "none"
-                    : timerMode === "global"
-                    ? "global"
-                    : timerMode === "question"
-                    ? "per question"
-                    : timerMode}
-                </span>
-              </span>
-            </div>
-          </div>
-          {timer && (
-            <div className="flex items-center gap-1 text-sm text-muted-foreground justify-end">
-              <TimerReset className="h-4 w-4" />
-              <div className="flex items-center">
-                <span>Timer: {timer/60} mins</span>
-              </div>
-            </div>
-          )}
-          <div className="flex items-center gap-1 text-sm text-muted-foreground justify-end">
-            <Users className="h-4 w-4" />
-            <span>
-              {participantCount}{" "}
-              {participantCount === 1 ? "participant" : "participants"}
-            </span>
-          </div>
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 pb-0">
+      <div className="space-y-2">
+        <div className="flex items-center gap-4">
+          <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
+          <Badge
+            variant={isLive ? "default" : "outline"}
+            className={
+              isLive
+                ? "animate-pulse"
+                : "text-muted-foreground border-muted-foreground"
+            }
+          >
+            {isLive ? "Live" : "Offline"}
+          </Badge>
         </div>
       </div>
-    </CardHeader>
+
+      <div className="mt-4 sm:mt-0 space-y-2 text-right">
+        <div className="flex justify-end items-center gap-2 text-sm text-muted-foreground">
+          {renderTimerInfo(timerMode, timer)}
+        </div>
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <div className="flex items-center justify-end gap-2 text-sm text-muted-foreground">
+                <Users className="h-4 w-4" />
+                <span>
+                  {participantCount}
+                  {participantCount === 1 ? " Participant" : " Participants"}
+                </span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              Number of participants registered for this quiz
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+    </div>
   );
 }
