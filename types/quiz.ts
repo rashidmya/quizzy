@@ -43,12 +43,12 @@ export interface QuizReport {
   id: string;
   title: string;
   accuracy: number;
+  status: QuizStatus
   completionRate: number;
   participantCount: number;
-  questionCount: number;
   createdAt: Date;
   lastAttempt?: Date;
-  author: {
+  createdBy: {
     id: string;
     name: string;
   };

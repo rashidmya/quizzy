@@ -30,10 +30,10 @@ interface ReportCardProps {
   onView: () => void;
 }
 
-export default function ReportCard({ report, onView }: ReportCardProps) {
+export default function ReportListCard({ report, onView }: ReportCardProps) {
   return (
     <Card
-      className="overflow-hidden transition-all hover:shadow-md cursor-pointer"
+      className="overflow-hidden transition-all hover:shadow-md cursor-pointer py-4"
       onClick={onView}
     >
       <CardHeader className="pb-2">
@@ -61,9 +61,6 @@ export default function ReportCard({ report, onView }: ReportCardProps) {
           </DropdownMenu>
         </div>
         <div className="flex gap-2 mt-1">
-          <Badge variant="outline" className="text-xs font-normal">
-            {report.questionCount} questions
-          </Badge>
           <Badge
             className={`text-xs font-normal ${getAccuracyBadgeColor(
               report.accuracy
@@ -116,7 +113,7 @@ export default function ReportCard({ report, onView }: ReportCardProps) {
             <div className="flex items-center gap-1.5">
               <User className="h-3.5 w-3.5 text-muted-foreground" />
               <span className="text-xs text-muted-foreground">
-                {report.author.name}
+                {report.createdBy.name}
               </span>
             </div>
             <Button

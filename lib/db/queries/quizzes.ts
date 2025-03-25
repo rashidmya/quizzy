@@ -42,10 +42,9 @@ export async function getQuizzesWithReport(userId: string) {
         id: quizzes.id,
         title: quizzes.title,
         createdAt: quizzes.createdAt,
-        questionCount: sql<number>`CAST((SELECT COUNT(*) FROM questions WHERE questions.quiz_id = ${quizzes.id}) AS INTEGER)`,
         participantCount: sql<number>`CAST((SELECT COUNT(*) FROM quiz_attempts WHERE quiz_attempts.quiz_id = ${quizzes.id}) AS INTEGER)`,
 
-        // Calculate accuracy - using a simpler approach without nested aggregates
+        // Calculate accuracy using CTEs to avoid nested aggregates
         accuracy: sql<number>`COALESCE(
         (WITH correct_answers AS (
           SELECT 
@@ -63,7 +62,7 @@ export async function getQuizzesWithReport(userId: string) {
         AS NUMERIC(5,1))
         FROM correct_answers), 0)`,
 
-        // Calculate completion rate - also avoiding nested aggregates
+        // Calculate completion rate also avoiding nested aggregates
         completionRate: sql<number>`COALESCE(
         (WITH question_counts AS (
           SELECT COUNT(*) as total_questions
@@ -91,10 +90,17 @@ export async function getQuizzesWithReport(userId: string) {
       )`,
 
         // Author information
-        author: {
+        createdBy: {
           id: users.id,
           name: users.name,
         },
+
+        // Using our new status field directly rather than deriving it
+        status: quizzes.status,
+
+        // Include scheduling information
+        scheduledAt: quizzes.scheduledAt,
+        endedAt: quizzes.endedAt,
       })
       .from(quizzes)
       .innerJoin(users, eq(quizzes.createdBy, users.id))

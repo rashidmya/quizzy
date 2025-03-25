@@ -55,7 +55,7 @@ export default function ReportList({ reports }: ReportListProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 py-6">
       <ReportsHeader
         totalReports={reports.length}
         searchQuery={searchQuery}
@@ -82,27 +82,39 @@ export default function ReportList({ reports }: ReportListProps) {
         <ReportsEmptyState searchQuery={searchQuery} />
       ) : (
         <div className="space-y-6">
-          {/* Group reports by participantCount ranges */}
+          {/* Group reports by status using the new status enum */}
           <ReportSection
-            title="High Engagement"
-            description="Reports with substantial participation"
-            reports={filteredReports.filter((r) => r.participantCount >= 30)}
+            title="Active"
+            description="Currently active quizzes accepting responses"
+            reports={filteredReports.filter((r) => r.status === "active")}
             onViewReport={handleViewReport}
           />
 
           <ReportSection
-            title="Medium Engagement"
-            description="Reports with moderate participation"
-            reports={filteredReports.filter(
-              (r) => r.participantCount >= 10 && r.participantCount < 30
-            )}
+            title="Scheduled"
+            description="Upcoming quizzes set for future dates"
+            reports={filteredReports.filter((r) => r.status === "scheduled")}
             onViewReport={handleViewReport}
           />
 
           <ReportSection
-            title="Low Engagement"
-            description="Reports with limited participation"
-            reports={filteredReports.filter((r) => r.participantCount < 10)}
+            title="Ended"
+            description="Finished quizzes with full analytics"
+            reports={filteredReports.filter((r) => r.status === "ended")}
+            onViewReport={handleViewReport}
+          />
+
+          <ReportSection
+            title="Paused"
+            description="Temporarily suspended quizzes"
+            reports={filteredReports.filter((r) => r.status === "paused")}
+            onViewReport={handleViewReport}
+          />
+
+          <ReportSection
+            title="Draft"
+            description="Quizzes in preparation"
+            reports={filteredReports.filter((r) => r.status === "draft")}
             onViewReport={handleViewReport}
           />
         </div>
