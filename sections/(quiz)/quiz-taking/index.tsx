@@ -14,8 +14,9 @@ import QuizTakingForm, {
   QuizTakingFormValues,
   QuizTakingFormRef,
 } from "./quiz-taking-form";
+import QuizTakingState from "./quiz-taking-state";
 // types
-import { Choice, Question, QuizAttempt, QuizWithQuestions } from "@/types/quiz";
+import { QuizAttempt, QuizWithQuestions } from "@/types/quiz";
 // actions
 import {
   startQuizAttempt,
@@ -29,7 +30,6 @@ import { Loader2 } from "lucide-react";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 // hooks
 import { useActionState } from "@/hooks/use-action-state";
-import QuizTakingState from "./quiz-taking-state";
 
 type QuizTakingProps = {
   quiz: QuizWithQuestions;
