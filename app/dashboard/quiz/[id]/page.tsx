@@ -1,6 +1,5 @@
 // queries
 import {
-  getParticipantCount,
   getQuizWithQuestions,
 } from "@/lib/db/queries/quizzes";
 // sections
@@ -17,7 +16,6 @@ export default async function QuizViewPage({
   const { id } = await params;
 
   const quiz = await getQuizWithQuestions(id);
-  const participantCount = await getParticipantCount(id);
 
   if (!quiz)
     return (
@@ -26,5 +24,5 @@ export default async function QuizViewPage({
       </h1>
     );
 
-  return <QuizView quiz={quiz} participantCount={participantCount} />;
+  return <QuizView quiz={quiz} />;
 }

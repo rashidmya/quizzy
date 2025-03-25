@@ -50,13 +50,9 @@ const TABS = [
 
 type QuizDashboardCardProps = {
   quiz: QuizWithQuestions;
-  participantCount?: number;
 };
 
-export default function QuizView({
-  quiz,
-  participantCount = 0,
-}: QuizDashboardCardProps) {
+export default function QuizView({ quiz }: QuizDashboardCardProps) {
   const { push } = useRouter();
 
   // State management
