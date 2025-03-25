@@ -1,7 +1,7 @@
 "use client";
 
 // Icons
-import { Users, Timer } from "lucide-react";
+import { Timer } from "lucide-react";
 // Components
 import { Badge } from "@/components/ui/badge";
 import {
@@ -14,7 +14,6 @@ import {
 // Types
 type QuizHeaderProps = {
   title: string;
-  participantCount: number;
   timerMode: string;
   timer?: number | null;
   isLive: boolean;
@@ -53,7 +52,6 @@ const renderTimerInfo = (timerMode: string, timer?: number | null) => {
 
 export default function QuizHeader({
   title,
-  participantCount,
   timerMode,
   timer,
   isLive,
@@ -80,23 +78,6 @@ export default function QuizHeader({
         <div className="flex justify-end items-center gap-2 text-sm text-muted-foreground">
           {renderTimerInfo(timerMode, timer)}
         </div>
-
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger>
-              <div className="flex items-center justify-end gap-2 text-sm text-muted-foreground">
-                <Users className="h-4 w-4" />
-                <span>
-                  {participantCount}
-                  {participantCount === 1 ? " Participant" : " Participants"}
-                </span>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              Number of participants registered for this quiz
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
       </div>
     </div>
   );

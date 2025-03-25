@@ -13,7 +13,6 @@ import {
   Share2,
   Star,
   Clock,
-  Users,
 } from "lucide-react";
 // components
 import { Button } from "@/components/ui/button";
@@ -83,7 +82,7 @@ export default function LibraryQuizItem({
   return (
     <>
       <Card className="group transition-all duration-200 hover:shadow-md">
-        <CardHeader className="p-4 pb-0">
+        <CardHeader className="px-4 pb-0">
           <div className="flex items-start justify-between">
             <div
               className="flex-1 cursor-pointer"
@@ -158,7 +157,7 @@ export default function LibraryQuizItem({
           </div>
         </CardContent>
 
-        <CardFooter className="p-4 pt-0 flex items-center justify-between">
+        <CardFooter className="px-4 pt-0 flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Avatar className="h-6 w-6">
               <AvatarFallback className="text-xs">
@@ -169,13 +168,6 @@ export default function LibraryQuizItem({
               {quiz.createdBy?.name || "Unknown"}
             </span>
           </div>
-
-          {quiz.participantCount > 0 && (
-            <div className="flex items-center text-xs text-muted-foreground">
-              <Users className="mr-1 h-3 w-3" />
-              {quiz.participantCount}
-            </div>
-          )}
         </CardFooter>
       </Card>
 

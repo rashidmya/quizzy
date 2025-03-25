@@ -139,7 +139,6 @@ export default function QuizView({
         <QuizViewHeader
           title={quiz.title}
           isLive={isLive}
-          participantCount={participantCount}
           timerMode={quiz.timerMode}
           timer={quiz.timer}
         />

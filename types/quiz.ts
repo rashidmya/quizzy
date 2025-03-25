@@ -35,7 +35,6 @@ export type LibraryQuiz = Omit<Quiz, "createdBy"> & {
     name: string;
   };
   questionCount: number;
-  participantCount: number;
 };
 
 export type AttemptAnswerWithCorrectness = AttemptAnswer & {
