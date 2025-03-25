@@ -14,9 +14,9 @@ import { Badge } from "@/components/ui/badge";
 // icons
 import { CalendarIcon, UsersIcon, BarChart3Icon } from "lucide-react";
 // sections
-import StatsCards from "./reports-view-stats-cards";
-import ParticipantsTab from "./reports-view-participants-tab";
-import QuestionsTab from "./reports-view-questions-tab";
+import StatsCards from "./report-view-stats-cards";
+import ParticipantsTab from "./report-view-participants-tab";
+import QuestionsTab from "./report-view-questions-tab";
 // types
 import { QuizAttemptWithAnswers, QuizWithQuestions } from "@/types/quiz";
 // utils
