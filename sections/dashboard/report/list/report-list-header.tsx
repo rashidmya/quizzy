@@ -15,7 +15,7 @@ export default function ReportsHeader({
   onSearchChange 
 }: ReportsHeaderProps) {
   return (
-    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
+    <div className="flex flex-col items-start gap-4 mb-8">
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10">
           <BarChart3 className="h-5 w-5 text-primary" />
@@ -28,7 +28,7 @@ export default function ReportsHeader({
         </div>
       </div>
 
-      <div className="relative w-full md:w-72">
+      <div className="relative w-full">
         <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Search reports..."

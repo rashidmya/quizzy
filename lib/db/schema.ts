@@ -87,6 +87,6 @@ export const attemptAnswers = pgTable("attempt_answers", {
       onDelete: "cascade",
     })
     .notNull(),
-  answer: varchar("answer", { length: 1024 }).notNull(),
+  answer: uuid("answer").notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

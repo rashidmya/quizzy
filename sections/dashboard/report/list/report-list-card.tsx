@@ -3,12 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,10 +19,11 @@ import {
   MoreHorizontal,
   ChevronRight,
 } from "lucide-react";
-// types
-import { QuizReport, getAccuracyBadgeColor } from "./report-types";
 // utils
 import { fToNow } from "@/utils/format-time";
+import { getAccuracyBadgeColor } from "@/utils/get-accuracy-badge-color";
+// types
+import { QuizReport } from "@/types/quiz";
 
 interface ReportCardProps {
   report: QuizReport;
@@ -68,8 +64,12 @@ export default function ReportCard({ report, onView }: ReportCardProps) {
           <Badge variant="outline" className="text-xs font-normal">
             {report.questionCount} questions
           </Badge>
-          <Badge className={`text-xs font-normal ${getAccuracyBadgeColor(report.accuracy)}`}>
-            {report.accuracy.toFixed(1)}% accuracy
+          <Badge
+            className={`text-xs font-normal ${getAccuracyBadgeColor(
+              report.accuracy
+            )}`}
+          >
+            {report.accuracy}% accuracy
           </Badge>
         </div>
       </CardHeader>
@@ -80,9 +80,13 @@ export default function ReportCard({ report, onView }: ReportCardProps) {
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-1.5">
                 <CheckCircle className="h-3.5 w-3.5 text-green-600" />
-                <span className="text-muted-foreground text-xs">Completion Rate</span>
+                <span className="text-muted-foreground text-xs">
+                  Completion Rate
+                </span>
               </div>
-              <span className="font-medium text-xs">{report.completionRate}%</span>
+              <span className="font-medium text-xs">
+                {report.completionRate}%
+              </span>
             </div>
             <Progress value={report.completionRate} className="h-1.5" />
           </div>
@@ -115,7 +119,11 @@ export default function ReportCard({ report, onView }: ReportCardProps) {
                 {report.author.name}
               </span>
             </div>
-            <Button variant="ghost" size="sm" className="text-xs gap-1 hover:text-primary">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs gap-1 hover:text-primary"
+            >
               View Details
               <ChevronRight className="h-3.5 w-3.5" />
             </Button>

@@ -7,7 +7,7 @@ import {
   quizAttempts,
   attemptAnswers,
 } from "../schema";
-import { and, eq, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 
 export async function getQuizzes(userId: string) {
   return db
@@ -26,20 +26,82 @@ export async function getQuizzes(userId: string) {
       timer: quizzes.timer,
       timerMode: quizzes.timerMode,
       isLive: quizzes.isLive,
-      shuffleQuestions: quizzes.shuffleQuestions
+      shuffleQuestions: quizzes.shuffleQuestions,
     })
     .from(quizzes)
     .innerJoin(users, eq(quizzes.createdBy, users.id))
     .where(eq(quizzes.createdBy, userId));
 }
 
-export async function getParticipantCount(quizId: string): Promise<number> {
-  const result = await db
-    .select({ count: sql<number>`COUNT(*)` })
-    .from(quizAttempts)
-    .where(eq(quizAttempts.quizId, quizId));
+export async function getQuizzesWithReport(userId: string) {
+  try {
+    return db
+      .select({
+        id: quizzes.id,
+        title: quizzes.title,
+        createdAt: quizzes.createdAt,
+        questionCount: sql<number>`CAST((SELECT COUNT(*) FROM questions WHERE questions.quiz_id = ${quizzes.id}) AS INTEGER)`,
+        participantCount: sql<number>`CAST((SELECT COUNT(*) FROM quiz_attempts WHERE quiz_attempts.quiz_id = ${quizzes.id}) AS INTEGER)`,
 
-  return result[0]?.count || 0;
+        // Calculate accuracy - using a simpler approach without nested aggregates
+        accuracy: sql<number>`COALESCE(
+        (WITH correct_answers AS (
+          SELECT 
+            qa.id as attempt_id,
+            COUNT(aa.id) as total_answers,
+            SUM(CASE WHEN c.is_correct = true THEN 1 ELSE 0 END) as correct_count
+          FROM quiz_attempts qa
+          JOIN attempt_answers aa ON qa.id = aa.attempt_id
+          JOIN choices c ON aa.answer = c.id
+          WHERE qa.quiz_id = ${quizzes.id}
+          GROUP BY qa.id
+        )
+        SELECT CAST(
+          (SUM(correct_count) * 100.0 / NULLIF(SUM(total_answers), 0))
+        AS NUMERIC(5,1))
+        FROM correct_answers), 0)`,
+
+        // Calculate completion rate - also avoiding nested aggregates
+        completionRate: sql<number>`COALESCE(
+        (WITH question_counts AS (
+          SELECT COUNT(*) as total_questions
+          FROM questions 
+          WHERE questions.quiz_id = ${quizzes.id}
+        ),
+        attempt_counts AS (
+          SELECT 
+            COUNT(DISTINCT qa.id) as total_attempts,
+            COUNT(aa.id) as total_answers
+          FROM quiz_attempts qa
+          LEFT JOIN attempt_answers aa ON qa.id = aa.attempt_id
+          WHERE qa.quiz_id = ${quizzes.id}
+        )
+        SELECT CAST(
+          (total_answers * 100.0 / NULLIF(total_attempts * total_questions, 0)) 
+        AS NUMERIC(5,1))
+        FROM attempt_counts, question_counts), 0)`,
+
+        // Get the most recent attempt date
+        lastAttempt: sql<Date>`(
+        SELECT MAX(taken_at)
+        FROM quiz_attempts
+        WHERE quiz_attempts.quiz_id = ${quizzes.id} AND quiz_attempts.submitted = true
+      )`,
+
+        // Author information
+        author: {
+          id: users.id,
+          name: users.name,
+        },
+      })
+      .from(quizzes)
+      .innerJoin(users, eq(quizzes.createdBy, users.id))
+      .where(eq(quizzes.createdBy, userId))
+      .orderBy(desc(quizzes.createdAt));
+  } catch (error) {
+    console.error("Failed to fetch quizzes with report:", error);
+    throw new Error("ailed to fetch quizzes with report");
+  }
 }
 
 export async function getQuizWithQuestions(quizId: string) {
