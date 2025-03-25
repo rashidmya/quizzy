@@ -41,6 +41,7 @@ import {
 import { TimerMode } from "@/types/quiz";
 // sections
 import { QuizFormValues } from "./index";
+import { Switch } from "@/components/ui/switch";
 
 export default function QuizNewEditSettingsDialog() {
   const { getValues, setValue } = useFormContext<QuizFormValues>();
@@ -53,6 +54,7 @@ export default function QuizNewEditSettingsDialog() {
   const [localTimerMode, setLocalTimerMode] = useState<TimerMode>("none");
   const [localTimer, setLocalTimer] = useState(0);
   const [titleCharCount, setTitleCharCount] = useState(0);
+  const [shuffleQuestionsEnabled, setShuffleQuestionsEnabled] = useState(false);
 
   // Title validation
   const minChars = 4;
@@ -71,6 +73,7 @@ export default function QuizNewEditSettingsDialog() {
       setTitleCharCount(values.title.length);
       validateTitle(values.title);
       validateTimer(values.timer || 0, values.timerMode);
+      setShuffleQuestionsEnabled(values.shuffleQuestions || false);
     }
   }, [open, getValues]);
 
@@ -122,6 +125,9 @@ export default function QuizNewEditSettingsDialog() {
     // Update the form values
     setValue("title", localTitle, { shouldDirty: true });
     setValue("timerMode", localTimerMode, { shouldDirty: true });
+    setValue("shuffleQuestions", shuffleQuestionsEnabled, {
+      shouldDirty: true,
+    });
 
     if (localTimerMode === "global") {
       setValue("timer", localTimer * 60, { shouldDirty: true }); // Convert minutes to seconds
@@ -271,17 +277,10 @@ export default function QuizNewEditSettingsDialog() {
                           Display questions in random order for each participant
                         </p>
                       </div>
-                      {/* <Controller
-                        control={control}
-                        name="shuffleQuestions"
-                        defaultValue={false}
-                        render={({ field }) => (
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        )}
-                      /> */}
+                      <Switch
+                        checked={shuffleQuestionsEnabled}
+                        onCheckedChange={setShuffleQuestionsEnabled}
+                      />
                     </div>
                   </CardContent>
                 </Card>

@@ -31,6 +31,7 @@ export const quizzes = pgTable("quizzes", {
   timerMode: timerModeEnum("timer_mode").notNull().default("global"),
   timer: integer("timer"),
   isLive: boolean("is_live").notNull().default(false),
+  shuffleQuestions: boolean("shuffle_questions").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

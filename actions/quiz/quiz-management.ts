@@ -12,13 +12,15 @@ import { TimerMode, QuestionType } from "@/types/quiz";
  */
 export async function upsertQuiz(formData: FormData) {
   try {
+    const userId = formData.get("userId") as string | null;
     const quizId = formData.get("quizId") as string | null;
     const title = formData.get("title") as string;
     const timerMode = formData.get("timerMode") as TimerMode;
     const timerStr = formData.get("timer") as string;
     const timer = timerStr ? Number(timerStr) : null;
     const questionsJson = formData.get("questions") as string;
-    const userId = formData.get("userId") as string | null;
+    const shuffleQuestionsStr = formData.get("shuffleQuestions") as string;
+    const shuffleQuestions = shuffleQuestionsStr === "true";
 
     if (!title?.trim()) {
       return { message: "Title is required", error: true };
@@ -48,7 +50,7 @@ export async function upsertQuiz(formData: FormData) {
       // Update existing quiz
       await db
         .update(quizzes)
-        .set({ title, timerMode, timer })
+        .set({ title, timerMode, timer, shuffleQuestions })
         .where(eq(quizzes.id, quizId));
 
       // Remove existing questions (cascade deletes choices).
@@ -62,7 +64,13 @@ export async function upsertQuiz(formData: FormData) {
       }
       const [insertedQuiz] = await db
         .insert(quizzes)
-        .values({ createdBy: userId, title, timerMode, timer })
+        .values({
+          createdBy: userId,
+          title,
+          timerMode,
+          timer,
+          shuffleQuestions,
+        })
         .returning({ id: quizzes.id });
 
       newQuizId = insertedQuiz.id;
@@ -140,5 +148,34 @@ export async function setQuizLive({
   } catch (error) {
     console.error("Error setting quiz live status:", error);
     return { message: "Failed to set quiz live status", error: true };
+  }
+}
+
+/**
+ * Updates quiz shuffle questions setting
+ */
+export async function setShuffleQuestions({
+  quizId,
+  shuffleQuestions,
+}: {
+  quizId: string;
+  shuffleQuestions: boolean;
+}) {
+  try {
+    if (!quizId.trim()) {
+      return { message: "Quiz ID is required", error: true };
+    }
+    await db
+      .update(quizzes)
+      .set({ shuffleQuestions })
+      .where(eq(quizzes.id, quizId));
+    return {
+      message: shuffleQuestions
+        ? "Questions will be shuffled"
+        : "Questions will not be shuffled",
+    };
+  } catch (error) {
+    console.error("Error updating shuffle setting:", error);
+    return { message: "Failed to update shuffle setting", error: true };
   }
 }

@@ -49,7 +49,6 @@ export const authQuizOptions: NextAuthOptions = {
         // Set isQuiz flag only if the provider is quiz-login.
         token.isQuiz = account?.provider === "quiz-login";
       }
-      console.log("JWT token:", token);
       return token;
     },
     async session({ session, token }) {
@@ -57,7 +56,6 @@ export const authQuizOptions: NextAuthOptions = {
         session.user.id = token.id as string;
         session.isQuiz = token.isQuiz as boolean | undefined;
       }
-      console.log("Session:", session);
       return session;
     },
     // This redirect callback is optional; if you don't want automatic redirects, you can remove it.

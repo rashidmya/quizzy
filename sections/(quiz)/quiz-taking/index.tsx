@@ -15,7 +15,7 @@ import QuizTakingForm, {
   QuizTakingFormRef,
 } from "./quiz-taking-form";
 // types
-import { QuizAttempt, QuizWithQuestions } from "@/types/quiz";
+import { Choice, Question, QuizAttempt, QuizWithQuestions } from "@/types/quiz";
 // actions
 import {
   startQuizAttempt,
@@ -41,6 +41,8 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
   const { setTheme } = useTheme();
 
   const [attempt, setAttempt] = useState<QuizAttempt | null>(null);
+
+  const [displayOrder, setDisplayOrder] = useState<number[]>([]);
 
   const [initialAnswers, setInitialAnswers] = useState<
     Record<string, string> | undefined
@@ -84,7 +86,7 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
    */
   useEffect(() => {
     const fetchQuizAttempt = async () => {
-      if (session?.isQuiz && session.user?.email && !attempt) {
+      if (session && session.user?.email && !attempt) {
         const result = await startQuizAttempt({
           email: session.user.email,
           quizId: quiz.id,
@@ -137,11 +139,25 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
         });
 
         setInitialAnswers(answersRecord);
+
+        if (quiz.shuffleQuestions) {
+          // Create an array of indices and shuffle it
+          const indices = Array.from(
+            { length: quiz.questions.length },
+            (_, i) => i
+          );
+          setDisplayOrder(shuffleArray(indices));
+        } else {
+          // Use sequential order
+          setDisplayOrder(
+            Array.from({ length: quiz.questions.length }, (_, i) => i)
+          );
+        }
       }
     };
 
     fetchAttemptAnswers();
-  }, [attempt, quizTaken, quiz.questions]);
+  }, [attempt, quizTaken, quiz.questions, quiz.shuffleQuestions]);
 
   /**
    * Final quiz submission.
@@ -169,13 +185,10 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
     async (data: QuizTakingFormValues) => {
       if (!attempt) return;
 
+      // Process only the answers that changed
       for (const [questionId, answer] of Object.entries(data.answers)) {
-        if (!questionId.trim()) continue;
+        if (!questionId.trim() || !answer.trim()) continue;
 
-        if (!answer.trim()) {
-          return;
-        }
-        
         const result = await autoSaveAction({
           attemptId: attempt.id,
           questionId,
@@ -187,7 +200,7 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
         }
       }
     },
-    [attempt]
+    [attempt, autoSaveAction]
   );
 
   /**
@@ -198,6 +211,9 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
       await handleQuizSubmit();
     }
   }, [formRef, handleQuizSubmit]);
+
+  // Order question based on if shuffle is on
+  const orderedQuestions = displayOrder.map((index) => quiz.questions[index]);
 
   /**
    * Decide which content to display based on quiz state.
@@ -213,7 +229,7 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
     }
 
     // Not logged in
-    if (!session?.isQuiz) {
+    if (!session) {
       return <QuizTakingLogin quizId={quiz.id} />;
     }
 
@@ -269,7 +285,10 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
         <div className="pt-34">
           <QuizTakingForm
             ref={formRef}
-            quiz={quiz}
+            quiz={{
+              ...quiz,
+              questions: orderedQuestions,
+            }}
             onSubmit={async () => {
               await handleQuizSubmit();
               setQuizTaken(true);
@@ -285,3 +304,12 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
 
   return <div className="container mx-auto max-w-full">{renderContent()}</div>;
 }
+
+const shuffleArray = <T,>(array: T[]): T[] => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};

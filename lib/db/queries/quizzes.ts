@@ -27,6 +27,7 @@ export async function getQuizzes(userId: string) {
       timer: quizzes.timer,
       timerMode: quizzes.timerMode,
       isLive: quizzes.isLive,
+      shuffleQuestions: quizzes.shuffleQuestions
     })
     .from(quizzes)
     .innerJoin(users, eq(quizzes.createdBy, users.id))
@@ -55,6 +56,7 @@ export async function getQuizWithQuestions(quizId: string) {
         timer: quizzes.timer,
         timerMode: quizzes.timerMode,
         isLive: quizzes.isLive,
+        shuffleQuestions: quizzes.shuffleQuestions,
         createdAt: quizzes.createdAt,
         updatedAt: quizzes.updatedAt,
       })

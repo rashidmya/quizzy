@@ -78,6 +78,7 @@ const quizFormSchema = z.object({
     .number()
     .min(60, { message: "Timer must be at least 60 seconds" })
     .optional(),
+  shuffleQuestions: z.boolean().default(false),
 });
 
 export type QuizFormValues = z.infer<typeof quizFormSchema>;
@@ -103,7 +104,9 @@ const DEFAULT_QUESTION = {
 
 export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
   const { push } = useRouter();
+
   const user = useCurrentUser();
+
   const [isLoading, setIsLoading] = useState(true);
   const [hasChanged, setHasChanged] = useState(false);
   const [confirmExit, setConfirmExit] = useState(false);
@@ -124,6 +127,7 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
     title: quiz?.title || "Untitled Quiz",
     timer: quiz?.timer || undefined,
     timerMode: quiz?.timerMode || "none",
+    shuffleQuestions: quiz?.shuffleQuestions || false,
     questions: quiz?.questions?.map((q: any) => ({
       id: q.id,
       text: q.text,
@@ -149,7 +153,6 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
     handleSubmit,
     formState: { errors, isDirty },
     watch,
-    reset,
   } = methods;
 
   // Track form changes
@@ -162,7 +165,6 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (hasChanged) {
         e.preventDefault();
-        e.returnValue = "";
         return "";
       }
     };
@@ -190,10 +192,12 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
     const formData = new FormData();
     formData.append("title", data.title);
     formData.append("timerMode", data.timerMode);
+    formData.append("shuffleQuestions", data.shuffleQuestions.toString());
+    formData.append("questions", JSON.stringify(data.questions));
+
     if (data.timer !== undefined) {
       formData.append("timer", data.timer.toString());
     }
-    formData.append("questions", JSON.stringify(data.questions));
 
     // If editing, append quizId; otherwise, append userId.
     if (isEdit && quiz) {

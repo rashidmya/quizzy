@@ -104,22 +104,47 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
     // Watch answers for auto-save functionality
     const watchedAnswers = useWatch({ control, name: "answers" });
 
-    // Debounced auto-save: only trigger if at least one answer differs from the initial answers.
+    // Reference to track the previous values
+    const previousAnswersRef = useRef<Record<string, string>>({});
+
+    // Modify the useEffect that watches for answer changes
     useEffect(() => {
       if (!onAutoSave) return;
 
+      // Don't trigger on initial load - wait until user actually changes something
+      if (Object.keys(previousAnswersRef.current).length === 0) {
+        previousAnswersRef.current = { ...watchedAnswers };
+        return;
+      }
+
       const timer = setTimeout(() => {
         const currentValues = getValues();
-        // Check if at least one answer has changed compared to when the quiz was first opened.
-        const hasChanged = quiz.questions.some(
-          (q) => currentValues.answers[q.id] !== initialAnswersRef.current[q.id]
+
+        // Create an object to hold just the changed answers
+        const changedAnswers: Record<string, string> = {};
+
+        // Check which answers have changed
+        Object.entries(currentValues.answers).forEach(
+          ([questionId, answer]) => {
+            // Only include this answer if it changed from previous value
+            if (previousAnswersRef.current[questionId] !== answer) {
+              changedAnswers[questionId] = answer;
+            }
+          }
         );
-        if (!hasChanged) return;
-        onAutoSave(currentValues);
+
+        // Only auto-save if there are actual changes
+        if (Object.keys(changedAnswers).length > 0) {
+          // Update the reference for next comparison
+          previousAnswersRef.current = { ...currentValues.answers };
+
+          // Call auto-save with only the changed answers
+          onAutoSave({ answers: changedAnswers });
+        }
       }, AUTO_SAVE_DEBOUNCE_MS);
 
       return () => clearTimeout(timer);
-    }, [watchedAnswers, onAutoSave, getValues, quiz.questions]);
+    }, [watchedAnswers, onAutoSave, getValues]);
 
     // Track quiz completion progress
     const answers = getValues("answers");
