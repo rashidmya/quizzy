@@ -67,12 +67,12 @@ export default function ReportView({
   };
 
   return (
-    <div className="container mx-auto py-10 space-y-8 max-w-6xl">
+    <div className="container mx-auto space-y-8 max-w-6xl">
       <div className="rounded-lg p-6 shadow-sm border-1">
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300">
+              <h1 className="text-4xl font-bold tracking-tight">
                 {quiz.title}
               </h1>
               <div className="flex items-center mt-2 text-muted-foreground">

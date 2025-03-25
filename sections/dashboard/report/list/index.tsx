@@ -55,7 +55,7 @@ export default function ReportList({ reports }: ReportListProps) {
   };
 
   return (
-    <div className="space-y-6 py-6">
+    <div className="space-y-6">
       <ReportsHeader
         totalReports={reports.length}
         searchQuery={searchQuery}

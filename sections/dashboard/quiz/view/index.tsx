@@ -130,7 +130,7 @@ export default function QuizView({ quiz }: QuizDashboardCardProps) {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 min-h-screen">
+    <div className="container mx-auto px-4 min-h-screen">
       <Card className="max-w-4xl mx-auto shadow-lg">
         <QuizViewHeader
           title={quiz.title}

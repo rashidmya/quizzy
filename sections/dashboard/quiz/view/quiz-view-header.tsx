@@ -65,7 +65,7 @@ export default function QuizHeader({
   endedAt,
 }: QuizHeaderProps) {
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 pb-0">
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-6 pb-0">
       <div className="space-y-2">
         <div className="flex items-center gap-4">
           <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
