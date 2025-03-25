@@ -31,7 +31,7 @@ export type QuizWithQuestions = Omit<Quiz, "createdBy" | "questions"> & {
   questions: Array<Question & { choices: Choice[] }>;
 };
 
-export type LibraryQuiz = Omit<Quiz, "createdBy"> & {
+export type LibraryQuiz = Omit<Quiz, "createdBy" | "questionCount"> & {
   createdBy: {
     id: string;
     name: string;
@@ -39,20 +39,23 @@ export type LibraryQuiz = Omit<Quiz, "createdBy"> & {
   questionCount: number;
 };
 
-export interface QuizReport {
-  id: string;
-  title: string;
-  accuracy: number;
-  status: QuizStatus
-  completionRate: number;
-  participantCount: number;
-  createdAt: Date;
-  lastAttempt?: Date;
+export type QuizReport = Omit<
+  Quiz,
+  | "createdBy"
+  | "completionRate"
+  | "participationCount"
+  | "accuracy"
+  | "lastAttempt"
+> & {
   createdBy: {
     id: string;
     name: string;
   };
-}
+  completionRate: number;
+  participantCount: number;
+  accuracy: number;
+  lastAttempt?: Date;
+};
 
 export type AttemptAnswerWithCorrectness = AttemptAnswer & {
   isCorrect: boolean;
