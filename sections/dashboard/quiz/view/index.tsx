@@ -15,7 +15,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
 // Custom Components
@@ -25,7 +24,7 @@ import { QuizViewAltActions, QuizViewMainActions } from "./quiz-view-actions";
 import QuizViewDetails from "./quiz-view-details";
 
 // Types
-import { QuizWithQuestions } from "@/types/quiz";
+import { QuizStatus, QuizWithQuestions } from "@/types/quiz";
 
 // Paths
 import { PATH_DASHBOARD } from "@/routes/paths";
@@ -34,7 +33,7 @@ import { PATH_DASHBOARD } from "@/routes/paths";
 import { useActionState } from "@/hooks/use-action-state";
 
 // Actions
-import { setQuizLive, deleteQuiz } from "@/actions/quiz/quiz-management";
+import { deleteQuiz, setQuizStatus } from "@/actions/quiz/quiz-management";
 
 // Utils
 import { encodeUUID } from "@/utils/encode-uuid";
@@ -56,13 +55,14 @@ export default function QuizView({ quiz }: QuizDashboardCardProps) {
   const { push } = useRouter();
 
   // State management
-  const [isLive, setIsLive] = useState(quiz.isLive);
+  const [quizStatus, setQuizStatusState] = useState<QuizStatus>(quiz.status || "draft");
   const [currentTab, setCurrentTab] = useState<string>(TABS[0].value);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Action states
-  const [_liveState, setLiveAction, isSetLivePending] = useActionState(
-    setQuizLive,
+  // Action states
+  const [_statusState, setStatusAction, isStatusPending] = useActionState(
+    setQuizStatus,
     {
       message: "",
       error: false,
@@ -79,12 +79,12 @@ export default function QuizView({ quiz }: QuizDashboardCardProps) {
   )}`;
 
   // Event Handlers
-  const handleToggleLive = async () => {
-    const newLive = !isLive;
+  const handleToggleActive = async () => {
+    const newStatus = quizStatus === "active" ? "draft" : "active";
 
-    const promise = setLiveAction({
+    const promise = setStatusAction({
       quizId: quiz.id,
-      isLive: newLive,
+      status: newStatus,
     }).then((result: any) => {
       if (result.error) {
         throw new Error(result.message);
@@ -93,11 +93,11 @@ export default function QuizView({ quiz }: QuizDashboardCardProps) {
     });
 
     toast.promise(promise, {
-      loading: newLive ? "Enabling quiz..." : "Disabling quiz...",
+      loading: newStatus === "active" ? "Activating quiz..." : "Deactivating quiz...",
       success: (result) => {
         if (!result.error) {
-          setIsLive(newLive);
-          return newLive ? "Quiz is online" : "Quiz is offline";
+          setQuizStatusState(newStatus);
+          return newStatus === "active" ? "Quiz is now active" : "Quiz is now in draft mode";
         }
         throw new Error(result.message || "Failed to update quiz status");
       },
@@ -134,7 +134,7 @@ export default function QuizView({ quiz }: QuizDashboardCardProps) {
       <Card className="max-w-4xl mx-auto shadow-lg">
         <QuizViewHeader
           title={quiz.title}
-          isLive={isLive}
+          status={quizStatus}
           timerMode={quiz.timerMode}
           timer={quiz.timer}
         />
@@ -155,10 +155,10 @@ export default function QuizView({ quiz }: QuizDashboardCardProps) {
           </div>
 
           <QuizViewMainActions
-            isLive={isLive}
-            isSetLivePending={isSetLivePending}
+            status={quizStatus}
+            isStatusPending={isStatusPending}
             onSchedule={handleSchedule}
-            onToggleLive={handleToggleLive}
+            onToggleActive={handleToggleActive}
           />
         </div>
 

@@ -11,6 +11,8 @@ export type TimerMode = "none" | "global" | "question";
 
 export type QuestionType = "multiple_choice";
 
+export type QuizStatus = "draft" | "scheduled" | "active" | "paused" | "ended";
+
 export type Quiz = InferSelectModel<typeof quizzes>;
 
 export type Question = InferSelectModel<typeof questions>;

@@ -1,4 +1,4 @@
-import { QUESTION_TYPES, TIMER_MODES } from "@/constants";
+import { QUESTION_TYPES, QUIZ_STATUSES, TIMER_MODES } from "@/constants";
 import {
   pgTable,
   varchar,
@@ -12,6 +12,7 @@ import {
 
 export const timerModeEnum = pgEnum("timer_modes", TIMER_MODES);
 export const questionTypeEnum = pgEnum("question_type", QUESTION_TYPES);
+export const quizStatusEnum = pgEnum("quiz_status", QUIZ_STATUSES);
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -28,9 +29,11 @@ export const quizzes = pgTable("quizzes", {
   createdBy: uuid("created_by")
     .references(() => users.id)
     .notNull(),
+  status: quizStatusEnum("status").notNull().default("draft"),
+  scheduledAt: timestamp("scheduled_at"),
+  endedAt: timestamp("ended_at"),
   timerMode: timerModeEnum("timer_mode").notNull().default("global"),
   timer: integer("timer"),
-  isLive: boolean("is_live").notNull().default(false),
   shuffleQuestions: boolean("shuffle_questions").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

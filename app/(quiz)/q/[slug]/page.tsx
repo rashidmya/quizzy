@@ -25,8 +25,9 @@ export default async function QuizPage({ params }: PageProps) {
     return notFound();
   }
 
-  if (!quiz.isLive) {
-    return <QuizOffline />;
+  // Check if the quiz is active (replacing the isLive check)
+  if (quiz.status !== "active") {
+    return <QuizOffline status={quiz.status} scheduledAt={quiz.scheduledAt} />;
   }
 
   return (

@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/lib/db/drizzle";
 import { quizzes, questions, choices } from "@/lib/db/schema";
-import { TimerMode, QuestionType } from "@/types/quiz";
+import { TimerMode, QuestionType, QuizStatus } from "@/types/quiz";
 
 /**
  * Creates or updates a quiz (and its questions/choices).
@@ -14,6 +14,7 @@ export async function upsertQuiz(formData: FormData) {
   try {
     const userId = formData.get("userId") as string | null;
     const quizId = formData.get("quizId") as string | null;
+    const updatedAt = new Date();
     const title = formData.get("title") as string;
     const timerMode = formData.get("timerMode") as TimerMode;
     const timerStr = formData.get("timer") as string;
@@ -50,7 +51,7 @@ export async function upsertQuiz(formData: FormData) {
       // Update existing quiz
       await db
         .update(quizzes)
-        .set({ title, timerMode, timer, shuffleQuestions })
+        .set({ title, timerMode, timer, shuffleQuestions, updatedAt })
         .where(eq(quizzes.id, quizId));
 
       // Remove existing questions (cascade deletes choices).
@@ -70,6 +71,7 @@ export async function upsertQuiz(formData: FormData) {
           timerMode,
           timer,
           shuffleQuestions,
+          status: "draft",
         })
         .returning({ id: quizzes.id });
 
@@ -128,26 +130,85 @@ export async function deleteQuiz(quizId: string) {
 }
 
 /**
- * Sets a quiz to “live” or “offline.”
+ * Updates the quiz status (replacing setQuizLive)
  */
-export async function setQuizLive({
+export async function setQuizStatus({
   quizId,
-  isLive,
+  status,
 }: {
   quizId: string;
-  isLive: boolean;
+  status: QuizStatus;
 }) {
   try {
     if (!quizId.trim()) {
       return { message: "Quiz ID is required", error: true };
     }
-    await db.update(quizzes).set({ isLive }).where(eq(quizzes.id, quizId));
+    await db.update(quizzes).set({ status }).where(eq(quizzes.id, quizId));
+
+    let message = "";
+    switch (status) {
+      case "active":
+        message = "Quiz is now active";
+        break;
+      case "draft":
+        message = "Quiz has been set to draft";
+        break;
+      case "paused":
+        message = "Quiz has been paused";
+        break;
+      case "scheduled":
+        message = "Quiz has been scheduled";
+        break;
+      case "ended":
+        message = "Quiz has ended";
+        break;
+      default:
+        message = `Quiz status updated to ${status}`;
+    }
+
+    return { message };
+  } catch (error) {
+    console.error("Error setting quiz status:", error);
+    return { message: "Failed to update quiz status", error: true };
+  }
+}
+
+/**
+ * Schedule a quiz to become active at a specified time
+ */
+export async function scheduleQuiz({
+  quizId,
+  scheduledAt,
+  endedAt,
+}: {
+  quizId: string;
+  scheduledAt: Date;
+  endedAt?: Date;
+}) {
+  try {
+    if (!quizId.trim()) {
+      return { message: "Quiz ID is required", error: true };
+    }
+
+    const updateData: any = {
+      status: "scheduled",
+      scheduledAt,
+    };
+
+    if (endedAt) {
+      updateData.endedAt = endedAt;
+    }
+
+    await db.update(quizzes).set(updateData).where(eq(quizzes.id, quizId));
+
     return {
-      message: isLive ? "Quiz is now live" : "Quiz is now offline",
+      message: endedAt
+        ? "Quiz has been scheduled with end time"
+        : "Quiz has been scheduled",
     };
   } catch (error) {
-    console.error("Error setting quiz live status:", error);
-    return { message: "Failed to set quiz live status", error: true };
+    console.error("Error scheduling quiz:", error);
+    return { message: "Failed to schedule quiz", error: true };
   }
 }
 

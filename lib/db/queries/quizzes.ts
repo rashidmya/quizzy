@@ -25,8 +25,10 @@ export async function getQuizzes(userId: string) {
       questionCount: sql<number>`CAST((SELECT COUNT(*) FROM questions WHERE questions.quiz_id = ${quizzes.id}) AS INTEGER)`,
       timer: quizzes.timer,
       timerMode: quizzes.timerMode,
-      isLive: quizzes.isLive,
+      status: quizzes.status,
       shuffleQuestions: quizzes.shuffleQuestions,
+      scheduledAt: quizzes.scheduledAt,
+      endedAt: quizzes.endedAt,
     })
     .from(quizzes)
     .innerJoin(users, eq(quizzes.createdBy, users.id))
@@ -116,10 +118,12 @@ export async function getQuizWithQuestions(quizId: string) {
         },
         timer: quizzes.timer,
         timerMode: quizzes.timerMode,
-        isLive: quizzes.isLive,
+        status: quizzes.status,
         shuffleQuestions: quizzes.shuffleQuestions,
         createdAt: quizzes.createdAt,
         updatedAt: quizzes.updatedAt,
+        scheduledAt: quizzes.scheduledAt,
+        endedAt: quizzes.endedAt,
       })
       .from(quizzes)
       .innerJoin(users, eq(quizzes.createdBy, users.id))

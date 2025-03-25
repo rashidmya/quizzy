@@ -13,6 +13,7 @@ import {
   Share2,
   Copy,
   CheckIcon,
+  PauseCircle,
 } from "lucide-react";
 
 // Components
@@ -22,7 +23,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
   Dialog,
@@ -48,12 +48,13 @@ import { useState } from "react";
 
 // Utilities
 import { toast } from "sonner";
+import { QuizStatus } from "@/types/quiz";
 
 // Types for component props
 type QuizMainActionsProps = {
-  isLive: boolean;
-  isSetLivePending: boolean;
-  onToggleLive: () => void;
+  status: QuizStatus;
+  isStatusPending: boolean;
+  onToggleActive: () => void;
   onSchedule: () => void;
 };
 
@@ -65,31 +66,40 @@ type QuizAltActionsProps = {
 };
 
 export function QuizViewMainActions({
-  isLive,
-  isSetLivePending,
-  onToggleLive,
+  status,
+  isStatusPending,
+  onToggleActive,
   onSchedule,
 }: QuizMainActionsProps) {
+  const isActive = status === "active";
+  const isPaused = status === "paused";
+  const isScheduled = status === "scheduled";
+  
   return (
     <div className="flex flex-col sm:flex-row gap-2">
       <Button
         className="w-full sm:flex-[2] h-12 sm:h-14"
         variant="default"
         size="lg"
-        onClick={onToggleLive}
-        disabled={isSetLivePending}
+        onClick={onToggleActive}
+        disabled={isStatusPending || isScheduled}
       >
-        {isSetLivePending ? (
+        {isStatusPending ? (
           <Loader className="mr-2 h-4 w-4 animate-spin" />
-        ) : isLive ? (
+        ) : isActive ? (
           <>
             <StopCircle className="mr-2 h-4 w-4" />
-            Stop Live
+            Set to Draft
+          </>
+        ) : isPaused ? (
+          <>
+            <PlayCircle className="mr-2 h-4 w-4" />
+            Resume Quiz
           </>
         ) : (
           <>
             <PlayCircle className="mr-2 h-4 w-4" />
-            Go Live
+            Activate Quiz
           </>
         )}
       </Button>
