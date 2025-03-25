@@ -23,7 +23,7 @@ export type QuizAttempt = InferSelectModel<typeof quizAttempts>;
 
 export type AttemptAnswer = InferSelectModel<typeof attemptAnswers>;
 
-export type QuizWithQuestions = Omit<Quiz, "createdBy" | "questions"> & {
+export type QuizWithQuestions = Omit<Quiz, "createdBy"> & {
   createdBy: {
     id: string;
     name: string;
@@ -31,7 +31,7 @@ export type QuizWithQuestions = Omit<Quiz, "createdBy" | "questions"> & {
   questions: Array<Question & { choices: Choice[] }>;
 };
 
-export type LibraryQuiz = Omit<Quiz, "createdBy" | "questionCount"> & {
+export type LibraryQuiz = Omit<Quiz, "createdBy"> & {
   createdBy: {
     id: string;
     name: string;
@@ -41,20 +41,16 @@ export type LibraryQuiz = Omit<Quiz, "createdBy" | "questionCount"> & {
 
 export type QuizReport = Omit<
   Quiz,
-  | "createdBy"
-  | "completionRate"
-  | "participationCount"
-  | "accuracy"
-  | "lastAttempt"
+  "createdBy" | "updatedAt" | "timerMode" | "timer" | "shuffleQuestions"
 > & {
-  createdBy: {
-    id: string;
-    name: string;
-  };
   completionRate: number;
   participantCount: number;
   accuracy: number;
   lastAttempt?: Date;
+  createdBy: {
+    id: string;
+    name: string;
+  };
 };
 
 export type AttemptAnswerWithCorrectness = AttemptAnswer & {
@@ -63,6 +59,6 @@ export type AttemptAnswerWithCorrectness = AttemptAnswer & {
   questionType: string | null;
 };
 
-export type QuizAttemptWithAnswers = Omit<QuizAttempt, "answers"> & {
+export type QuizAttemptWithAnswers = QuizAttempt & {
   answers: AttemptAnswerWithCorrectness[];
 };
