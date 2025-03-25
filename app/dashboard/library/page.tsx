@@ -3,7 +3,7 @@ import { getQuizzes } from "@/lib/db/queries/quizzes";
 // sections
 import LibraryView from "@/sections/dashboard/library";
 // next-auth
-import { getServerSession } from "next-auth/next";
+import { getServerSession } from "next-auth";
 // lib
 import { authMainOptions } from "@/lib/auth/main/auth.config";
 
