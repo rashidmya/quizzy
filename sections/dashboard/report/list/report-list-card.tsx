@@ -36,7 +36,7 @@ export default function ReportListCard({ report, onView }: ReportCardProps) {
       className="overflow-hidden transition-all hover:shadow-md cursor-pointer py-4"
       onClick={onView}
     >
-      <CardHeader className="pb-2">
+      <CardHeader>
         <div className="flex justify-between items-start">
           <CardTitle className="text-lg line-clamp-1">{report.title}</CardTitle>
           <DropdownMenu>
@@ -89,15 +89,15 @@ export default function ReportListCard({ report, onView }: ReportCardProps) {
           </div>
 
           {/* Quiz Stats */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex items-center gap-2 border rounded-md p-2">
+          <div className="grid grid-cols-2 gap-3 border rounded-md bg-muted/30">
+            <div className="flex items-center gap-2 p-2">
               <Users className="h-4 w-4 text-purple-600" />
               <div>
                 <p className="text-xs text-muted-foreground">Participants</p>
-                <p className="font-medium">{report.participantCount}</p>
+                <p className="text-xs font-medium">{report.participantCount}</p>
               </div>
             </div>
-            <div className="flex items-center gap-2 border rounded-md p-2">
+            <div className="flex items-center gap-2 p-2">
               <Clock className="h-4 w-4 text-blue-600" />
               <div>
                 <p className="text-xs text-muted-foreground">Last Attempt</p>
@@ -106,24 +106,6 @@ export default function ReportListCard({ report, onView }: ReportCardProps) {
                 </p>
               </div>
             </div>
-          </div>
-
-          {/* Author & View Details Button */}
-          <div className="flex items-center justify-between pt-2">
-            <div className="flex items-center gap-1.5">
-              <User className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">
-                {report.createdBy.name}
-              </span>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-xs gap-1 hover:text-primary"
-            >
-              View Details
-              <ChevronRight className="h-3.5 w-3.5" />
-            </Button>
           </div>
         </div>
       </CardContent>
