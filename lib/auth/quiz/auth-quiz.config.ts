@@ -46,15 +46,12 @@ export const authQuizOptions: NextAuthOptions = {
     async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
-        // Set isQuiz flag only if the provider is quiz-login.
-        token.isQuiz = account?.provider === "quiz-login";
       }
       return token;
     },
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id as string;
-        session.isQuiz = token.isQuiz as boolean | undefined;
       }
       return session;
     },
