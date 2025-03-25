@@ -180,6 +180,8 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
 
   /**
    * Auto-save each answer whenever the user changes it.
+   * Only saves answers that have actually been modified to reduce API calls.
+   * Uses debouncing to prevent excessive save operations during rapid input.
    */
   const handleAutoSave = useCallback(
     async (data: QuizTakingFormValues) => {
