@@ -10,7 +10,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
+import StatusBadge from "@/components/status-badge";
 // Types
 import { QuizStatus } from "@/types/quiz";
 import { fDateTime } from "@/utils/format-time";
@@ -56,54 +56,6 @@ const renderTimerInfo = (timerMode: string, timer?: number | null) => {
   );
 };
 
-// Helper to render status badge with appropriate styling
-const renderStatusBadge = (status: QuizStatus) => {
-  let badgeVariant = "outline";
-  let badgeClass = "text-muted-foreground border-muted-foreground";
-  let animation = "";
-  let label = "";
-
-  switch (status) {
-    case "active":
-      badgeVariant = "default";
-      badgeClass = "bg-green-500 text-white";
-      animation = "animate-pulse";
-      label = "Active";
-      break;
-    case "draft":
-      badgeVariant = "outline";
-      badgeClass = "text-muted-foreground border-muted-foreground";
-      label = "Draft";
-      break;
-    case "paused":
-      badgeVariant = "outline";
-      badgeClass = "bg-amber-100 text-amber-800 border-amber-300";
-      label = "Paused";
-      break;
-    case "scheduled":
-      badgeVariant = "outline";
-      badgeClass = "bg-blue-100 text-blue-800 border-blue-300";
-      label = "Scheduled";
-      break;
-    case "ended":
-      badgeVariant = "outline";
-      badgeClass = "bg-red-100 text-red-800 border-red-300";
-      label = "Ended";
-      break;
-    default:
-      label = "";
-  }
-
-  return (
-    <Badge
-      variant={badgeVariant as any}
-      className={`${badgeClass} ${animation}`}
-    >
-      {label}
-    </Badge>
-  );
-};
-
 export default function QuizHeader({
   title,
   timerMode,
@@ -117,7 +69,7 @@ export default function QuizHeader({
       <div className="space-y-2">
         <div className="flex items-center gap-4">
           <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
-          {renderStatusBadge(status)}
+          {<StatusBadge status={status} />}
         </div>
 
         {status === "scheduled" && scheduledAt && (

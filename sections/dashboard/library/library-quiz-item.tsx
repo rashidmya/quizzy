@@ -13,6 +13,8 @@ import {
   Share2,
   Star,
   Clock,
+  CalendarClock,
+  PlusCircle,
 } from "lucide-react";
 // components
 import { Button } from "@/components/ui/button";
@@ -41,18 +43,27 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import StatusBadge from "@/components/status-badge";
 // paths
 import { PATH_DASHBOARD } from "@/routes/paths";
 // types
 import { LibraryQuiz } from "@/types/quiz";
 // utils
-import { fToNow } from "@/utils/format-time";
+import { fDate, fToNow } from "@/utils/format-time";
 
 type QuizItemProps = {
   quiz: LibraryQuiz;
   onDelete: (quizId: string) => void;
   onEdit: (quizId: string) => void;
 };
+
+// Helper function to render the appropriate status badge
 
 export default function LibraryQuizItem({
   quiz,
@@ -76,12 +87,9 @@ export default function LibraryQuizItem({
       .substring(0, 2);
   };
 
-  // Format relative date
-  const formattedDate = fToNow(new Date(quiz.createdAt));
-
   return (
     <>
-      <Card className="group transition-all duration-200 hover:shadow-md">
+      <Card className="group transition-all duration-200 hover:shadow-md py-4">
         <CardHeader className="px-4 pb-0">
           <div className="flex items-start justify-between">
             <div
@@ -96,9 +104,21 @@ export default function LibraryQuizItem({
                 </div>
                 <div className="flex-1 space-y-1">
                   <h3 className="font-semibold line-clamp-1">{quiz.title}</h3>
-                  <div className="flex items-center text-xs text-muted-foreground">
-                    <Clock className="mr-1 h-3 w-3" />
-                    {formattedDate}
+                  <div className="flex items-center text-xs text-muted-foreground gap-1.5">
+                    <PlusCircle className="h-3 w-3" />
+                    <span>Created {fToNow(quiz.createdAt)}</span>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Clock className="h-3 w-3 ml-1" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-xs">
+                            Created on {fDate(quiz.createdAt, "MMMM dd, yyyy")}
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                 </div>
               </div>
@@ -143,30 +163,69 @@ export default function LibraryQuizItem({
         </CardHeader>
 
         <CardContent className="p-4 cursor-pointer" onClick={handleNavigation}>
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex flex-wrap items-center gap-2 mb-3">
             <Badge variant="outline" className="text-xs font-normal">
               {quiz.questionCount || 0}{" "}
               {quiz.questionCount === 1 ? "question" : "questions"}
             </Badge>
 
-            {/* {quiz.isPublic && (
-              <Badge variant="secondary" className="text-xs font-normal">
-                Public
-              </Badge>
-            )} */}
+            {/* Display the status badge */}
+            {<StatusBadge status={quiz.status || "draft"} />}
+
+            {quiz.scheduledAt && quiz.status === "scheduled" && (
+              <Tooltip>
+                <TooltipTrigger>
+                  <Badge
+                    variant="outline"
+                    className="text-xs font-normal bg-blue-50 dark:bg-blue-900/20"
+                  >
+                    <CalendarClock className="mr-1 h-3 w-3" />
+                    {fDate(quiz.scheduledAt, "MMM dd, HH:mm")}
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs">
+                    Scheduled for{" "}
+                    {fDate(quiz.scheduledAt, "MMMM dd, yyyy 'at' HH:mm")}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            )}
           </div>
         </CardContent>
 
-        <CardFooter className="px-4 pt-0 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Avatar className="h-6 w-6">
-              <AvatarFallback className="text-xs">
+        <CardFooter className="px-4 pt-3 flex items-center justify-between border-t bg-muted/10">
+          <div className="flex items-center gap-2">
+            <Avatar className="h-7 w-7 border border-border/50">
+              <AvatarFallback className="text-xs font-medium bg-primary/10 text-primary">
                 {quiz.createdBy?.name ? getInitials(quiz.createdBy.name) : "??"}
               </AvatarFallback>
             </Avatar>
-            <span className="truncate max-w-[120px]">
-              {quiz.createdBy?.name || "Unknown"}
-            </span>
+            <div className="flex flex-col">
+              <span className="text-xs font-medium truncate max-w-[120px]">
+                {quiz.createdBy?.name || "Unknown"}
+              </span>
+              <span className="text-[10px] text-muted-foreground">Creator</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-1.5">
+                    <Edit className="h-3.5 w-3.5" />
+                    <span>Updated {fToNow(quiz.updatedAt)}</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p className="text-xs">
+                    Last updated on{" "}
+                    {fDate(quiz.updatedAt, "MMMM dd, yyyy 'at' HH:mm")}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </CardFooter>
       </Card>
