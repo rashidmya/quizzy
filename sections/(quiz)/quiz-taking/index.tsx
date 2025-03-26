@@ -36,49 +36,56 @@ type QuizTakingProps = {
   quiz: QuizWithQuestions;
 };
 
-export default function QuizTaking({ quiz }: QuizTakingProps) {
+/**
+ * Manages the entire quiz-taking experience
+ * Handles user authentication, attempt tracking, and quiz progression
+ */
+export default function QuizTaking({ quiz }: { quiz: QuizWithQuestions }) {
+  // Session and authentication management
   const { data: session, status } = useSession();
-
   const { setTheme } = useTheme();
 
+  // Quiz attempt and state tracking
   const [attempt, setAttempt] = useState<QuizAttempt | null>(null);
-
   const [displayOrder, setDisplayOrder] = useState<number[]>([]);
-
   const [initialAnswers, setInitialAnswers] = useState<
     Record<string, string> | undefined
   >(undefined);
-
   const [quizTaken, setQuizTaken] = useState(false);
 
+  // Form reference for submission and interaction
   const formRef = useRef<QuizTakingFormRef>(null);
 
+  // Auto-save action state
   const [_, autoSaveAction, isAutoSavePending] = useActionState(
     autoSaveAnswer,
-    {
-      message: "",
-    }
+    { message: "" }
   );
 
   /**
-   * Force light theme for quiz-taking.
+   * Force light theme for consistent quiz-taking experience
    */
   useEffect(() => {
     setTheme("light");
   }, [setTheme]);
 
   /**
-   * Checks if the user can still continue the quiz (time left or no timer).
+   * Determines if the quiz can continue based on timer rules
+   * @returns {boolean} Whether the quiz can continue
    */
-  const canContinueQuiz = useCallback(() => {
+  const canContinueQuiz = useCallback((): boolean => {
+    // No timer: always can continue
     if (quiz.timerMode === "none") return true;
+
+    // Global timer: check remaining time
     if (quiz.timerMode === "global" && attempt && quiz.timer) {
-      const totalTime = quiz.timer; // in seconds
+      const totalTime = quiz.timer; // seconds
       const startedTime = new Date(attempt.startedAt).getTime();
       const now = Date.now();
       const secondsPassed = Math.floor((now - startedTime) / 1000);
       return totalTime - secondsPassed > 0;
     }
+
     return false;
   }, [quiz.timerMode, quiz.timer, attempt]);
 
@@ -308,6 +315,12 @@ export default function QuizTaking({ quiz }: QuizTakingProps) {
   return <div className="container mx-auto max-w-full">{renderContent()}</div>;
 }
 
+/**
+ * Shuffles an array using the Fisher-Yates algorithm
+ * @template T Array element type
+ * @param {T[]} array - The array to shuffle
+ * @returns {T[]} A new shuffled array
+ */
 const shuffleArray = <T,>(array: T[]): T[] => {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {

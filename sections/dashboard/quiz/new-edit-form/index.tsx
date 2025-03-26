@@ -88,8 +88,11 @@ type Props = {
   isEdit?: boolean;
 };
 
-// Reusable default question constant
-const DEFAULT_QUESTION = {
+/**
+ * Creates a default question template for new quizzes
+ * @returns {Object} Default question object
+ */
+const createDefaultQuestion = () => ({
   text: "What is the capital of France?",
   type: "multiple_choice" as const,
   timer: undefined,
@@ -100,7 +103,7 @@ const DEFAULT_QUESTION = {
     { text: "Berlin", isCorrect: false },
     { text: "Madrid", isCorrect: false },
   ],
-};
+});
 
 export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
   const { push } = useRouter();
@@ -139,7 +142,7 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
         text: c.text,
         isCorrect: c.isCorrect,
       })),
-    })) || [DEFAULT_QUESTION],
+    })) || [createDefaultQuestion()],
   };
 
   const methods = useForm<QuizFormValues>({
@@ -322,7 +325,7 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
             <QuizNewEditQuestionDialog
               onSave={(newQuestionData) => {
                 const completeQuestion = {
-                  ...DEFAULT_QUESTION,
+                  ...createDefaultQuestion(),
                   text: newQuestionData.text,
                   choices: newQuestionData.choices,
                 };
@@ -335,7 +338,7 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
 
           {questionFields.length === 0 ? (
             <QuizNewEditEmptyState
-              onAddQuestion={() => appendQuestion(DEFAULT_QUESTION)}
+              onAddQuestion={() => appendQuestion(createDefaultQuestion())}
             />
           ) : (
             <div className="grid grid-cols-1 gap-4">
@@ -413,7 +416,7 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
                   variant="ghost"
                   type="button"
                   onClick={() => {
-                    appendQuestion(DEFAULT_QUESTION);
+                    appendQuestion(createDefaultQuestion());
                     setHasChanged(true);
                   }}
                   className="w-full gap-2"
