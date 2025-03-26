@@ -1,11 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { eq } from "drizzle-orm";
 
+import { eq } from "drizzle-orm";
 import { db } from "@/lib/db/drizzle";
 import { quizzes, questions, choices } from "@/lib/db/schema";
-import { TimerMode, QuestionType, QuizStatus } from "@/types/quiz";
+
+import { TimerMode, QuizStatus } from "@/types/quiz";
+import { QuestionType } from "@/types/question";
 
 /**
  * Creates or updates a quiz (and its questions/choices).

@@ -16,7 +16,8 @@ import QuizTakingForm, {
 } from "./quiz-taking-form";
 import QuizTakingState from "./quiz-taking-state";
 // types
-import { QuizAttempt, QuizWithQuestions } from "@/types/quiz";
+import { QuizWithQuestions } from "@/types/quiz";
+import { QuizAttempt } from "@/types/attempt";
 // actions
 import {
   startQuizAttempt,

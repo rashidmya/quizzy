@@ -18,7 +18,8 @@ import StatsCards from "./report-view-stats-cards";
 import ParticipantsTab from "./report-view-participants-tab";
 import QuestionsTab from "./report-view-questions-tab";
 // types
-import { QuizAttemptWithAnswers, QuizWithQuestions } from "@/types/quiz";
+import { QuizWithQuestions } from "@/types/quiz";
+import { QuizAttemptWithAnswers } from "@/types/attempt";
 // utils
 import { fDate } from "@/utils/format-time";
 

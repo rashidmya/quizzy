@@ -1,13 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db/drizzle";
-import {
-  quizAttempts,
-  attemptAnswers,
-} from "@/lib/db/schema";
-import { QuizAttempt } from "@/types/quiz";
+import { quizAttempts, attemptAnswers } from "@/lib/db/schema";
+
+import { QuizAttempt } from "@/types/attempt";
 
 /**
  * Starts or resumes a quiz attempt for a given user/email.

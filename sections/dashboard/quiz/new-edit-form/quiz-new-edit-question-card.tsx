@@ -38,7 +38,7 @@ import {
 // sections
 import QuizNewEditQuestionDialog from "./quiz-new-edit-question-dialog";
 // types
-import { QuestionType } from "@/types/quiz";
+import { QuestionType } from "@/types/question";
 
 export type QuestionCardData = {
   id?: string;

@@ -1,27 +1,13 @@
-import {
-  attemptAnswers,
-  choices,
-  questions,
-  quizAttempts,
-  quizzes,
-} from "@/lib/db/schema";
+import { quizzes } from "@/lib/db/schema";
 import { InferSelectModel } from "drizzle-orm";
+import { Question } from "./question";
+import { Choice } from "./choice";
 
 export type TimerMode = "none" | "global" | "question";
-
-export type QuestionType = "multiple_choice";
 
 export type QuizStatus = "draft" | "scheduled" | "active" | "paused" | "ended";
 
 export type Quiz = InferSelectModel<typeof quizzes>;
-
-export type Question = InferSelectModel<typeof questions>;
-
-export type Choice = InferSelectModel<typeof choices>;
-
-export type QuizAttempt = InferSelectModel<typeof quizAttempts>;
-
-export type AttemptAnswer = InferSelectModel<typeof attemptAnswers>;
 
 export type QuizWithQuestions = Omit<Quiz, "createdBy"> & {
   createdBy: {
@@ -51,14 +37,4 @@ export type QuizReport = Omit<
     id: string;
     name: string;
   };
-};
-
-export type AttemptAnswerWithCorrectness = AttemptAnswer & {
-  isCorrect: boolean;
-  questionPoints: number | null;
-  questionType: string | null;
-};
-
-export type QuizAttemptWithAnswers = QuizAttempt & {
-  answers: AttemptAnswerWithCorrectness[];
 };

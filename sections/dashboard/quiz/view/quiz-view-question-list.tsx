@@ -8,7 +8,6 @@ import {
   FileText,
   ListChecks,
 } from "lucide-react";
-
 // Components
 import { Badge } from "@/components/ui/badge";
 import {
@@ -18,11 +17,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
 // Types
-import { Choice, Question } from "@/types/quiz";
-
-// Utility functions
+import { Choice } from "@/types/choice";
+import { Question } from "@/types/question";
+// Utils
 import { getQuestionTypeLabel } from "@/utils/get-question-type-label";
 import { cn } from "@/lib/utils";
 

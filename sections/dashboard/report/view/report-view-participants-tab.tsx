@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 // types
-import { QuizAttemptWithAnswers } from "@/types/quiz";
+import { QuizAttemptWithAnswers } from "@/types/attempt";
 // icons
 import { Users, Medal, Trophy } from "lucide-react";
 
