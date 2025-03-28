@@ -9,6 +9,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "npx tsx lib/db/migrate.ts",
     "db:drop-schema": "npx tsx lib/db/drop-schema.ts",
+    "db:reset": "pnpm db:drop-schema && pnpm db:generate && pnpm db:migrate && pnpm db:seed",
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
