@@ -65,9 +65,9 @@ export const questions = pgTable("questions", {
 
 /**
  * Multiple-Choice Questions Details.
- * (Existing mechanism via the choices table.)
+ * Stores answer options for multiple-choice questions.
  */
-export const multipleChoiceDetails = pgTable("choices", {
+export const multipleChoiceDetails = pgTable("multiple_choice_details", {
   id: uuid("id").defaultRandom().primaryKey(),
   questionId: uuid("question_id")
     .references(() => questions.id, { onDelete: "cascade" })
@@ -78,39 +78,36 @@ export const multipleChoiceDetails = pgTable("choices", {
 
 /**
  * True/False Questions Details.
- * Stores additional data for true/false questions.
+ * Stores the correct answer (true or false) and an optional explanation.
  */
 export const trueFalseDetails = pgTable("true_false_details", {
   questionId: uuid("question_id")
     .references(() => questions.id, { onDelete: "cascade" })
     .primaryKey(),
-  // Optional explanation or hint.
+  correctAnswer: boolean("correct_answer").notNull(),
   explanation: varchar("explanation", { length: 1024 }),
 });
 
 /**
  * Fill-in-the-Blank Questions Details.
- * Stores the correct answer and optionally accepted variations.
+ * Stores the correct answer and optionally accepted answers.
  */
 export const fillInBlankDetails = pgTable("fill_in_blank_details", {
   questionId: uuid("question_id")
     .references(() => questions.id, { onDelete: "cascade" })
     .primaryKey(),
-  // Correct answer is required.
   correctAnswer: varchar("correct_answer", { length: 1024 }).notNull(),
-  // Optionally, store accepted answers as a comma-separated string or JSON if needed.
   acceptedAnswers: varchar("accepted_answers", { length: 1024 }),
 });
 
 /**
  * Open-Ended Questions Details.
- * Stores guidelines, expected keywords, or sample answers.
+ * Stores guidelines or sample answers for open-ended questions.
  */
 export const openEndedDetails = pgTable("open_ended_details", {
   questionId: uuid("question_id")
     .references(() => questions.id, { onDelete: "cascade" })
     .primaryKey(),
-  // Guidelines or sample answer for open-ended questions.
   guidelines: varchar("guidelines", { length: 1024 }),
 });
 
@@ -134,6 +131,10 @@ export const quizAttempts = pgTable(
 
 /**
  * Unified Attempt Answers table.
+ * The answer column is flexible:
+ * - For multiple choice, store the ID of the selected option (from multiple_choice_details).
+ * - For true/false, store a boolean as a string.
+ * - For fill-in-the-blank and open-ended, store text.
  */
 export const attemptAnswers = pgTable("attempt_answers", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -143,7 +144,6 @@ export const attemptAnswers = pgTable("attempt_answers", {
   questionId: uuid("question_id")
     .references(() => questions.id, { onDelete: "cascade" })
     .notNull(),
-  // The answer can be stored in a flexible format (e.g., UUID reference for multiple-choice, text for others)
   answer: varchar("answer", { length: 1024 }).notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
