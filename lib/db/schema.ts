@@ -49,7 +49,6 @@ export const questions = pgTable("questions", {
   type: questionTypeEnum("type").notNull(),
   points: integer("points").notNull(),
   timer: integer("timer"),
-  properties: jsonb("properties"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
