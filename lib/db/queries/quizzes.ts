@@ -2,7 +2,7 @@ import { db } from "../drizzle";
 import {
   quizzes,
   questions,
-  choices,
+  multipleChoiceDetails,
   users,
   quizAttempts,
   attemptAnswers,
@@ -150,8 +150,8 @@ export async function getQuizWithQuestions(quizId: string) {
       questionsResult.map(async (question) => {
         const choicesResult = await db
           .select()
-          .from(choices)
-          .where(eq(choices.questionId, question.id));
+          .from(multipleChoiceDetails)
+          .where(eq(multipleChoiceDetails.questionId, question.id));
         return { ...question, choices: choicesResult };
       })
     );
@@ -195,9 +195,9 @@ export async function getQuizAttemptsByQuizId(quizId: string) {
             // In a real app, you might have more complex logic based on question type
             const isCorrect = await db
               .select()
-              .from(choices)
+              .from(multipleChoiceDetails)
               .where(
-                and(eq(choices.id, answer.answer), eq(choices.isCorrect, true))
+                and(eq(multipleChoiceDetails.id, answer.answer), eq(multipleChoiceDetails.isCorrect, true))
               );
 
             return {

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db/drizzle";
-import { quizzes, questions, choices } from "@/lib/db/schema";
+import { quizzes, questions, multipleChoiceDetails } from "@/lib/db/schema";
 
 import { TimerMode, QuizStatus } from "@/types/quiz";
 import { QuestionType } from "@/types/question";
@@ -94,7 +94,7 @@ export async function upsertQuiz(formData: FormData) {
         .returning({ id: questions.id });
 
       for (const c of q.choices) {
-        await db.insert(choices).values({
+        await db.insert(multipleChoiceDetails).values({
           questionId: insertedQuestion.id,
           text: c.text,
           isCorrect: c.isCorrect,

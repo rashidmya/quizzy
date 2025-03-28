@@ -4,7 +4,7 @@ import {
   users,
   quizzes,
   questions,
-  choices,
+  multipleChoiceDetails,
   quizAttempts,
   attemptAnswers,
 } from "./schema";
@@ -62,7 +62,7 @@ async function main() {
       isCorrect: i === 0, // Mark the first choice as correct.
     }));
     const returnedChoices = await db
-      .insert(choices)
+      .insert(multipleChoiceDetails)
       .values(choicesForQuestion)
       .returning();
     questionChoicesMap.set(question.id, returnedChoices);
