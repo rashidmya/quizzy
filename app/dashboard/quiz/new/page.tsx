@@ -1,5 +1,5 @@
 // sections
-import QuizNewEdit from "@/sections/dashboard/quiz/new-edit-form";
+import QuizNewEdit from "@/sections/@dashboard/quiz/new-edit-form";
 
 export const dynamic = "force-static";
 

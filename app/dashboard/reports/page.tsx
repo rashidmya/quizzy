@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 // authconfig
 import { authMainOptions } from "@/lib/auth/main/auth.config";
 // sections
-import ReportList from "@/sections/dashboard/report/list";
+import ReportList from "@/sections/@dashboard/report/list";
 // query
 import { getQuizzesWithReport } from "@/lib/db/queries/quizzes";
 

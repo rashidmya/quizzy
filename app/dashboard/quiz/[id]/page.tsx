@@ -3,7 +3,7 @@ import {
   getQuizWithQuestions,
 } from "@/lib/db/queries/quizzes";
 // sections
-import QuizView from "@/sections/dashboard/quiz/view";
+import QuizView from "@/sections/@dashboard/quiz/view";
 
 // This will be replaced by 'use cache' soon
 export const dynamic = "force-static";

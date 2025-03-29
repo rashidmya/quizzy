@@ -1,4 +1,4 @@
-import SettingsView from "@/sections/dashboard/settings";
+import SettingsView from "@/sections/@dashboard/settings";
 
 export const dynamic = "force-dynamic";
 

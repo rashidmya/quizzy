@@ -1,7 +1,7 @@
 // queries
 import { getQuizzes } from "@/lib/db/queries/quizzes";
 // sections
-import LibraryView from "@/sections/dashboard/library";
+import LibraryView from "@/sections/@dashboard/library";
 // next-auth
 import { getServerSession } from "next-auth";
 // lib
