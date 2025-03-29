@@ -1,20 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-// next/router
 import { useRouter } from "next/navigation";
-// components
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
 // types
-import { QuizReport } from "@/types/quiz";
-// sections
-import ReportCard from "./report-list-card";
-import ReportsHeader from "./report-list-header";
-import ReportsEmptyState from "./report-list-empty-state";
-import ReportsLoadingSkeleton from "./report-list-loading-skeleton";
+import { QuizReport, QuizStatus } from "@/types/quiz";
+// components
+import ReportListHeader from "./components/report-list-header";
+import ReportAdvancedFilters from "./components/report-list-advanced-filters";
+import ReportTable from "./components/report-list-table";
+import ReportEmptyState from "./components/report-empty-state";
+import ReportTableSkeleton from "./components/report-list-table-skeleton";
 // paths
 import { PATH_DASHBOARD } from "@/routes/paths";
+// utils
+import { filterReports, sortReports, hasActiveFilters } from "./utils/filters";
 
 interface ReportListProps {
   reports: QuizReport[];
@@ -22,142 +21,132 @@ interface ReportListProps {
 
 export default function ReportList({ reports }: ReportListProps) {
   const router = useRouter();
-
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredReports, setFilteredReports] = useState<QuizReport[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [view, setView] = useState<"recent" | "popular" | "all">("all");
 
-  // Filter and sort reports based on search query and view filter
+  // Filter and sort state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dateFilter, setDateFilter] = useState<
+    "all" | "today" | "week" | "month"
+  >("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | QuizStatus>("all");
+  const [ownershipFilter, setOwnershipFilter] = useState<
+    "my" | "shared" | "all"
+  >("all");
+  const [sortConfig, setSortConfig] = useState<{
+    key: string;
+    direction: "ascending" | "descending";
+  }>({
+    key: "createdAt",
+    direction: "descending",
+  });
+
+  // Filtered reports
+  const [filteredReports, setFilteredReports] = useState<QuizReport[]>([]);
+
+  // Simulate loading for better UX
   useEffect(() => {
-    let filtered = reports.filter((report) =>
-      report.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const timer = setTimeout(() => setIsLoading(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
-    // Apply additional sorting based on view
-    if (view === "recent") {
-      filtered = [...filtered].sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-    } else if (view === "popular") {
-      filtered = [...filtered].sort(
-        (a, b) => b.participantCount - a.participantCount
-      );
-    }
-
-    setFilteredReports(filtered);
-    setIsLoading(false);
-  }, [searchQuery, reports, view]);
-
+  // Handle view report action
   const handleViewReport = (reportId: string) => {
     router.push(PATH_DASHBOARD.reports.root + "/" + reportId);
   };
 
+  // Handle sorting
+  const handleSort = (key: string) => {
+    let direction: "ascending" | "descending" = "ascending";
+    if (sortConfig.key === key && sortConfig.direction === "ascending") {
+      direction = "descending";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  // Reset all filters
+  const resetFilters = () => {
+    setSearchQuery("");
+    setDateFilter("all");
+    setStatusFilter("all");
+    setOwnershipFilter("all");
+    setSortConfig({
+      key: "createdAt",
+      direction: "descending",
+    });
+  };
+
+  // Apply filters and sorting when dependencies change
+  useEffect(() => {
+    // Apply filters
+    let filtered = filterReports({
+      reports,
+      searchQuery,
+      statusFilter,
+      dateFilter,
+      ownershipFilter,
+    });
+
+    // Apply sorting
+    filtered = sortReports(filtered, sortConfig);
+
+    setFilteredReports(filtered);
+  }, [
+    reports,
+    searchQuery,
+    dateFilter,
+    statusFilter,
+    ownershipFilter,
+    sortConfig,
+  ]);
+
+  if (isLoading) {
+    return <ReportTableSkeleton />;
+  }
+
+  // Check if any filters are active
+  const areFiltersActive = hasActiveFilters(
+    searchQuery,
+    statusFilter,
+    dateFilter,
+    ownershipFilter
+  );
+
   return (
-    <div className="space-y-6">
-      <ReportsHeader
+    <div className="space-y-8">
+      <ReportListHeader
         totalReports={reports.length}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
       />
 
-      {/* View filter tabs */}
-      <div className="flex justify-between items-center">
-        <Tabs
-          value={view}
-          onValueChange={(v) => setView(v as "recent" | "popular" | "all")}
-        >
-          <TabsList>
-            <TabsTrigger value="all">All Reports</TabsTrigger>
-            <TabsTrigger value="recent">Recent</TabsTrigger>
-            <TabsTrigger value="popular">Popular</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
+      <ReportAdvancedFilters
+        dateFilter={dateFilter}
+        statusFilter={statusFilter}
+        ownershipFilter={ownershipFilter}
+        onDateFilterChange={setDateFilter}
+        onStatusFilterChange={setStatusFilter}
+        onOwnershipFilterChange={setOwnershipFilter}
+        onResetFilters={resetFilters}
+      />
 
-      {isLoading ? (
-        <ReportsLoadingSkeleton />
+      {reports.length === 0 ? (
+        <ReportEmptyState type="no-reports" />
       ) : filteredReports.length === 0 ? (
-        <ReportsEmptyState searchQuery={searchQuery} />
+        <ReportEmptyState
+          type="no-results"
+          searchQuery={searchQuery}
+          hasFilters={areFiltersActive}
+          onResetFilters={resetFilters}
+        />
       ) : (
-        <div className="space-y-6">
-          {/* Group reports by status using the new status enum */}
-          <ReportSection
-            title="Active"
-            description="Currently active quizzes accepting responses"
-            reports={filteredReports.filter((r) => r.status === "active")}
-            onViewReport={handleViewReport}
-          />
-
-          <ReportSection
-            title="Scheduled"
-            description="Upcoming quizzes set for future dates"
-            reports={filteredReports.filter((r) => r.status === "scheduled")}
-            onViewReport={handleViewReport}
-          />
-
-          <ReportSection
-            title="Ended"
-            description="Finished quizzes with full analytics"
-            reports={filteredReports.filter((r) => r.status === "ended")}
-            onViewReport={handleViewReport}
-          />
-
-          <ReportSection
-            title="Paused"
-            description="Temporarily suspended quizzes"
-            reports={filteredReports.filter((r) => r.status === "paused")}
-            onViewReport={handleViewReport}
-          />
-
-          <ReportSection
-            title="Draft"
-            description="Quizzes in preparation"
-            reports={filteredReports.filter((r) => r.status === "draft")}
-            onViewReport={handleViewReport}
-          />
-        </div>
+        <ReportTable
+          reports={filteredReports}
+          sortConfig={sortConfig}
+          onSort={handleSort}
+          onViewReport={handleViewReport}
+          totalReports={reports.length}
+        />
       )}
-    </div>
-  );
-}
-
-interface ReportSectionProps {
-  title: string;
-  description: string;
-  reports: QuizReport[];
-  onViewReport: (id: string) => void;
-}
-
-function ReportSection({
-  title,
-  description,
-  reports,
-  onViewReport,
-}: ReportSectionProps) {
-  // Don't render the section if there are no reports
-  if (reports.length === 0) return null;
-
-  return (
-    <div className="space-y-3">
-      <div>
-        <h2 className="text-xl font-semibold">{title}</h2>
-        <p className="text-sm text-muted-foreground">{description}</p>
-      </div>
-
-      <ScrollArea className="w-full pb-4">
-        <div className="flex space-x-4 pb-2">
-          {reports.map((report) => (
-            <div key={report.id} className="min-w-[350px] max-w-[350px]">
-              <ReportCard
-                report={report}
-                onView={() => onViewReport(report.id)}
-              />
-            </div>
-          ))}
-        </div>
-      </ScrollArea>
     </div>
   );
 }
