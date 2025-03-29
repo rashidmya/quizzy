@@ -21,8 +21,6 @@ import { PATH_DASHBOARD } from "@/routes/paths";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useActionState } from "@/hooks/use-action-state";
 // sections
-import QuizNewEditQuestionCard from "./quiz-new-edit-question-card";
-import QuizNewEditQuestionDialog from "./quiz-new-edit-question-dialog";
 import QuizNewEditHeader from "./quiz-new-edit-header";
 import QuizNewEditEmptyState from "./quiz-new-edit-empty-state";
 // types
@@ -32,38 +30,6 @@ import { toast } from "sonner";
 // constants
 import { QUESTION_TYPES, TIMER_MODES } from "@/constants";
 
-// Schema definitions
-const choiceSchema = z.object({
-  id: z.string().optional(),
-  text: z.string().min(1, { message: "Choice text is required" }),
-  isCorrect: z.boolean().default(false),
-});
-
-const questionSchema = z.object({
-  id: z.string().optional(),
-  text: z
-    .string()
-    .min(5, { message: "Question text is required (min 5 characters)" }),
-  type: z.enum(QUESTION_TYPES, {
-    message: "Question type is required",
-  }),
-  timer: z
-    .number()
-    .min(0, { message: "Timer must be non-negative" })
-    .optional(),
-  points: z
-    .number()
-    .min(1, { message: "At least 1 point is required" })
-    .max(10, { message: "Maximum 10 points allowed" })
-    .default(1),
-  choices: z
-    .array(choiceSchema)
-    .min(2, { message: "At least two choices are required" })
-    .refine((choices) => choices.some((choice) => choice.isCorrect), {
-      message: "At least one choice must be marked as correct",
-    }),
-});
-
 const quizFormSchema = z.object({
   title: z
     .string()
@@ -71,9 +37,6 @@ const quizFormSchema = z.object({
     .max(80, { message: "Title must be at most 80 characters" })
     .default("Untitled Quiz"),
   timerMode: z.enum(TIMER_MODES).default("none"),
-  questions: z
-    .array(questionSchema)
-    .min(1, { message: "At least one question is required" }),
   timer: z
     .number()
     .min(60, { message: "Timer must be at least 60 seconds" })
@@ -131,18 +94,6 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
     timer: quiz?.timer || undefined,
     timerMode: quiz?.timerMode || "none",
     shuffleQuestions: quiz?.shuffleQuestions || false,
-    questions: quiz?.questions?.map((q: any) => ({
-      id: q.id,
-      text: q.text,
-      type: q.type,
-      timer: q.timer || undefined,
-      points: q.points || 1,
-      choices: q.choices.map((c: any) => ({
-        id: c.id,
-        text: c.text,
-        isCorrect: c.isCorrect,
-      })),
-    })) || [createDefaultQuestion()],
   };
 
   const methods = useForm<QuizFormValues>({
@@ -176,18 +127,6 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [hasChanged]);
 
-  // Manage questions array
-  const {
-    fields: questionFields,
-    append: appendQuestion,
-    remove: removeQuestion,
-    update: updateQuestion,
-    move,
-  } = useFieldArray({
-    control,
-    name: "questions",
-  });
-
   const titleValue = watch("title") || "";
   const timerMode = watch("timerMode");
 
@@ -196,7 +135,6 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
     formData.append("title", data.title);
     formData.append("timerMode", data.timerMode);
     formData.append("shuffleQuestions", data.shuffleQuestions.toString());
-    formData.append("questions", JSON.stringify(data.questions));
 
     if (data.timer !== undefined) {
       formData.append("timer", data.timer.toString());
@@ -304,130 +242,6 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
         )}
 
         {/* Questions Section */}
-        <div className="space-y-4 p-4 flex-1">
-          <div className="flex w-full justify-between items-center">
-            <div>
-              <h2 className="text-xl font-bold flex items-center gap-2">
-                Questions
-                <span className="text-sm font-normal text-muted-foreground">
-                  ({questionFields.length}{" "}
-                  {questionFields.length === 1 ? "question" : "questions"})
-                </span>
-              </h2>
-              {errors.questions &&
-                typeof errors.questions.message === "string" && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.questions.message}
-                  </p>
-                )}
-            </div>
-
-            <QuizNewEditQuestionDialog
-              onSave={(newQuestionData) => {
-                const completeQuestion = {
-                  ...createDefaultQuestion(),
-                  text: newQuestionData.text,
-                  choices: newQuestionData.choices,
-                };
-                appendQuestion(completeQuestion);
-                setHasChanged(true);
-              }}
-              triggerText="Add Question"
-            />
-          </div>
-
-          {questionFields.length === 0 ? (
-            <QuizNewEditEmptyState
-              onAddQuestion={() => appendQuestion(createDefaultQuestion())}
-            />
-          ) : (
-            <div className="grid grid-cols-1 gap-4">
-              {questionFields.map((field, index) => (
-                <div key={field.id} className="flex flex-row gap-2 group">
-                  <div className="flex-1">
-                    <QuizNewEditQuestionCard
-                      questionIndex={index}
-                      question={field}
-                      timerMode={timerMode}
-                      onUpdate={(updatedQuestion) => {
-                        updateQuestion(index, updatedQuestion);
-                        setHasChanged(true);
-                      }}
-                      onDelete={() => {
-                        removeQuestion(index);
-                        setHasChanged(true);
-                      }}
-                      onDuplicate={(questionData) => {
-                        const newQuestion = {
-                          ...questionData,
-                          id: undefined,
-                          choices: questionData.choices.map((choice) => ({
-                            ...choice,
-                            id: undefined,
-                          })),
-                        };
-                        appendQuestion(newQuestion);
-                        setHasChanged(true);
-                      }}
-                    />
-                  </div>
-
-                  {/* Reorder Controls - Only show on hover or focus for cleaner UI */}
-                  <div className="flex flex-col justify-center opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
-                    <Button
-                      type="button"
-                      onClick={() => {
-                        move(index, index - 1);
-                        setHasChanged(true);
-                      }}
-                      disabled={index === 0}
-                      variant="ghost"
-                      size="icon"
-                      className="rounded-full h-8 w-8"
-                      title="Move up"
-                    >
-                      <ChevronUp className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={() => {
-                        move(index, index + 1);
-                        setHasChanged(true);
-                      }}
-                      disabled={index === questionFields.length - 1}
-                      variant="ghost"
-                      size="icon"
-                      className="rounded-full h-8 w-8"
-                      title="Move down"
-                    >
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Quick add button at the bottom */}
-          {questionFields.length > 0 && (
-            <Card className="border-dashed hover:border-primary/50 transition-colors cursor-pointer">
-              <CardContent className="p-4 flex justify-center">
-                <Button
-                  variant="ghost"
-                  type="button"
-                  onClick={() => {
-                    appendQuestion(createDefaultQuestion());
-                    setHasChanged(true);
-                  }}
-                  className="w-full gap-2"
-                >
-                  <Plus className="h-4 w-4" />
-                  Add another question
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-        </div>
       </form>
     </FormProvider>
   );
