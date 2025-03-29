@@ -5,6 +5,9 @@ import {
   quizzes,
   questions,
   multipleChoiceDetails,
+  trueFalseDetails,
+  fillInBlankDetails,
+  openEndedDetails,
   quizAttempts,
   attemptAnswers,
 } from "./schema";
@@ -30,19 +33,26 @@ async function main() {
       Array.from({ length: 2 }).map((_, i) => ({
         title: `Quiz Title ${i + 1}`,
         createdBy: insertedUsers[0].id,
-        timerMode: TIMER_MODES[0],
+        timerMode: TIMER_MODES[0], // e.g. "global"
         timer: null,
       }))
     )
     .returning();
 
-  // Seed questions: 3 per quiz, for a total of 6 questions.
-  const insertedQuestions = [];
+  // Seed questions for each quiz.
+  // For each quiz, insert one question per question type.
+  const insertedQuestions: Array<{
+    id: string;
+    quizId: string;
+    text: string;
+    type: string;
+    points: number;
+  }> = [];
   for (const quiz of insertedQuizzes) {
-    const questionsForQuiz = Array.from({ length: 3 }).map((_, i) => ({
+    const questionsForQuiz = QUESTION_TYPES.map((qType, idx) => ({
       quizId: quiz.id,
-      text: `Sample question ${i + 1} for quiz "${quiz.title}"?`,
-      type: QUESTION_TYPES[0],
+      text: `Sample ${qType} question for quiz "${quiz.title}"?`,
+      type: qType,
       points: 1,
     }));
     const returnedQuestions = await db
@@ -52,31 +62,61 @@ async function main() {
     insertedQuestions.push(...returnedQuestions);
   }
 
-  // Seed choices: 4 choices per question.
-  // We'll store the returned choices in a Map for later use in creating answers.
-  const questionChoicesMap = new Map<string, { id: string; isCorrect: boolean }[]>();
+  // For multiple choice questions, we will store the inserted choices in a Map.
+  const questionChoicesMap = new Map<
+    string,
+    { id: string; isCorrect: boolean }[]
+  >();
+
+  // Insert details for each question based on its type.
   for (const question of insertedQuestions) {
-    const choicesForQuestion = Array.from({ length: 4 }).map((_, i) => ({
-      questionId: question.id,
-      text: `Choice ${i + 1} for question "${question.text}"`,
-      isCorrect: i === 0, // Mark the first choice as correct.
-    }));
-    const returnedChoices = await db
-      .insert(multipleChoiceDetails)
-      .values(choicesForQuestion)
-      .returning();
-    questionChoicesMap.set(question.id, returnedChoices);
+    if (question.type === "multiple_choice") {
+      // Insert 4 choices per multiple-choice question.
+      const choicesForQuestion = Array.from({ length: 4 }).map((_, i) => ({
+        questionId: question.id,
+        text: `Choice ${i + 1} for question "${question.text}"`,
+        isCorrect: i === 0, // Mark the first choice as correct.
+      }));
+      const returnedChoices = await db
+        .insert(multipleChoiceDetails)
+        .values(choicesForQuestion)
+        .returning();
+      questionChoicesMap.set(question.id, returnedChoices);
+    } else if (question.type === "true_false") {
+      // Insert true/false details.
+      await db.insert(trueFalseDetails).values({
+        questionId: question.id,
+        correctAnswer: true,
+        explanation: "This is a sample explanation for a true/false question.",
+      });
+    } else if (question.type === "fill_in_blank") {
+      // Insert fill-in-the-blank details.
+      await db.insert(fillInBlankDetails).values({
+        questionId: question.id,
+        correctAnswer: "correct",
+        acceptedAnswers: "correct, right",
+      });
+    } else if (question.type === "open_ended") {
+      // Insert open-ended details.
+      await db.insert(openEndedDetails).values({
+        questionId: question.id,
+        guidelines: "Provide a detailed answer.",
+      });
+    }
   }
 
   // Seed quiz attempts with random attempts for each quiz.
   for (const quiz of insertedQuizzes) {
     // Filter questions for this quiz.
-    const quizQuestions = insertedQuestions.filter(q => q.quizId === quiz.id);
+    const quizQuestions = insertedQuestions.filter((q) => q.quizId === quiz.id);
     // Generate a random number of attempts between 5 and 10.
-    const numAttempts = Math.floor(Math.random() * 6) + 5; // random number from 5 to 10
+    const numAttempts = Math.floor(Math.random() * 6) + 5;
     for (let i = 0; i < numAttempts; i++) {
       // Create a unique participant email for each attempt.
-      const attemptEmail = `participant${i + 1}_${quiz.id.slice(0, 4)}@example.com`;
+      const attemptEmail = `participant${i + 1}_${quiz.id.slice(
+        0,
+        4
+      )}@example.com`;
       const insertedAttempt = await db
         .insert(quizAttempts)
         .values({
@@ -87,18 +127,56 @@ async function main() {
         .returning();
       const attemptId = insertedAttempt[0].id;
 
-      // For each question in this quiz, create an answer with a random choice.
-      const attemptAnswerRecords = quizQuestions.map(question => {
-        const choicesForQuestion = questionChoicesMap.get(question.id) || [];
-        const randomIndex = Math.floor(Math.random() * choicesForQuestion.length);
-        const chosenChoice = choicesForQuestion[randomIndex];
-        return {
-          attemptId,
-          questionId: question.id,
-          // Save the chosen choice id as the answer.
-          answer: chosenChoice.id,
-        };
-      });
+      // Create answer records based on question type.
+      const attemptAnswerRecords = quizQuestions
+        .map((question) => {
+          if (question.type === "multiple_choice") {
+            const choicesForQuestion =
+              questionChoicesMap.get(question.id) || [];
+            if (choicesForQuestion.length === 0) {
+              console.warn(`No choices found for question ${question.id}`);
+              return null;
+            }
+            const randomIndex = Math.floor(
+              Math.random() * choicesForQuestion.length
+            );
+            const chosenChoice = choicesForQuestion[randomIndex];
+            return {
+              attemptId,
+              questionId: question.id,
+              answer: chosenChoice.id,
+            };
+          } else if (question.type === "true_false") {
+            const answer = Math.random() < 0.5 ? "true" : "false";
+            return {
+              attemptId,
+              questionId: question.id,
+              answer,
+            };
+          } else if (question.type === "fill_in_blank") {
+            return {
+              attemptId,
+              questionId: question.id,
+              answer: "correct",
+            };
+          } else if (question.type === "open_ended") {
+            return {
+              attemptId,
+              questionId: question.id,
+              answer: "This is a sample open-ended answer.",
+            };
+          }
+          return null;
+        })
+        .filter(
+          (
+            record
+          ): record is {
+            attemptId: string;
+            questionId: string;
+            answer: string;
+          } => record !== null
+        );
 
       await db.insert(attemptAnswers).values(attemptAnswerRecords);
     }
