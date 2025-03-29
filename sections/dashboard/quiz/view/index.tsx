@@ -1,11 +1,17 @@
+// sections/dashboard/quiz/view/quiz-detail-view.tsx
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
-// Components
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+// components
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,76 +22,72 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-
-// Custom Components
-import QuizViewQuestionList from "./quiz-view-question-list";
-import QuizViewHeader from "./quiz-view-header";
-import { QuizViewAltActions, QuizViewMainActions } from "./quiz-view-actions";
-import QuizViewDetails from "./quiz-view-details";
-
-// Types
+// custom components
+import QuizMetaInfo from "./components/quiz-meta-info";
+import QuizQuestionsList from "./components/quiz-questions-list";
+import QuizScheduleDialog from "./components/quiz-schedule-dialog";
+import QuizShareDialog from "./components/quiz-share-dialog";
+// icons
+import {
+  ArrowLeft,
+  CalendarClock,
+  Edit,
+  Eye,
+  PauseCircle,
+  PlayCircle,
+  StopCircle,
+  Trash2,
+  FileQuestion,
+  BarChart3,
+} from "lucide-react";
+// types
 import { QuizStatus, QuizWithQuestions } from "@/types/quiz";
-
-// Paths
-import { PATH_DASHBOARD } from "@/routes/paths";
-
-// Hooks
-import { useActionState } from "@/hooks/use-action-state";
-
-// Actions
-import { deleteQuiz, setQuizStatus } from "@/actions/quiz/quiz-management";
-
-// Utils
+// utils
+import { fDateTime } from "@/utils/format-time";
 import { encodeUUID } from "@/utils/encode-uuid";
-
-// Toasts
+// hooks
+import { useActionState } from "@/hooks/use-action-state";
+// actions
+import { setQuizStatus, deleteQuiz } from "@/actions/quiz/quiz-management";
+// paths
+import { PATH_DASHBOARD } from "@/routes/paths";
+// toast
 import { toast } from "sonner";
+import StatusBadge from "@/components/status-badge";
 
-// Tabs configuration
-const TABS = [
-  { label: "Questions", value: "questions" },
-  { label: "Feedback", value: "feedbacks" },
-] as const;
-
-type QuizDashboardCardProps = {
+interface QuizDetailViewProps {
   quiz: QuizWithQuestions;
-};
+}
 
-export default function QuizView({ quiz }: QuizDashboardCardProps) {
-  const { push } = useRouter();
-
-  // State management
-  const [quizStatus, setQuizStatusState] = useState<QuizStatus>(quiz.status || "draft");
-  const [currentTab, setCurrentTab] = useState<string>(TABS[0].value);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
-  // Action states
-  // Action states
-  const [_statusState, setStatusAction, isStatusPending] = useActionState(
-    setQuizStatus,
-    {
-      message: "",
-      error: false,
-    }
+export default function QuizDetailView({ quiz }: QuizDetailViewProps) {
+  const router = useRouter();
+  const [currentStatus, setCurrentStatus] = useState<QuizStatus>(
+    quiz.status || "draft"
   );
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("questions");
 
-  const [_deleteState, deleteAction] = useActionState(deleteQuiz, {
+  // Action states
+  const [_, setStatusAction, isStatusPending] = useActionState(setQuizStatus, {
+    message: "",
+    error: false,
+  });
+
+  const [__, deleteAction, isDeletePending] = useActionState(deleteQuiz, {
     message: "",
   });
 
-  // Quiz URL generation
-  const quizUrl = `${process.env.NEXT_PUBLIC_HOSTNAME}/q/${encodeUUID(
-    quiz.id
-  )}`;
+  // URL for sharing the quiz
+  const quizUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/q/${encodeUUID(quiz.id)}`
+      : "";
 
-  // Event Handlers
-  const handleToggleActive = async () => {
-    const newStatus = quizStatus === "active" ? "draft" : "active";
-
+  const handleStatusChange = async (newStatus: QuizStatus) => {
     const promise = setStatusAction({
       quizId: quiz.id,
       status: newStatus,
-    }).then((result: any) => {
+    }).then((result) => {
       if (result.error) {
         throw new Error(result.message);
       }
@@ -93,106 +95,165 @@ export default function QuizView({ quiz }: QuizDashboardCardProps) {
     });
 
     toast.promise(promise, {
-      loading: newStatus === "active" ? "Activating quiz..." : "Deactivating quiz...",
+      loading: `Updating quiz status...`,
       success: (result) => {
-        if (!result.error) {
-          setQuizStatusState(newStatus);
-          return newStatus === "active" ? "Quiz is now active" : "Quiz is now in draft mode";
-        }
-        throw new Error(result.message || "Failed to update quiz status");
+        setCurrentStatus(newStatus);
+        return result.message;
       },
       error: (err) => err.message || "Failed to update quiz status",
     });
   };
 
-  const handleSchedule = () => {
-    // TODO: Implement scheduling modal/functionality
-    toast.info("Scheduling feature coming soon");
-  };
-
-  const handlePreview = () => {
-    // TODO: Implement quiz preview functionality
-    toast.info("Preview feature coming soon");
-  };
-
   const handleDelete = async () => {
-    const result = await deleteAction(quiz.id);
-    if (result.error) {
-      return toast.error(result.message);
-    }
+    const promise = deleteAction(quiz.id).then((result) => {
+      if (result.error) {
+        throw new Error(result.message);
+      }
+      return result;
+    });
 
-    push(PATH_DASHBOARD.library.root);
-    toast.success(result.message);
+    toast.promise(promise, {
+      loading: "Deleting quiz...",
+      success: (result) => {
+        router.push(PATH_DASHBOARD.library.root);
+        return result.message;
+      },
+      error: (err) => err.message || "Failed to delete quiz",
+    });
   };
 
   const handleEdit = () => {
-    push(PATH_DASHBOARD.quiz.edit(quiz.id));
+    router.push(PATH_DASHBOARD.quiz.edit(quiz.id));
   };
 
   return (
-    <div className="container mx-auto px-4 min-h-screen">
-      <Card className="max-w-4xl mx-auto shadow-lg">
-        <QuizViewHeader
-          title={quiz.title}
-          status={quizStatus}
-          timerMode={quiz.timerMode}
-          timer={quiz.timer}
-        />
+    <div className="container mx-auto py-6 max-w-6xl space-y-6 min-h-screen">
+      {/* Header Card with Title and Basic Info */}
+      <Card className="shadow-sm border-b-2 border-b-primary/10">
+        <CardHeader className="pb-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-3">
+                <h1 className="text-3xl font-bold">{quiz.title}</h1>
+                <StatusBadge status={currentStatus} />
+              </div>
+              <p className="text-muted-foreground text-sm">
+                Created by {quiz.createdBy.name} • Last updated{" "}
+                {fDateTime(quiz.updatedAt)}
+              </p>
+            </div>
 
-        <div className="p-6 space-y-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <QuizViewDetails
-              name={quiz.createdBy.name}
-              createdAt={new Date(quiz.createdAt)}
-            />
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1"
+                onClick={() => router.back()}
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back
+              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-1"
+                      onClick={handleEdit}
+                    >
+                      <Edit className="h-4 w-4" />
+                      Edit
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    Edit quiz details and questions
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <QuizShareDialog quizUrl={quizUrl} />
+            </div>
+          </div>
+        </CardHeader>
 
-            <QuizViewAltActions
-              quizUrl={quizUrl}
-              onPreview={handlePreview}
-              onEdit={handleEdit}
-              onDelete={() => setIsDeleteDialogOpen(true)}
-            />
+        <CardContent className="pb-6">
+          {/* Meta Information Row */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <QuizMetaInfo quiz={quiz} status={currentStatus} />
           </div>
 
-          <QuizViewMainActions
-            status={quizStatus}
-            isStatusPending={isStatusPending}
-            onSchedule={handleSchedule}
-            onToggleActive={handleToggleActive}
-          />
-        </div>
-
-        <Tabs
-          value={currentTab}
-          onValueChange={setCurrentTab}
-          className="border-t"
-        >
-          <TabsList className="w-full justify-start bg-muted/50 rounded-none">
-            {TABS.map((tab) => (
-              <TabsTrigger
-                key={tab.value}
-                value={tab.value}
-                className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-3 mt-4">
+            {/* Status Control Buttons */}
+            {currentStatus === "draft" || currentStatus === "paused" ? (
+              <Button
+                className="gap-2"
+                onClick={() => handleStatusChange("active")}
+                disabled={isStatusPending}
               >
-                {tab.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+                <PlayCircle className="h-4 w-4" />
+                Activate Quiz
+              </Button>
+            ) : null}
 
-          {TABS.map((tab) => (
-            <TabsContent key={tab.value} value={tab.value} className="p-6">
-              {tab.value === "questions" && (
-                <QuizViewQuestionList questions={quiz.questions} />
-              )}
-              {tab.value === "feedbacks" && (
-                <div className="text-center text-muted-foreground">
-                  No feedback available yet.
-                </div>
-              )}
-            </TabsContent>
-          ))}
-        </Tabs>
+            {currentStatus === "active" ? (
+              <Button
+                className="gap-2"
+                onClick={() => handleStatusChange("paused")}
+                disabled={isStatusPending}
+              >
+                <PauseCircle className="h-4 w-4" />
+                Pause Quiz
+              </Button>
+            ) : null}
+
+            {currentStatus !== "ended" && currentStatus !== "draft" ? (
+              <Button
+                className="gap-2"
+                onClick={() => handleStatusChange("ended")}
+                variant="secondary"
+                disabled={isStatusPending}
+              >
+                <StopCircle className="h-4 w-4" />
+                End Quiz
+              </Button>
+            ) : null}
+
+            {/* Always available actions */}
+            <QuizScheduleDialog
+              quizId={quiz.id}
+              onSuccess={(newStatus) => setCurrentStatus(newStatus)}
+            >
+              <Button className="gap-2" variant="outline">
+                <CalendarClock className="h-4 w-4" />
+                Schedule Quiz
+              </Button>
+            </QuizScheduleDialog>
+
+            <Button className="gap-2" variant="outline" asChild>
+              <a
+                href={`/q/${encodeUUID(quiz.id)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Eye className="h-4 w-4" />
+                Preview Quiz
+              </a>
+            </Button>
+
+            <Button
+              className="gap-2 text-destructive hover:text-destructive"
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(true)}
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete Quiz
+            </Button>
+          </div>
+        </CardContent>
       </Card>
+
+      <QuizQuestionsList questions={quiz.questions} />
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog
@@ -201,10 +262,10 @@ export default function QuizView({ quiz }: QuizDashboardCardProps) {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogTitle>Delete this quiz?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete this
-              quiz and remove all associated data.
+              This action cannot be undone. This will permanently delete the
+              quiz and all associated questions and responses.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -212,8 +273,9 @@ export default function QuizView({ quiz }: QuizDashboardCardProps) {
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={isDeletePending}
             >
-              Delete
+              {isDeletePending ? "Deleting..." : "Delete Quiz"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -221,6 +283,3 @@ export default function QuizView({ quiz }: QuizDashboardCardProps) {
     </div>
   );
 }
-
-// Enforce static rendering for now
-export const dynamic = "force-static";

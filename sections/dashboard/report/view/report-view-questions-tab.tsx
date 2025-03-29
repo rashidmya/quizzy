@@ -14,7 +14,7 @@ import {
 // icons
 import { CheckCircle, XCircle, HelpCircle, Users } from "lucide-react";
 // utills
-import { getQuestionTypeLabel } from "@/utils/get-question-type-label";
+import { getQuestionTypeInfo } from "@/utils/get-question-type-label";
 
 interface QuestionsTabProps {
   questions: any[];
@@ -126,7 +126,7 @@ export default function QuestionsTab({
                       Question {index + 1}
                     </h3>
                     <Badge variant="outline" className="font-normal">
-                      {getQuestionTypeLabel(question.type)}
+                      {getQuestionTypeInfo(question.type).label}
                     </Badge>
                     <Badge variant="secondary" className="font-normal">
                       {question.points} points

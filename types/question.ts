@@ -42,6 +42,7 @@ export interface MultipleChoiceQuestion extends BaseQuestion {
 export interface TrueFalseQuestion extends BaseQuestion {
   type: "true_false";
   explanation?: string;
+  correctAnswer: boolean;
 }
 
 // Extend for fill-in-the-blank questions.
@@ -54,8 +55,7 @@ export interface FillInBlankQuestion extends BaseQuestion {
 // Extend for short answer (essay) questions.
 export interface OpenEndedQuestion extends BaseQuestion {
   type: "open_ended";
-  correctAnswer: string;
-  acceptedAnswers?: string[];
+  guidelines: string;
 }
 
 // Create a union of all question types.
