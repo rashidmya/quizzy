@@ -25,16 +25,22 @@ import { upsertQuiz } from "@/actions/quiz/quiz-management";
 // paths
 import { PATH_DASHBOARD } from "@/routes/paths";
 // constants
-import { QUESTION_TYPES } from "@/constants";
+import { QUESTION_TYPES, TIMER_MODES } from "@/constants";
 // toast
 import { toast } from "sonner";
 // types and schemas
 import { quizFormSchema } from "./schemas/quiz-form-schema";
 import { createDefaultQuestion } from "./utils/default-question";
+import { QuizWithQuestions } from "@/types/quiz";
 
 export type QuizFormValues = z.infer<typeof quizFormSchema>;
 
-export default function QuizCreationForm() {
+type Props = {
+  quiz?: QuizWithQuestions;
+  isEdit?: boolean;
+};
+
+export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
   const { push } = useRouter();
   const user = useCurrentUser();
 
@@ -53,14 +59,77 @@ export default function QuizCreationForm() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Default form values
-  const defaultValues: QuizFormValues = {
-    title: "Untitled Quiz",
-    timer: undefined,
-    timerMode: "none",
-    shuffleQuestions: false,
-    questions: [createDefaultQuestion("multiple_choice")],
-  };
+  // Prepare default form values based on whether we're editing or creating
+  let defaultValues: QuizFormValues;
+
+  if (isEdit && quiz) {
+    // Map the existing quiz data for editing
+    defaultValues = {
+      title: quiz.title,
+      timer: quiz.timer || undefined,
+      timerMode: quiz.timerMode || "none",
+      shuffleQuestions: quiz.shuffleQuestions || false,
+      questions:
+        quiz.questions?.map((q: any) => {
+          // Handle different question types
+          if (q.type === "multiple_choice") {
+            return {
+              id: q.id,
+              text: q.text,
+              type: q.type,
+              timer: q.timer || undefined,
+              points: q.points || 1,
+              choices: q.choices.map((c: any) => ({
+                id: c.id,
+                text: c.text,
+                isCorrect: c.isCorrect,
+              })),
+            };
+          } else if (q.type === "true_false") {
+            return {
+              id: q.id,
+              text: q.text,
+              type: q.type,
+              timer: q.timer || undefined,
+              points: q.points || 1,
+              correctAnswer: q.correctAnswer,
+              explanation: q.explanation,
+            };
+          } else if (q.type === "fill_in_blank") {
+            return {
+              id: q.id,
+              text: q.text,
+              type: q.type,
+              timer: q.timer || undefined,
+              points: q.points || 1,
+              correctAnswer: q.correctAnswer,
+              acceptedAnswers: q.acceptedAnswers,
+            };
+          } else if (q.type === "open_ended") {
+            return {
+              id: q.id,
+              text: q.text,
+              type: q.type,
+              timer: q.timer || undefined,
+              points: q.points || 1,
+              guidelines: q.guidelines,
+            };
+          }
+
+          // Default case
+          return createDefaultQuestion("multiple_choice");
+        }) || [],
+    };
+  } else {
+    // Default values for new quiz
+    defaultValues = {
+      title: "Untitled Quiz",
+      timer: undefined,
+      timerMode: "none",
+      shuffleQuestions: false,
+      questions: [createDefaultQuestion("multiple_choice")],
+    };
+  }
 
   const methods = useForm<QuizFormValues>({
     resolver: zodResolver(quizFormSchema),
@@ -119,7 +188,12 @@ export default function QuizCreationForm() {
       formData.append("timer", data.timer.toString());
     }
 
-    formData.append("userId", user.id || "");
+    // If editing, append quizId; otherwise, append userId.
+    if (isEdit && quiz) {
+      formData.append("quizId", quiz.id);
+    } else {
+      formData.append("userId", user.id || "");
+    }
 
     const promise = upsertAction(formData).then((result: any) => {
       if (result.error) {
@@ -129,13 +203,16 @@ export default function QuizCreationForm() {
     });
 
     toast.promise(promise, {
-      loading: "Saving quiz...",
+      loading: isEdit ? "Updating quiz..." : "Creating quiz...",
       success: (data: any) => {
         setHasChanged(false);
         push(PATH_DASHBOARD.quiz.view(data.quizId));
-        return "Quiz created successfully!";
+        return isEdit
+          ? "Quiz updated successfully!"
+          : "Quiz created successfully!";
       },
-      error: (error: any) => error.message || "Error saving quiz",
+      error: (error: any) =>
+        error.message || `Error ${isEdit ? "updating" : "creating"} quiz`,
     });
   };
 
@@ -148,6 +225,9 @@ export default function QuizCreationForm() {
   };
 
   const navigateBack = () => {
+    if (isEdit && quiz) {
+      return push(PATH_DASHBOARD.quiz.view(quiz.id));
+    }
     push(PATH_DASHBOARD.library.root);
   };
 
@@ -205,6 +285,7 @@ export default function QuizCreationForm() {
           confirmExit={confirmExit}
           onConfirmExit={() => navigateBack()}
           onCancelExit={() => setConfirmExit(false)}
+          isEdit={isEdit}
         />
 
         {/* Form errors summary */}

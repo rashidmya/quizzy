@@ -27,7 +27,6 @@ import {
   Save,
   BookOpen,
   RotateCcw,
-  Settings,
 } from "lucide-react";
 // dialogs
 import QuizSettingsDialog from "./quiz-settings-dialog";
@@ -39,6 +38,7 @@ type Props = {
   confirmExit?: boolean;
   onConfirmExit?: () => void;
   onCancelExit?: () => void;
+  isEdit?: boolean;
 };
 
 export default function QuizHeader({
@@ -48,6 +48,7 @@ export default function QuizHeader({
   confirmExit = false,
   onConfirmExit,
   onCancelExit,
+  isEdit = false,
 }: Props) {
   const {
     setValue,
@@ -124,18 +125,20 @@ export default function QuizHeader({
                     {isPending ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        Saving...
+                        {isEdit ? "Updating..." : "Saving..."}
                       </>
                     ) : (
                       <>
                         <Save className="h-4 w-4" />
-                        Save Quiz
+                        {isEdit ? "Update Quiz" : "Save Quiz"}
                       </>
                     )}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Save quiz and exit</p>
+                  <p>
+                    {isEdit ? "Update quiz and exit" : "Save quiz and exit"}
+                  </p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
