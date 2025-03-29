@@ -1,7 +1,21 @@
-import { questions } from "@/lib/db/schema";
+import {
+  multipleChoiceDetails,
+  questions,
+  fillInBlankDetails,
+  openEndedDetails,
+  trueFalseDetails,
+} from "@/lib/db/schema";
 import { InferSelectModel } from "drizzle-orm";
 
 export type Question = InferSelectModel<typeof questions>;
+
+export type MultipleChoice = InferSelectModel<typeof multipleChoiceDetails>;
+
+export type FillInBlank = InferSelectModel<typeof fillInBlankDetails>;
+
+export type OpenEnded = InferSelectModel<typeof openEndedDetails>;
+
+export type TrueFalse = InferSelectModel<typeof trueFalseDetails>;
 
 // Define a union for all allowed question types.
 export type QuestionType =

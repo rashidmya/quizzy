@@ -25,13 +25,14 @@ import { upsertQuiz } from "@/actions/quiz/quiz-management";
 // paths
 import { PATH_DASHBOARD } from "@/routes/paths";
 // constants
-import { QUESTION_TYPES, TIMER_MODES } from "@/constants";
+import { QUESTION_TYPES } from "@/constants";
 // toast
 import { toast } from "sonner";
 // types and schemas
 import { quizFormSchema } from "./schemas/quiz-form-schema";
 import { createDefaultQuestion } from "./utils/default-question";
 import { QuizWithQuestions } from "@/types/quiz";
+import { MultipleChoice } from "@/types/question";
 
 export type QuizFormValues = z.infer<typeof quizFormSchema>;
 
@@ -61,6 +62,8 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
 
   // Prepare default form values based on whether we're editing or creating
   let defaultValues: QuizFormValues;
+
+  console.log(quiz);
 
   if (isEdit && quiz) {
     // Map the existing quiz data for editing
@@ -231,7 +234,7 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
     push(PATH_DASHBOARD.library.root);
   };
 
-  const handleAddQuestion = (type: keyof typeof QUESTION_TYPES) => {
+  const handleAddQuestion = (type: (typeof QUESTION_TYPES)[number]) => {
     appendQuestion(createDefaultQuestion(type));
     setHasChanged(true);
   };
@@ -336,10 +339,11 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
                 const newQuestion = {
                   ...questionData,
                   id: undefined,
-                  choices: questionData.choices?.map((choice) => ({
-                    ...choice,
-                    id: undefined,
-                  })),
+                  choices: questionData.choices?.map(
+                    (choice: MultipleChoice) => ({
+                      ...choice,
+                    })
+                  ),
                 };
                 appendQuestion(newQuestion);
                 setHasChanged(true);

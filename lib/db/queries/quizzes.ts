@@ -6,6 +6,9 @@ import {
   users,
   quizAttempts,
   attemptAnswers,
+  trueFalseDetails,
+  fillInBlankDetails,
+  openEndedDetails,
 } from "../schema";
 import { and, desc, eq, sql } from "drizzle-orm";
 
@@ -136,27 +139,53 @@ export async function getQuizWithQuestions(quizId: string) {
       .where(eq(quizzes.id, quizId));
 
     if (!quizResult.length) return null;
-
     const quiz = quizResult[0];
 
-    // Query the associated questions.
+    // Get all questions for this quiz.
     const questionsResult = await db
       .select()
       .from(questions)
       .where(eq(questions.quizId, quizId));
 
-    // For each question, query the associated choices.
-    const questionsWithChoices = await Promise.all(
+    // For each question, get its details based on its type.
+    const questionsWithDetails = await Promise.all(
       questionsResult.map(async (question) => {
-        const choicesResult = await db
-          .select()
-          .from(multipleChoiceDetails)
-          .where(eq(multipleChoiceDetails.questionId, question.id));
-        return { ...question, choices: choicesResult };
+        switch (question.type) {
+          case "multiple_choice": {
+            const choices = await db
+              .select()
+              .from(multipleChoiceDetails)
+              .where(eq(multipleChoiceDetails.questionId, question.id));
+            return { ...question, choices };
+          }
+          case "true_false": {
+            const details = await db
+              .select()
+              .from(trueFalseDetails)
+              .where(eq(trueFalseDetails.questionId, question.id));
+            return { ...question, ...details[0] || null };
+          }
+          case "fill_in_blank": {
+            const details = await db
+              .select()
+              .from(fillInBlankDetails)
+              .where(eq(fillInBlankDetails.questionId, question.id));
+            return { ...question, ...details[0] || null };
+          }
+          case "open_ended": {
+            const details = await db
+              .select()
+              .from(openEndedDetails)
+              .where(eq(openEndedDetails.questionId, question.id));
+            return { ...question, ...details[0] || null };
+          }
+          default:
+            return question;
+        }
       })
     );
 
-    return { ...quiz, questions: questionsWithChoices };
+    return { ...quiz, questions: questionsWithDetails };
   } catch (error) {
     console.error("Failed to fetch quiz with questions:", error);
     throw new Error("Failed to fetch quiz with questions");

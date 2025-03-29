@@ -1,11 +1,12 @@
-import { QuestionType } from "@/types/question";
+// sections/dashboard/quiz/creation/utils/default-question.ts
+import { QUESTION_TYPES } from "@/constants";
 
 /**
  * Creates a default question template based on question type
  * @param type The type of question to create
  * @returns Default question object with appropriate structure for the given type
  */
-export function createDefaultQuestion(type: QuestionType) {
+export function createDefaultQuestion(type: (typeof QUESTION_TYPES)[number]) {
   switch (type) {
     case "multiple_choice":
       return {
