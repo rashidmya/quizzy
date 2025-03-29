@@ -4,7 +4,7 @@ export const QUESTION_TYPES = [
   "multiple_choice",
   "true_false",
   "fill_in_blank",
-  "short_answer"
+  "open_ended",
 ] as const;
 
 export const QUIZ_STATUSES = [

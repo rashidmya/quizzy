@@ -3,13 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { FileQuestion, Plus } from "lucide-react";
 
-type QuizFormEmptyStateProps = {
+type QuizEmptyStateProps = {
   onAddQuestion: () => void;
 };
 
-export default function QuizNewEditEmptyState({
-  onAddQuestion,
-}: QuizFormEmptyStateProps) {
+export default function QuizEmptyState({ onAddQuestion }: QuizEmptyStateProps) {
   return (
     <div className="min-h-[300px] flex flex-col items-center justify-center p-8 text-center bg-muted/30 rounded-lg border border-dashed">
       <div className="h-20 w-20 flex items-center justify-center rounded-full bg-muted mb-4">
@@ -19,8 +17,8 @@ export default function QuizNewEditEmptyState({
       <h3 className="text-xl font-medium mb-2">No questions added yet</h3>
 
       <p className="text-muted-foreground max-w-md mb-6">
-        Start by adding your first question. You can add multiple choice
-        questions and customize them as needed.
+        Start by adding your first question. You can create multiple choice,
+        true/false, fill-in-the-blank, or open-ended questions.
       </p>
 
       <Button onClick={onAddQuestion} size="lg" className="gap-2">

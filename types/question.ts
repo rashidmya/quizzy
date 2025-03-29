@@ -8,7 +8,7 @@ export type QuestionType =
   | "multiple_choice"
   | "true_false"
   | "fill_in_blank"
-  | "short_answer";
+  | "open_ended";
 
 // Base question with common fields.
 export interface BaseQuestion extends Question {}
@@ -38,8 +38,8 @@ export interface FillInBlankQuestion extends BaseQuestion {
 }
 
 // Extend for short answer (essay) questions.
-export interface ShortAnswerQuestion extends BaseQuestion {
-  type: "short_answer";
+export interface OpenEndedQuestion extends BaseQuestion {
+  type: "open_ended";
   correctAnswer: string;
   acceptedAnswers?: string[];
 }
@@ -49,4 +49,4 @@ export type QuestionUnion =
   | MultipleChoiceQuestion
   | TrueFalseQuestion
   | FillInBlankQuestion
-  | ShortAnswerQuestion;
+  | OpenEndedQuestion;

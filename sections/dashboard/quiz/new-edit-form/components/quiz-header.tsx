@@ -27,9 +27,10 @@ import {
   Save,
   BookOpen,
   RotateCcw,
+  Settings,
 } from "lucide-react";
-// sections
-import QuizNewEditSettingsDialog from "./quiz-new-edit-settings-dialog";
+// dialogs
+import QuizSettingsDialog from "./quiz-settings-dialog";
 
 type Props = {
   onBack: () => void;
@@ -40,7 +41,7 @@ type Props = {
   onCancelExit?: () => void;
 };
 
-export default function QuizNewEditHeader({
+export default function QuizHeader({
   onBack,
   title,
   isPending,
@@ -109,7 +110,7 @@ export default function QuizNewEditHeader({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div>
-                    <QuizNewEditSettingsDialog />
+                    <QuizSettingsDialog />
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>

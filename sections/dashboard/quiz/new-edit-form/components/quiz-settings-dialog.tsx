@@ -28,6 +28,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 // icons
 import {
   Settings,
@@ -36,18 +43,30 @@ import {
   FileText,
   TimerOff,
   AlertTriangle,
+  ListChecks,
+  ToggleLeft,
+  FileInput,
+  MessageSquare,
+  Plus,
 } from "lucide-react";
 // types
 import { TimerMode } from "@/types/quiz";
-// sections
-import { QuizFormValues } from "./index";
 import { Switch } from "@/components/ui/switch";
+import { QuizFormValues } from "..";
 
-export default function QuizNewEditSettingsDialog() {
+type QuizSettingsDialogProps = {
+  onAddQuestion?: (
+    type: "multiple_choice" | "true_false" | "fill_in_blank" | "open_ended"
+  ) => void;
+};
+
+export default function QuizSettingsDialog({
+  onAddQuestion,
+}: QuizSettingsDialogProps) {
   const { getValues, setValue } = useFormContext<QuizFormValues>();
 
   const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("general");
+  const [activeTab, setActiveTab] = useState<string>("general");
 
   // Local state for form values
   const [localTitle, setLocalTitle] = useState("");
@@ -56,12 +75,10 @@ export default function QuizNewEditSettingsDialog() {
   const [titleCharCount, setTitleCharCount] = useState(0);
   const [shuffleQuestionsEnabled, setShuffleQuestionsEnabled] = useState(false);
 
-  // Title validation
+  // Validation
   const minChars = 4;
   const maxChars = 80;
   const [titleError, setTitleError] = useState("");
-
-  // Timer validation
   const [timerError, setTimerError] = useState("");
 
   useEffect(() => {
@@ -69,7 +86,7 @@ export default function QuizNewEditSettingsDialog() {
       const values = getValues();
       setLocalTitle(values.title);
       setLocalTimerMode(values.timerMode || "none");
-      setLocalTimer(values.timer ? values.timer / 60 : 0); // Convert seconds to minutes for display
+      setLocalTimer(values.timer ? values.timer / 60 : 0); // Convert seconds to minutes
       setTitleCharCount(values.title.length);
       validateTitle(values.title);
       validateTimer(values.timer || 0, values.timerMode);
@@ -110,11 +127,10 @@ export default function QuizNewEditSettingsDialog() {
   const handleTimerChange = (value: number[]) => {
     const timerValue = value[0];
     setLocalTimer(timerValue);
-    validateTimer(timerValue * 60, localTimerMode); // Convert minutes to seconds for validation
+    validateTimer(timerValue * 60, localTimerMode);
   };
 
   const handleSave = () => {
-    // Validate before saving
     const isTitleValid = validateTitle(localTitle);
     const isTimerValid = validateTimer(localTimer * 60, localTimerMode);
 
@@ -122,7 +138,6 @@ export default function QuizNewEditSettingsDialog() {
       return;
     }
 
-    // Update the form values
     setValue("title", localTitle, { shouldDirty: true });
     setValue("timerMode", localTimerMode, { shouldDirty: true });
     setValue("shuffleQuestions", shuffleQuestionsEnabled, {
@@ -135,9 +150,7 @@ export default function QuizNewEditSettingsDialog() {
       setValue("timer", undefined, { shouldDirty: true });
     }
 
-    // Update question timers based on timer mode
     updateQuestionTimers();
-
     setOpen(false);
   };
 
@@ -148,7 +161,6 @@ export default function QuizNewEditSettingsDialog() {
   const updateQuestionTimers = () => {
     const currentValues = getValues();
 
-    // Handle question timers based on timer mode
     if (localTimerMode === "none") {
       const updatedQuestions = currentValues.questions.map((q: any) => ({
         ...q,
@@ -161,16 +173,9 @@ export default function QuizNewEditSettingsDialog() {
         timer: undefined,
       }));
       setValue("questions", updatedQuestions, { shouldDirty: true });
-    } else if (localTimerMode === "question") {
-      const updatedQuestions = currentValues.questions.map((q: any) => ({
-        ...q,
-        timer: q.timer || 300, // Default 5 minutes per question if not set
-      }));
-      setValue("questions", updatedQuestions, { shouldDirty: true });
     }
   };
 
-  // Format timer display
   const formatTimerLabel = (minutes: number) => {
     if (minutes < 1) {
       return "30 seconds";
@@ -181,6 +186,41 @@ export default function QuizNewEditSettingsDialog() {
     return `${minutes} minutes`;
   };
 
+  // If this is the add question dropdown
+  if (onAddQuestion) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="default" className="gap-2">
+            <Plus className="h-4 w-4" />
+            Add Question
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuGroup>
+            <DropdownMenuItem onClick={() => onAddQuestion("multiple_choice")}>
+              <ListChecks className="mr-2 h-4 w-4" />
+              Multiple Choice
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onAddQuestion("true_false")}>
+              <ToggleLeft className="mr-2 h-4 w-4" />
+              True / False
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onAddQuestion("fill_in_blank")}>
+              <FileInput className="mr-2 h-4 w-4" />
+              Fill in the Blank
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onAddQuestion("open_ended")}>
+              <MessageSquare className="mr-2 h-4 w-4" />
+              Open Ended
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
+
+  // This is the settings dialog
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
