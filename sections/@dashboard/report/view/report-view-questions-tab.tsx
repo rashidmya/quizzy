@@ -14,7 +14,7 @@ import {
 // icons
 import { CheckCircle, XCircle, HelpCircle, Users } from "lucide-react";
 // utills
-import { getQuestionTypeInfo } from "@/utils/get-question-type-label";
+import { getQuestionTypeInfo } from "@/utils/get-question-type";
 
 interface QuestionsTabProps {
   questions: any[];

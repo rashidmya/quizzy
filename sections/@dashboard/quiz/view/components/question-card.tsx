@@ -2,12 +2,15 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Award, Clock } from "lucide-react";
-import { Question, QuestionUnion } from "@/types/question";
+import { QuestionUnion } from "@/types/question";
 import MultipleChoiceQuestion from "./question-types/multiple-choice-question";
 import TrueFalseQuestion from "./question-types/true-false-question";
 import FillInBlankQuestion from "./question-types/fill-in-blank-question";
 import OpenEndedQuestion from "./question-types/open-ended-question";
-import { getQuestionTypeInfo } from "@/utils/get-question-type-label";
+import {
+  getQuestionTypeLabel,
+  getQuestionTypeIcon,
+} from "@/utils/get-question-type";
 
 /**
  * Props for the QuestionCard component
@@ -21,7 +24,8 @@ interface QuestionCardProps {
  * A card component that displays a question with its metadata and content
  */
 export default function QuestionCard({ question, index }: QuestionCardProps) {
-  const { icon: QuestionTypeIcon, label } = getQuestionTypeInfo(question.type);
+  const label = getQuestionTypeLabel(question.type);
+  const icon = getQuestionTypeIcon(question.type);
 
   console.log(question);
 
@@ -43,7 +47,7 @@ export default function QuestionCard({ question, index }: QuestionCardProps) {
 
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="outline" className="flex items-center gap-1">
-              {QuestionTypeIcon && <QuestionTypeIcon className="h-3 w-3" />}
+              {/* {icon && <QuestionTypeIcon className="h-3 w-3" />} */}
               {label}
             </Badge>
 
