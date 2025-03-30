@@ -15,7 +15,7 @@ import * as z from "zod";
 // components
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
-import { Clock, Save } from "lucide-react";
+import { Clock, Save, Loader2 } from "lucide-react";
 import QuestionNavigation from "./question-navigation";
 import CurrentQuestion from "./current-question";
 import FormNavButtons from "./form-nav-buttons";
@@ -61,6 +61,9 @@ interface QuizTakingFormProps {
  */
 const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
   ({ quiz, onSubmit, onAutoSave, initialAnswers, isAutoSavePending }, ref) => {
+    // Ensure quiz has questions array
+    const hasQuestions = Array.isArray(quiz.questions) && quiz.questions.length > 0;
+    
     // Current question index state
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -72,10 +75,10 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
         defaultValues: {
           answers:
             initialAnswers ||
-            quiz.questions.reduce((acc, q) => {
+            (hasQuestions ? quiz.questions.reduce((acc, q) => {
               acc[q.id] = "";
               return acc;
-            }, {} as Record<string, string>),
+            }, {} as Record<string, string>) : {}),
         },
       });
 
@@ -145,8 +148,28 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
       }
     };
 
-    // Get current question
+    // Check if questions are available
+    if (!hasQuestions) {
+      return (
+        <div className="flex flex-col items-center justify-center h-[50vh]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+          <p className="text-muted-foreground">Loading quiz questions...</p>
+        </div>
+      );
+    }
+
+    // Get current question - with safety check
     const currentQuestion = quiz.questions[currentQuestionIndex];
+    if (!currentQuestion) {
+      // Reset to first question if current index is invalid
+      setCurrentQuestionIndex(0);
+      return (
+        <div className="flex flex-col items-center justify-center h-[50vh]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+          <p className="text-muted-foreground">Loading question data...</p>
+        </div>
+      );
+    }
     
     // Track quiz completion progress
     const answers = getValues("answers");

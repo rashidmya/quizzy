@@ -5,27 +5,21 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 // sonner
 import { toast } from "sonner";
 // components
-import QuizTakingForm, { QuizTakingFormRef, QuizTakingFormValues } from "./components/quiz-taking-form";
+import QuizTakingForm, {
+  QuizTakingFormRef,
+  QuizTakingFormValues,
+} from "./components/quiz-taking-form";
 import QuizTakingState from "./components/quiz-taking-state";
 import QuizHeader from "./components/quiz-header";
 // types
 import { QuizWithQuestions } from "@/types/quiz";
 import { QuizAttempt } from "@/types/attempt";
-import { 
-  Question,
-  MultipleChoiceQuestion,
-  TrueFalseQuestion,
-  FillInBlankQuestion,
-  OpenEndedQuestion,
-  QuestionUnion
-} from "@/types/question";
-// actions
 import {
   startQuizAttempt,
   submitQuizAttempt,
   autoSaveAnswer,
   getAttemptAnswers,
-  getQuestionDetails
+  getQuestionDetails,
 } from "@/actions/quiz/quiz-taking";
 // hooks
 import { useActionState } from "@/hooks/use-action-state";
@@ -40,27 +34,34 @@ interface QuizTakingContentProps {
 
 /**
  * Manages active quiz-taking content and state
- * Works with the existing question type definitions
+ * Enhanced to support all question types
  */
-export default function QuizTakingContent({ 
-  quiz, 
+export default function QuizTakingContent({
+  quiz,
   userEmail,
-  onQuizComplete 
+  onQuizComplete,
 }: QuizTakingContentProps) {
   // Quiz attempt and answer state
   const [attempt, setAttempt] = useState<QuizAttempt | null>(null);
-  const [initialAnswers, setInitialAnswers] = useState<Record<string, string> | undefined>(undefined);
-  const [enhancedQuestions, setEnhancedQuestions] = useState<QuestionUnion[]>([]);
+  const [initialAnswers, setInitialAnswers] = useState<
+    Record<string, string> | undefined
+  >(undefined);
+  const [questionDetails, setQuestionDetails] = useState<Record<string, any>>(
+    {}
+  );
   const [isLoadingDetails, setIsLoadingDetails] = useState(true);
-  
+
   // Form reference for submission and interaction
   const formRef = useRef<QuizTakingFormRef>(null);
-  
+
+  const isReady =
+    attempt !== null && initialAnswers !== undefined && !isLoadingDetails;
+
   // Question order management (handles shuffling)
   const { displayOrder, orderedQuestions } = useQuestionOrder(
-    enhancedQuestions.length > 0 ? enhancedQuestions : quiz.questions, 
+    quiz.questions,
     quiz.shuffleQuestions,
-    attempt && initialAnswers !== undefined && !isLoadingDetails
+    isReady
   );
 
   // Auto-save action state
@@ -116,89 +117,33 @@ export default function QuizTakingContent({
   }, [userEmail, quiz.id, attempt, startTimer, onQuizComplete]);
 
   /**
-   * Fetch and enhance questions with type-specific details
+   * Fetch question-specific details
    */
   useEffect(() => {
-    const enhanceQuestions = async () => {
+    const fetchQuestionDetails = async () => {
       if (quiz.questions.length > 0) {
         setIsLoadingDetails(true);
-        
+
         try {
           // Fetch details for all questions in the quiz
-          const questionIds = quiz.questions.map(q => q.id);
+          const questionIds = quiz.questions.map((q) => q.id);
           const details = await getQuestionDetails(questionIds);
-          
-          if (!details.error && details.data) {
-            // Transform questions based on their type and details
-            const enhanced = quiz.questions.map(baseQuestion => {
-              const questionDetails = details.data[baseQuestion.id] || {};
-              
-              // Default to multiple_choice if type is missing
-              const questionType = baseQuestion.type || "multiple_choice";
-              
-              // Create specific question type based on the base question type
-              switch (questionType) {
-                case "multiple_choice":
-                  return {
-                    ...baseQuestion,
-                    type: "multiple_choice" as const,
-                    choices: questionDetails.choices || []
-                  } as MultipleChoiceQuestion;
-                  
-                case "true_false":
-                  return {
-                    ...baseQuestion,
-                    type: "true_false" as const,
-                    correctAnswer: questionDetails.correctAnswer || false,
-                    explanation: questionDetails.explanation
-                  } as TrueFalseQuestion;
-                  
-                case "fill_in_blank":
-                  return {
-                    ...baseQuestion,
-                    type: "fill_in_blank" as const,
-                    correctAnswer: questionDetails.correctAnswer || "",
-                    acceptedAnswers: questionDetails.acceptedAnswers 
-                      ? questionDetails.acceptedAnswers.split(',').map((a: string) => a.trim()) 
-                      : []
-                  } as FillInBlankQuestion;
-                  
-                case "open_ended":
-                  return {
-                    ...baseQuestion,
-                    type: "open_ended" as const,
-                    guidelines: questionDetails.guidelines || ""
-                  } as OpenEndedQuestion;
-                  
-                default:
-                  return {
-                    ...baseQuestion,
-                    type: "multiple_choice" as const,
-                    choices: []
-                  } as MultipleChoiceQuestion;
-              }
-            });
-            
-            setEnhancedQuestions(enhanced);
+
+          if (!details.error) {
+            setQuestionDetails(details.data || {});
           } else {
             toast.error("Failed to load question details");
-            // Use base questions with minimal information
-            setEnhancedQuestions(quiz.questions.map(q => ({
-              ...q,
-              type: q.type || "multiple_choice",
-              choices: []
-            } as QuestionUnion)));
           }
         } catch (error) {
-          console.error("Error enhancing questions:", error);
+          console.error("Error fetching question details:", error);
           toast.error("Failed to load question details");
         } finally {
           setIsLoadingDetails(false);
         }
       }
     };
-    
-    enhanceQuestions();
+
+    fetchQuestionDetails();
   }, [quiz.questions]);
 
   /**
@@ -234,33 +179,36 @@ export default function QuizTakingContent({
   /**
    * Final quiz submission
    */
-  const handleQuizSubmit = useCallback(async (data: QuizTakingFormValues) => {
-    if (!attempt) {
-      toast.error("Something went wrong submitting your quiz");
-      return;
-    }
+  const handleQuizSubmit = useCallback(
+    async (data: QuizTakingFormValues) => {
+      if (!attempt) {
+        toast.error("Something went wrong submitting your quiz");
+        return;
+      }
 
-    // First auto-save all answers one final time
-    for (const [questionId, answer] of Object.entries(data.answers)) {
-      if (!questionId.trim() || !answer.trim()) continue;
+      // First auto-save all answers one final time
+      for (const [questionId, answer] of Object.entries(data.answers)) {
+        if (!questionId.trim() || !answer.trim()) continue;
 
-      await autoSaveAction({
-        attemptId: attempt.id,
-        questionId,
-        answer,
-      });
-    }
+        await autoSaveAction({
+          attemptId: attempt.id,
+          questionId,
+          answer,
+        });
+      }
 
-    // Now submit the attempt
-    const submitResult = await submitQuizAttempt({ attemptId: attempt.id });
-    if (submitResult.error) {
-      toast.error(submitResult.message);
-      return;
-    }
+      // Now submit the attempt
+      const submitResult = await submitQuizAttempt({ attemptId: attempt.id });
+      if (submitResult.error) {
+        toast.error(submitResult.message);
+        return;
+      }
 
-    onQuizComplete();
-    toast.success(submitResult.message);
-  }, [attempt, autoSaveAction, onQuizComplete]);
+      onQuizComplete();
+      toast.success(submitResult.message);
+    },
+    [attempt, autoSaveAction, onQuizComplete]
+  );
 
   /**
    * Auto-save each answer whenever the user changes it
@@ -287,6 +235,23 @@ export default function QuizTakingContent({
     [attempt, autoSaveAction]
   );
 
+  /**
+   * Enhance questions with type-specific details
+   */
+  const enhanceQuestionsWithDetails = useCallback(() => {
+    if (!orderedQuestions || !questionDetails) return [];
+
+    return orderedQuestions.map((question) => {
+      const details = questionDetails[question.id] || {};
+
+      // Combine the base question with type-specific details
+      return {
+        ...question,
+        ...details,
+      };
+    });
+  }, [orderedQuestions, questionDetails]);
+
   // Loading attempt
   if (!attempt) {
     return <QuizTakingState text="Preparing your quiz..." isLoading />;
@@ -296,7 +261,7 @@ export default function QuizTakingContent({
   if (initialAnswers === undefined) {
     return <QuizTakingState text="Loading your saved answers..." isLoading />;
   }
-  
+
   // Loading question details
   if (isLoadingDetails) {
     return <QuizTakingState text="Loading question details..." isLoading />;
@@ -305,21 +270,21 @@ export default function QuizTakingContent({
   // Time is up
   if (!canContinueQuiz) {
     return (
-      <QuizTakingState 
-        text="Time's up!" 
+      <QuizTakingState
+        text="Time's up!"
         secondaryText="Your quiz has been automatically submitted."
       />
     );
   }
 
-  // Get ordered questions based on display order
-  const reorderedQuestions = displayOrder.map(index => enhancedQuestions[index]);
+  // Get enhanced questions with their type-specific details
+  const enhancedQuestions = enhanceQuestionsWithDetails();
 
   // Quiz in progress - the main form
   return (
     <>
-      <QuizHeader 
-        title={quiz.title} 
+      <QuizHeader
+        title={quiz.title}
         timerMode={quiz.timerMode}
         timer={quiz.timer}
         startedAt={attempt.startedAt}
@@ -331,11 +296,12 @@ export default function QuizTakingContent({
           ref={formRef}
           quiz={{
             ...quiz,
-            questions: reorderedQuestions,
+            questions: enhancedQuestions,
           }}
           onSubmit={handleQuizSubmit}
           onAutoSave={handleAutoSave}
           isAutoSavePending={isAutoSavePending}
+          initialAnswers={initialAnswers}
         />
       </div>
     </>

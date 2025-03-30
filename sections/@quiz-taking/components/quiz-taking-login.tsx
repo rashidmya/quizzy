@@ -49,7 +49,6 @@ export default function QuizTakingLogin({ quizId }: QuizTakingLoginProps) {
     try {
       const result = await signIn("quiz-login", {
         email,
-        redirect: true,
         callbackUrl: `/q/${quizId}`,
       });
 
