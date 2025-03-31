@@ -49,7 +49,7 @@ export interface TrueFalseQuestion extends BaseQuestion {
 export interface FillInBlankQuestion extends BaseQuestion {
   type: "fill_in_blank";
   correctAnswer: string;
-  acceptedAnswers?: string[]; // Optionally, list alternative correct answers.
+  acceptedAnswers?: string; // Optionally, list alternative correct answers.
 }
 
 // Extend for open ended questions.

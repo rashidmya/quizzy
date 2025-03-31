@@ -42,18 +42,18 @@ export async function upsertQuiz(formData: FormData) {
     let quizQuestions: Array<{
       id?: string;
       text: string;
-      type: "multiple_choice" | "true_false" | "fill_in_blank" | "short_answer";
+      type: "multiple_choice" | "true_false" | "fill_in_blank" | "open_ended";
       timer?: number;
       points: number;
       // For multiple choice
       choices?: Array<{ id?: string; text: string; isCorrect: boolean }>;
+      // for true/false and fill in blank
+      correctAnswer: boolean | string;
       // For true/false
-      correctAnswer?: boolean;
       explanation?: string;
       // For fill in blank
-      correctAnswerText?: string;
-      acceptedAnswers?: string[]; // expected as array, stored as comma-separated string
-      // For short answer (using openEndedDetails)
+      acceptedAnswers?: string; // expected as array, stored as comma-separated string
+      // For open ended answer
       guidelines?: string;
     }>;
 
@@ -105,7 +105,7 @@ export async function upsertQuiz(formData: FormData) {
           text: q.text,
           type: q.type,
           timer: q.timer,
-          points: q.points ?? 1,
+          points: q.points,
         })
         .returning({ id: questions.id });
 
@@ -125,20 +125,18 @@ export async function upsertQuiz(formData: FormData) {
         case "true_false":
           await db.insert(trueFalseDetails).values({
             questionId: insertedQuestion.id,
-            correctAnswer: q.correctAnswer ?? false,
+            correctAnswer: (q.correctAnswer as boolean) ?? false,
             explanation: q.explanation || null,
           });
           break;
         case "fill_in_blank":
           await db.insert(fillInBlankDetails).values({
             questionId: insertedQuestion.id,
-            correctAnswer: q.correctAnswerText || "",
-            acceptedAnswers: q.acceptedAnswers
-              ? q.acceptedAnswers.join(",")
-              : null,
+            correctAnswer: q.correctAnswer as string,
+            acceptedAnswers: q.acceptedAnswers || null,
           });
           break;
-        case "short_answer":
+        case "open_ended":
           await db.insert(openEndedDetails).values({
             questionId: insertedQuestion.id,
             guidelines: q.guidelines || "",

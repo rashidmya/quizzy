@@ -208,7 +208,7 @@ export default function CurrentQuestion({
               {q.acceptedAnswers && q.acceptedAnswers.length > 0 && (
                 <p className="text-xs text-muted-foreground">
                   <span className="font-medium">Hint:</span> {
-                    q.acceptedAnswers.join(', ')
+                    q.acceptedAnswers
                   }
                 </p>
               )}

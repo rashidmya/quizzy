@@ -176,9 +176,6 @@ export async function getQuizWithQuestions(quizId: string) {
             return {
               ...question,
               ...details[0],
-              acceptedAnswers:
-                details[0].acceptedAnswers?.split(",").map((a) => a.trim()) ||
-                [],
             } as FillInBlankQuestion;
           }
           case "open_ended": {

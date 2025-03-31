@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
  */
 interface FillInBlankQuestionProps {
   correctAnswer: string;
-  acceptedAnswers?: string[];
+  acceptedAnswers?: string;
 }
 
 /**
