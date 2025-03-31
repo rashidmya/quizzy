@@ -3,8 +3,6 @@ import { notFound } from "next/navigation";
 import { getQuizWithQuestions } from "@/lib/db/queries/quizzes";
 import { getQuizAttemptsByQuizId } from "@/lib/db/queries/quizzes";
 
-import ReportView from "@/sections/@dashboard/report/view";
-
 export const dynamic = "force-static";
 
 export default async function QuizReportPage({
@@ -26,5 +24,5 @@ export default async function QuizReportPage({
     return notFound();
   }
 
-  return <ReportView quiz={quiz} attempts={attempts} />;
+  return <>nothing to see here</>;
 }
