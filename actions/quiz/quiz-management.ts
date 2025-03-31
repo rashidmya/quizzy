@@ -139,7 +139,7 @@ export async function upsertQuiz(formData: FormData) {
         case "open_ended":
           await db.insert(openEndedDetails).values({
             questionId: insertedQuestion.id,
-            guidelines: q.guidelines || "",
+            guidelines: q.guidelines || null,
           });
           break;
         default:
