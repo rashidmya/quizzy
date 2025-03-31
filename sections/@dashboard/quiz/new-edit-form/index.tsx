@@ -63,8 +63,6 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
   // Prepare default form values based on whether we're editing or creating
   let defaultValues: QuizFormValues;
 
-  console.log(quiz);
-
   if (isEdit && quiz) {
     // Map the existing quiz data for editing
     defaultValues = {
@@ -106,7 +104,7 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
               timer: q.timer || undefined,
               points: q.points || 1,
               correctAnswer: q.correctAnswer,
-              acceptedAnswers: q.acceptedAnswers,
+              acceptedAnswers: q.acceptedAnswers
             };
           } else if (q.type === "open_ended") {
             return {
