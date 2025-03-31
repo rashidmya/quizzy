@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import QuizTakingForm, {
   QuizTakingFormRef,
   QuizTakingFormValues,
-} from "./components/quiz-taking-form";
+} from "./components/form/quiz-taking-form";
 import QuizTakingState from "./components/quiz-taking-state";
 import QuizHeader from "./components/quiz-header";
 // types

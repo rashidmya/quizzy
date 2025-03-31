@@ -98,7 +98,7 @@ export default function CurrentQuestion({
                 key={choice.id || index}
                 className={`flex items-center space-x-2 p-3 rounded-md border 
                   ${
-                    field.value === (choice.id || index.toString())
+                    field.value === (choice.text || index.toString())
                       ? "bg-primary/5 border-primary"
                       : "border-gray-200 hover:bg-muted/50"
                   }`}
