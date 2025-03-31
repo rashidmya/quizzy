@@ -52,7 +52,7 @@ export interface FillInBlankQuestion extends BaseQuestion {
   acceptedAnswers?: string[]; // Optionally, list alternative correct answers.
 }
 
-// Extend for short answer (essay) questions.
+// Extend for open ended questions.
 export interface OpenEndedQuestion extends BaseQuestion {
   type: "open_ended";
   guidelines?: string;
