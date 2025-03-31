@@ -55,7 +55,7 @@ export interface FillInBlankQuestion extends BaseQuestion {
 // Extend for short answer (essay) questions.
 export interface OpenEndedQuestion extends BaseQuestion {
   type: "open_ended";
-  guidelines: string;
+  guidelines?: string;
 }
 
 // Create a union of all question types.

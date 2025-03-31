@@ -1,3 +1,9 @@
+import {
+  FillInBlankQuestion,
+  MultipleChoiceQuestion,
+  OpenEndedQuestion,
+  TrueFalseQuestion,
+} from "@/types/question";
 import { db } from "../drizzle";
 import {
   quizzes,
@@ -153,31 +159,41 @@ export async function getQuizWithQuestions(quizId: string) {
               .select()
               .from(multipleChoiceDetails)
               .where(eq(multipleChoiceDetails.questionId, question.id));
-            return { ...question, choices };
+            return { ...question, choices } as MultipleChoiceQuestion;
           }
           case "true_false": {
             const details = await db
               .select()
               .from(trueFalseDetails)
               .where(eq(trueFalseDetails.questionId, question.id));
-            return { ...question, ...details[0] || null };
+            return { ...question, ...details[0] } as TrueFalseQuestion;
           }
           case "fill_in_blank": {
             const details = await db
               .select()
               .from(fillInBlankDetails)
               .where(eq(fillInBlankDetails.questionId, question.id));
-            return { ...question, ...details[0] || null };
+            return {
+              ...question,
+              ...details[0],
+              acceptedAnswers:
+                details[0].acceptedAnswers?.split(",").map((a) => a.trim()) ||
+                [],
+            } as FillInBlankQuestion;
           }
           case "open_ended": {
             const details = await db
               .select()
               .from(openEndedDetails)
               .where(eq(openEndedDetails.questionId, question.id));
-            return { ...question, ...details[0] || null };
+            return { ...question, ...details[0] } as OpenEndedQuestion;
           }
           default:
-            return question;
+            return {
+              ...question,
+              type: "multiple_choice", // Default to multiple choice
+              choices: [], // Add required properties for multiple choice
+            } as MultipleChoiceQuestion;
         }
       })
     );
@@ -239,8 +255,10 @@ export async function getQuizAttemptsByQuizId(quizId: string) {
               if (tfDetail.length > 0) {
                 // Assume answer.answer is a string "true" or "false"
                 isCorrect =
-                  (tfDetail[0].correctAnswer === true && answer.answer === "true") ||
-                  (tfDetail[0].correctAnswer === false && answer.answer === "false");
+                  (tfDetail[0].correctAnswer === true &&
+                    answer.answer === "true") ||
+                  (tfDetail[0].correctAnswer === false &&
+                    answer.answer === "false");
               }
             } else if (answer.questionType === "fill_in_blank") {
               // For fill-in-the-blank, compare answer with correct answer and accepted answers.
@@ -254,7 +272,9 @@ export async function getQuizAttemptsByQuizId(quizId: string) {
               if (fibDetail.length > 0) {
                 const detail = fibDetail[0];
                 const acceptedAnswers = detail.acceptedAnswers
-                  ? detail.acceptedAnswers.split(",").map(a => a.trim().toLowerCase())
+                  ? detail.acceptedAnswers
+                      .split(",")
+                      .map((a) => a.trim().toLowerCase())
                   : [];
                 const given = answer.answer.trim().toLowerCase();
                 isCorrect =
