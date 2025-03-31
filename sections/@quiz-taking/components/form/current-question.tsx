@@ -17,10 +17,10 @@ import {
   QuestionType,
 } from "@/types/question";
 import { getQuestionTypeLabel } from "@/utils/get-question-type";
+import { useEffect } from "react";
 
 interface CurrentQuestionProps {
   question: QuestionUnion;
-  initialAnswer: string;
   isAnswered: boolean;
   questionIndex: number;
 }
@@ -31,11 +31,11 @@ interface CurrentQuestionProps {
  */
 export default function CurrentQuestion({
   question,
-  initialAnswer,
   isAnswered,
   questionIndex,
 }: CurrentQuestionProps) {
   const { control } = useFormContext();
+
   /**
    * Get question icon based on question type
    */
@@ -92,11 +92,10 @@ export default function CurrentQuestion({
       <Controller
         control={control}
         name={`answers.${question.id}` as const}
-        defaultValue={initialAnswer}
         render={({ field }) => (
           <RadioGroup
             value={field.value}
-            onValueChange={(val) => field.onChange(val)}
+            onValueChange={field.onChange}
             className="flex flex-col space-y-3 mt-4"
           >
             {q.choices.map((choice, index) => (
@@ -136,7 +135,6 @@ export default function CurrentQuestion({
       <Controller
         control={control}
         name={`answers.${question.id}` as const}
-        defaultValue={initialAnswer}
         render={({ field }) => (
           <div className="space-y-4 mt-4">
             <RadioGroup
@@ -212,7 +210,6 @@ export default function CurrentQuestion({
         <Controller
           control={control}
           name={`answers.${question.id}` as const}
-          defaultValue={initialAnswer}
           render={({ field }) => (
             <div className="space-y-2">
               <Input
@@ -241,7 +238,6 @@ export default function CurrentQuestion({
         <Controller
           control={control}
           name={`answers.${question.id}` as const}
-          defaultValue={initialAnswer}
           render={({ field }) => (
             <div className="space-y-2">
               <Textarea

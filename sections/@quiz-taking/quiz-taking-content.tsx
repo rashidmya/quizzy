@@ -168,7 +168,7 @@ export default function QuizTakingContent({
         quiz.questions.forEach(({ id }) => {
           if (!answersRecord[id]) answersRecord[id] = "";
         });
-
+        
         setInitialAnswers(answersRecord);
       }
     };

@@ -254,7 +254,6 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
             {/* Current question */}
             <CurrentQuestion
               question={currentQuestion}
-              initialAnswer={initialAnswers?.[currentQuestion.id] ?? ""}
               isAnswered={!!answers[currentQuestion.id]?.trim()}
               questionIndex={currentQuestionIndex}
             />
