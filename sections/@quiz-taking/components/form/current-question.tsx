@@ -1,27 +1,25 @@
 // sections/(quiz)/quiz-taking/components/current-question.tsx
 "use client";
 
-import { Controller, Control } from "react-hook-form";
+import { Controller, Control, useFormContext } from "react-hook-form";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle, Circle, HelpCircle, Text, Check, X } from "lucide-react";
-import { 
+import {
   MultipleChoiceQuestion,
   TrueFalseQuestion,
   FillInBlankQuestion,
   OpenEndedQuestion,
   QuestionUnion,
-  QuestionType
+  QuestionType,
 } from "@/types/question";
-import { QuizTakingFormValues } from "./quiz-taking-form";
 import { getQuestionTypeLabel } from "@/utils/get-question-type";
 
 interface CurrentQuestionProps {
   question: QuestionUnion;
-  control: Control<QuizTakingFormValues>;
   initialAnswer: string;
   isAnswered: boolean;
   questionIndex: number;
@@ -33,11 +31,11 @@ interface CurrentQuestionProps {
  */
 export default function CurrentQuestion({
   question,
-  control,
   initialAnswer,
   isAnswered,
-  questionIndex
+  questionIndex,
 }: CurrentQuestionProps) {
+  const { control } = useFormContext();
   /**
    * Get question icon based on question type
    */
@@ -70,7 +68,11 @@ export default function CurrentQuestion({
       case "open_ended":
         return renderOpenEnded(question as OpenEndedQuestion);
       default:
-        return <div className="mt-4 text-muted-foreground">Unknown question type</div>;
+        return (
+          <div className="mt-4 text-muted-foreground">
+            Unknown question type
+          </div>
+        );
     }
   };
 
@@ -79,7 +81,11 @@ export default function CurrentQuestion({
    */
   const renderMultipleChoice = (q: MultipleChoiceQuestion) => {
     if (!q.choices || q.choices.length === 0) {
-      return <div className="mt-4 text-muted-foreground">No choices available for this question</div>;
+      return (
+        <div className="mt-4 text-muted-foreground">
+          No choices available for this question
+        </div>
+      );
     }
 
     return (
@@ -140,7 +146,11 @@ export default function CurrentQuestion({
             >
               <div
                 className={`flex items-center justify-center space-x-2 p-6 rounded-md border flex-1 cursor-pointer
-                  ${field.value === "true" ? "bg-green-50 border-green-500 dark:bg-green-900/20" : "border-gray-200 hover:bg-muted/50"}`}
+                  ${
+                    field.value === "true"
+                      ? "bg-green-50 border-green-500 dark:bg-green-900/20"
+                      : "border-gray-200 hover:bg-muted/50"
+                  }`}
                 onClick={() => field.onChange("true")}
               >
                 <RadioGroupItem
@@ -156,10 +166,14 @@ export default function CurrentQuestion({
                   True
                 </Label>
               </div>
-              
+
               <div
                 className={`flex items-center justify-center space-x-2 p-6 rounded-md border flex-1 cursor-pointer
-                  ${field.value === "false" ? "bg-red-50 border-red-500 dark:bg-red-900/20" : "border-gray-200 hover:bg-muted/50"}`}
+                  ${
+                    field.value === "false"
+                      ? "bg-red-50 border-red-500 dark:bg-red-900/20"
+                      : "border-gray-200 hover:bg-muted/50"
+                  }`}
                 onClick={() => field.onChange("false")}
               >
                 <RadioGroupItem
@@ -176,10 +190,11 @@ export default function CurrentQuestion({
                 </Label>
               </div>
             </RadioGroup>
-            
+
             {q.explanation && (
               <div className="text-sm p-3 bg-muted/50 rounded-md border border-dashed mt-2">
-                <span className="font-medium">Explanation:</span> {q.explanation}
+                <span className="font-medium">Explanation:</span>{" "}
+                {q.explanation}
               </div>
             )}
           </div>
@@ -207,9 +222,7 @@ export default function CurrentQuestion({
               />
               {q.acceptedAnswers && q.acceptedAnswers.length > 0 && (
                 <p className="text-xs text-muted-foreground">
-                  <span className="font-medium">Hint:</span> {
-                    q.acceptedAnswers
-                  }
+                  <span className="font-medium">Hint:</span> {q.acceptedAnswers}
                 </p>
               )}
             </div>
@@ -238,7 +251,8 @@ export default function CurrentQuestion({
               />
               {q.guidelines && (
                 <div className="text-xs p-2 bg-muted rounded-md">
-                  <span className="font-medium">Guidelines:</span> {q.guidelines}
+                  <span className="font-medium">Guidelines:</span>{" "}
+                  {q.guidelines}
                 </div>
               )}
             </div>

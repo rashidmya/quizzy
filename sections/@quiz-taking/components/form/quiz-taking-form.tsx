@@ -9,7 +9,7 @@ import React, {
   useEffect,
 } from "react";
 // react-hook-form
-import { useForm, useWatch } from "react-hook-form";
+import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 // components
@@ -62,44 +62,48 @@ interface QuizTakingFormProps {
 const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
   ({ quiz, onSubmit, onAutoSave, initialAnswers, isAutoSavePending }, ref) => {
     // Ensure quiz has questions array
-    const hasQuestions = Array.isArray(quiz.questions) && quiz.questions.length > 0;
-    
+    const hasQuestions =
+      Array.isArray(quiz.questions) && quiz.questions.length > 0;
+
     // Current question index state
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    
+
     // Setup form with validation
-    const { control, handleSubmit, reset, getValues, formState } =
-      useForm<QuizTakingFormValues>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-          answers:
-            initialAnswers ||
-            (hasQuestions ? quiz.questions.reduce((acc, q) => {
-              acc[q.id] = "";
-              return acc;
-            }, {} as Record<string, string>) : {}),
-        },
-      });
+    const methods = useForm<QuizTakingFormValues>({
+      resolver: zodResolver(formSchema),
+      defaultValues: {
+        answers:
+          initialAnswers ||
+          (hasQuestions
+            ? quiz.questions.reduce((acc, q) => {
+                acc[q.id] = "";
+                return acc;
+              }, {} as Record<string, string>)
+            : {}),
+      },
+    });
+
+    const { control, handleSubmit, reset, getValues, formState } = methods;
 
     // Handle auto-saving
     const previousAnswersRef = useRef<Record<string, string>>({});
     const watchedAnswers = useWatch({ control, name: "answers" });
-    
+
     useEffect(() => {
       const setupAutoSave = () => {
         if (!onAutoSave) return () => {};
-        
+
         // Initialize previous values on first render
         if (Object.keys(previousAnswersRef.current).length === 0) {
           previousAnswersRef.current = { ...watchedAnswers };
           return () => {};
         }
-        
+
         const timer = setTimeout(() => {
           const currentValues = getValues();
           const changedAnswers: Record<string, string> = {};
-          
+
           // Find changed answers
           Object.entries(currentValues.answers).forEach(
             ([questionId, answer]) => {
@@ -108,20 +112,20 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
               }
             }
           );
-          
+
           // Auto-save if changes exist
           if (Object.keys(changedAnswers).length > 0) {
             previousAnswersRef.current = { ...currentValues.answers };
             onAutoSave({ answers: changedAnswers });
           }
         }, 800);
-        
+
         return () => clearTimeout(timer);
       };
-      
+
       return setupAutoSave();
     }, [watchedAnswers, onAutoSave, getValues]);
-    
+
     // Reset form when initialAnswers changes
     useEffect(() => {
       if (initialAnswers) {
@@ -170,7 +174,7 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
         </div>
       );
     }
-    
+
     // Track quiz completion progress
     const answers = getValues("answers");
     const answeredCount = Object.values(answers).filter(
@@ -179,7 +183,7 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
     const totalQuestions = quiz.questions.length;
     const completionPercentage = (answeredCount / totalQuestions) * 100;
     const allAnswered = answeredCount === totalQuestions;
-    
+
     // Navigation functions
     const goToNextQuestion = () => {
       if (currentQuestionIndex < totalQuestions - 1) {
@@ -207,13 +211,15 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
             <span className="text-sm text-muted-foreground">
               {answeredCount} of {totalQuestions} questions answered
             </span>
-            <span className="text-sm font-medium">{Math.round(completionPercentage)}%</span>
+            <span className="text-sm font-medium">
+              {Math.round(completionPercentage)}%
+            </span>
           </div>
           <Progress value={completionPercentage} className="h-2" />
         </div>
 
         {/* Question navigation indicators */}
-        <QuestionNavigation 
+        <QuestionNavigation
           questions={quiz.questions}
           answers={answers}
           currentIndex={currentQuestionIndex}
@@ -225,11 +231,16 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
           <Alert
             variant="default"
             className={`mb-6 transition-colors duration-300 ${
-              !isAutoSavePending ? "bg-muted/50" : "bg-amber-50 dark:bg-amber-900/20"
+              !isAutoSavePending
+                ? "bg-muted/50"
+                : "bg-amber-50 dark:bg-amber-900/20"
             }`}
           >
-            {!isAutoSavePending ? <Clock className="h-4 w-4 mr-2" /> : 
-             <Save className="h-4 w-4 mr-2 animate-pulse text-amber-500" />}
+            {!isAutoSavePending ? (
+              <Clock className="h-4 w-4 mr-2" />
+            ) : (
+              <Save className="h-4 w-4 mr-2 animate-pulse text-amber-500" />
+            )}
             <AlertDescription>
               {!isAutoSavePending
                 ? "Your answers are automatically saved as you progress"
@@ -238,27 +249,28 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
           </Alert>
         )}
 
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
-          {/* Current question */}
-          <CurrentQuestion
-            question={currentQuestion}
-            control={control}
-            initialAnswer={initialAnswers?.[currentQuestion.id] ?? ""}
-            isAnswered={!!answers[currentQuestion.id]?.trim()}
-            questionIndex={currentQuestionIndex}
-          />
+        <FormProvider {...methods}>
+          <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
+            {/* Current question */}
+            <CurrentQuestion
+              question={currentQuestion}
+              initialAnswer={initialAnswers?.[currentQuestion.id] ?? ""}
+              isAnswered={!!answers[currentQuestion.id]?.trim()}
+              questionIndex={currentQuestionIndex}
+            />
 
-          {/* Navigation buttons */}
-          <FormNavButtons
-            currentIndex={currentQuestionIndex}
-            totalQuestions={totalQuestions}
-            isSubmitting={isSubmitting}
-            allAnswered={allAnswered}
-            answeredCount={answeredCount}
-            onPrevious={goToPreviousQuestion}
-            onNext={goToNextQuestion}
-          />
-        </form>
+            {/* Navigation buttons */}
+            <FormNavButtons
+              currentIndex={currentQuestionIndex}
+              totalQuestions={totalQuestions}
+              isSubmitting={isSubmitting}
+              allAnswered={allAnswered}
+              answeredCount={answeredCount}
+              onPrevious={goToPreviousQuestion}
+              onNext={goToNextQuestion}
+            />
+          </form>
+        </FormProvider>
       </div>
     );
   }
