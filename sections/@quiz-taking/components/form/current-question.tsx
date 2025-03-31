@@ -17,7 +17,6 @@ import {
   QuestionType,
 } from "@/types/question";
 import { getQuestionTypeLabel } from "@/utils/get-question-type";
-import { useEffect, useState } from "react";
 
 interface CurrentQuestionProps {
   question: QuestionUnion;
@@ -34,20 +33,7 @@ export default function CurrentQuestion({
   isAnswered,
   questionIndex,
 }: CurrentQuestionProps) {
-  const { control, getValues, watch } = useFormContext();
-  
-  // Add a local state to force re-renders when question changes
-  const [currentQuestionId, setCurrentQuestionId] = useState(question.id);
-  
-  // Watch the specific answer field for this question
-  const answerValue = watch(`answers.${question.id}`);
-  
-  // Update local state when question changes
-  useEffect(() => {
-    if (question.id !== currentQuestionId) {
-      setCurrentQuestionId(question.id);
-    }
-  }, [question.id, currentQuestionId]);
+  const { control } = useFormContext();
 
   /**
    * Get question icon based on question type

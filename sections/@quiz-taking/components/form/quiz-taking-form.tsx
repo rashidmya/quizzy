@@ -85,8 +85,11 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
       mode: "onChange",
     });
 
-    const { control, handleSubmit, reset, getValues, formState } = methods;
-
+    const { control, handleSubmit, reset, getValues, formState, watch } = methods;
+    
+    // Watch all form values for changes to trigger auto-save
+    const watchAllFields = watch();
+    
     // Auto-save timer reference
     const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
     const previousAnswersRef = useRef<Record<string, string>>(
@@ -110,42 +113,50 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
       }
     }, [initialAnswers, reset]);
 
-    // Setup auto-save when form values change
+    // Setup auto-save when form values change - triggered by watchAllFields
     useEffect(() => {
-      const setupAutoSave = async () => {
-        if (!onAutoSave) return;
+      if (!onAutoSave) return;
 
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+
+      autoSaveTimerRef.current = setTimeout(() => {
+        const currentValues = getValues();
+        const changedAnswers: Record<string, string> = {};
+
+        // Find changed answers by comparing with previous values
+        Object.entries(currentValues.answers).forEach(
+          ([questionId, answer]) => {
+            const prevAnswer = previousAnswersRef.current[questionId];
+            
+            // Only add to changes if different from previous
+            if (prevAnswer !== answer) {
+              changedAnswers[questionId] = answer || "";
+            }
+          }
+        );
+
+        // Auto-save if changes exist
+        if (Object.keys(changedAnswers).length > 0) {
+          // Update previous answers reference
+          previousAnswersRef.current = {
+            ...previousAnswersRef.current,
+            ...changedAnswers
+          };
+          
+          // Call auto-save function
+          onAutoSave({ answers: changedAnswers });
+        }
+      }, 800);
+      
+      // Cleanup function
+      return () => {
         if (autoSaveTimerRef.current) {
           clearTimeout(autoSaveTimerRef.current);
         }
-
-        autoSaveTimerRef.current = setTimeout(() => {
-          const currentValues = getValues();
-          const changedAnswers: Record<string, string> = {};
-
-          // Find changed answers
-          Object.entries(currentValues.answers).forEach(
-            ([questionId, answer]) => {
-              // Only save if there's an actual value and it's different from previous
-              if (
-                (answer || answer === "") &&
-                previousAnswersRef.current[questionId] !== answer
-              ) {
-                changedAnswers[questionId] = answer;
-              }
-            }
-          );
-
-          // Auto-save if changes exist
-          if (Object.keys(changedAnswers).length > 0) {
-            previousAnswersRef.current = { ...currentValues.answers };
-            onAutoSave({ answers: changedAnswers });
-          }
-        }, 800);
       };
-
-      setupAutoSave();
-    }, [formState.isDirty, getValues, onAutoSave]);
+    }, [watchAllFields, getValues, onAutoSave]);
 
     // Expose methods to parent component
     useImperativeHandle(ref, () => ({
@@ -200,30 +211,18 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
     // Navigation functions
     const goToNextQuestion = () => {
       if (currentQuestionIndex < totalQuestions - 1) {
-        // Save current answer before moving
-        const currAnswers = getValues().answers;
-        previousAnswersRef.current = { ...currAnswers };
-        
         setCurrentQuestionIndex(prevIndex => prevIndex + 1);
       }
     };
 
     const goToPreviousQuestion = () => {
       if (currentQuestionIndex > 0) {
-        // Save current answer before moving
-        const currAnswers = getValues().answers;
-        previousAnswersRef.current = { ...currAnswers };
-        
         setCurrentQuestionIndex(prevIndex => prevIndex - 1);
       }
     };
 
     const goToQuestion = (index: number) => {
       if (index >= 0 && index < totalQuestions) {
-        // Save current answer before moving
-        const currAnswers = getValues().answers;
-        previousAnswersRef.current = { ...currAnswers };
-        
         setCurrentQuestionIndex(index);
       }
     };
