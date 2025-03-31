@@ -1,4 +1,4 @@
-// sections/(quiz)/quiz-taking/components/quiz-taking-form.tsx
+// sections/(quiz)/quiz-taking/components/form/quiz-taking-form.tsx
 "use client";
 
 import React, {
@@ -9,7 +9,7 @@ import React, {
   useEffect,
 } from "react";
 // react-hook-form
-import { FormProvider, useForm, useWatch } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 // components
@@ -68,8 +68,8 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
     // Current question index state
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
-    // Setup form with validation
+    
+    // Set up form with validation
     const methods = useForm<QuizTakingFormValues>({
       resolver: zodResolver(formSchema),
       defaultValues: {
@@ -82,32 +82,55 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
               }, {} as Record<string, string>)
             : {}),
       },
+      mode: "onChange",
     });
 
     const { control, handleSubmit, reset, getValues, formState } = methods;
 
-    // Handle auto-saving
-    const previousAnswersRef = useRef<Record<string, string>>({});
-    const watchedAnswers = useWatch({ control, name: "answers" });
+    // Auto-save timer reference
+    const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const previousAnswersRef = useRef<Record<string, string>>(
+      initialAnswers || {}
+    );
 
+    // Clear auto-save timer on unmount
     useEffect(() => {
-      const setupAutoSave = () => {
-        if (!onAutoSave) return () => {};
+      return () => {
+        if (autoSaveTimerRef.current) {
+          clearTimeout(autoSaveTimerRef.current);
+        }
+      };
+    }, []);
 
-        // Initialize previous values on first render
-        if (Object.keys(previousAnswersRef.current).length === 0) {
-          previousAnswersRef.current = { ...watchedAnswers };
-          return () => {};
+    // Reset form when initialAnswers changes
+    useEffect(() => {
+      if (initialAnswers) {
+        reset({ answers: initialAnswers });
+        previousAnswersRef.current = { ...initialAnswers };
+      }
+    }, [initialAnswers, reset]);
+
+    // Setup auto-save when form values change
+    useEffect(() => {
+      const setupAutoSave = async () => {
+        if (!onAutoSave) return;
+
+        if (autoSaveTimerRef.current) {
+          clearTimeout(autoSaveTimerRef.current);
         }
 
-        const timer = setTimeout(() => {
+        autoSaveTimerRef.current = setTimeout(() => {
           const currentValues = getValues();
           const changedAnswers: Record<string, string> = {};
 
           // Find changed answers
           Object.entries(currentValues.answers).forEach(
             ([questionId, answer]) => {
-              if (previousAnswersRef.current[questionId] !== answer) {
+              // Only save if there's an actual value and it's different from previous
+              if (
+                (answer || answer === "") &&
+                previousAnswersRef.current[questionId] !== answer
+              ) {
                 changedAnswers[questionId] = answer;
               }
             }
@@ -119,20 +142,10 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
             onAutoSave({ answers: changedAnswers });
           }
         }, 800);
-
-        return () => clearTimeout(timer);
       };
 
-      return setupAutoSave();
-    }, [watchedAnswers, onAutoSave, getValues]);
-
-    // Reset form when initialAnswers changes
-    useEffect(() => {
-      if (initialAnswers) {
-        reset({ answers: initialAnswers });
-        previousAnswersRef.current = { ...initialAnswers };
-      }
-    }, [initialAnswers, reset]);
+      setupAutoSave();
+    }, [formState.isDirty, getValues, onAutoSave]);
 
     // Expose methods to parent component
     useImperativeHandle(ref, () => ({
@@ -178,7 +191,7 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
     // Track quiz completion progress
     const answers = getValues("answers");
     const answeredCount = Object.values(answers).filter(
-      (answer) => answer.trim() !== ""
+      (answer) => answer && answer.trim() !== ""
     ).length;
     const totalQuestions = quiz.questions.length;
     const completionPercentage = (answeredCount / totalQuestions) * 100;
@@ -187,18 +200,30 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
     // Navigation functions
     const goToNextQuestion = () => {
       if (currentQuestionIndex < totalQuestions - 1) {
-        setCurrentQuestionIndex(currentQuestionIndex + 1);
+        // Save current answer before moving
+        const currAnswers = getValues().answers;
+        previousAnswersRef.current = { ...currAnswers };
+        
+        setCurrentQuestionIndex(prevIndex => prevIndex + 1);
       }
     };
 
     const goToPreviousQuestion = () => {
       if (currentQuestionIndex > 0) {
-        setCurrentQuestionIndex(currentQuestionIndex - 1);
+        // Save current answer before moving
+        const currAnswers = getValues().answers;
+        previousAnswersRef.current = { ...currAnswers };
+        
+        setCurrentQuestionIndex(prevIndex => prevIndex - 1);
       }
     };
 
     const goToQuestion = (index: number) => {
       if (index >= 0 && index < totalQuestions) {
+        // Save current answer before moving
+        const currAnswers = getValues().answers;
+        previousAnswersRef.current = { ...currAnswers };
+        
         setCurrentQuestionIndex(index);
       }
     };
@@ -253,6 +278,7 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
           <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
             {/* Current question */}
             <CurrentQuestion
+              key={currentQuestion.id} // This key is important for proper re-rendering
               question={currentQuestion}
               isAnswered={!!answers[currentQuestion.id]?.trim()}
               questionIndex={currentQuestionIndex}

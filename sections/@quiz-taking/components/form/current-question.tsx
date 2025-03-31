@@ -1,7 +1,7 @@
 // sections/(quiz)/quiz-taking/components/current-question.tsx
 "use client";
 
-import { Controller, Control, useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -17,7 +17,7 @@ import {
   QuestionType,
 } from "@/types/question";
 import { getQuestionTypeLabel } from "@/utils/get-question-type";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface CurrentQuestionProps {
   question: QuestionUnion;
@@ -34,7 +34,20 @@ export default function CurrentQuestion({
   isAnswered,
   questionIndex,
 }: CurrentQuestionProps) {
-  const { control } = useFormContext();
+  const { control, getValues, watch } = useFormContext();
+  
+  // Add a local state to force re-renders when question changes
+  const [currentQuestionId, setCurrentQuestionId] = useState(question.id);
+  
+  // Watch the specific answer field for this question
+  const answerValue = watch(`answers.${question.id}`);
+  
+  // Update local state when question changes
+  useEffect(() => {
+    if (question.id !== currentQuestionId) {
+      setCurrentQuestionId(question.id);
+    }
+  }, [question.id, currentQuestionId]);
 
   /**
    * Get question icon based on question type
@@ -91,36 +104,41 @@ export default function CurrentQuestion({
     return (
       <Controller
         control={control}
-        name={`answers.${question.id}` as const}
+        name={`answers.${question.id}`}
         render={({ field }) => (
           <RadioGroup
-            value={field.value}
-            onValueChange={field.onChange}
+            value={field.value || ""}
+            onValueChange={(val) => {
+              field.onChange(val);
+            }}
             className="flex flex-col space-y-3 mt-4"
           >
-            {q.choices.map((choice, index) => (
-              <div
-                key={choice.id || index}
-                className={`flex items-center space-x-2 p-3 rounded-md border 
-                  ${
-                    field.value === (choice.text || index.toString())
-                      ? "bg-primary/5 border-primary"
-                      : "border-gray-200 hover:bg-muted/50"
-                  }`}
-              >
-                <RadioGroupItem
-                  value={choice.id || index.toString()}
-                  id={`${question.id}-${choice.id || index}`}
-                  className="text-primary"
-                />
-                <Label
-                  htmlFor={`${question.id}-${choice.id || index}`}
-                  className="flex-grow cursor-pointer font-normal"
+            {q.choices.map((choice, index) => {
+              const choiceId = choice.id || index.toString();
+              return (
+                <div
+                  key={choiceId}
+                  className={`flex items-center space-x-2 p-3 rounded-md border 
+                    ${
+                      field.value === choiceId
+                        ? "bg-primary/5 border-primary"
+                        : "border-gray-200 hover:bg-muted/50"
+                    }`}
                 >
-                  {choice.text}
-                </Label>
-              </div>
-            ))}
+                  <RadioGroupItem
+                    value={choiceId}
+                    id={`${question.id}-${choiceId}`}
+                    className="text-primary"
+                  />
+                  <Label
+                    htmlFor={`${question.id}-${choiceId}`}
+                    className="flex-grow cursor-pointer font-normal"
+                  >
+                    {choice.text}
+                  </Label>
+                </div>
+              );
+            })}
           </RadioGroup>
         )}
       />
@@ -134,12 +152,14 @@ export default function CurrentQuestion({
     return (
       <Controller
         control={control}
-        name={`answers.${question.id}` as const}
+        name={`answers.${question.id}`}
         render={({ field }) => (
           <div className="space-y-4 mt-4">
             <RadioGroup
-              value={field.value}
-              onValueChange={(val) => field.onChange(val)}
+              value={field.value || ""}
+              onValueChange={(val) => {
+                field.onChange(val);
+              }}
               className="flex flex-col md:flex-row gap-4"
             >
               <div
@@ -209,17 +229,19 @@ export default function CurrentQuestion({
       <div className="mt-4">
         <Controller
           control={control}
-          name={`answers.${question.id}` as const}
+          name={`answers.${question.id}`}
           render={({ field }) => (
             <div className="space-y-2">
               <Input
-                {...field}
+                id={`fill-blank-${question.id}`}
+                value={field.value || ""}
+                onChange={(e) => field.onChange(e.target.value)}
                 placeholder="Type your answer here..."
                 className="w-full"
               />
               {q.acceptedAnswers && q.acceptedAnswers.length > 0 && (
                 <p className="text-xs text-muted-foreground">
-                  <span className="font-medium">Hint:</span> {q.acceptedAnswers}
+                  <span className="font-medium">Hint:</span> Multiple answers may be correct
                 </p>
               )}
             </div>
@@ -237,11 +259,13 @@ export default function CurrentQuestion({
       <div className="mt-4 space-y-2">
         <Controller
           control={control}
-          name={`answers.${question.id}` as const}
+          name={`answers.${question.id}`}
           render={({ field }) => (
             <div className="space-y-2">
               <Textarea
-                {...field}
+                id={`open-ended-${question.id}`}
+                value={field.value || ""}
+                onChange={(e) => field.onChange(e.target.value)}
                 placeholder="Type your answer here..."
                 className="w-full min-h-32 resize-y"
               />
