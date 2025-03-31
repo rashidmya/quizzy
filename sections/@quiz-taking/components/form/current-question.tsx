@@ -143,56 +143,50 @@ export default function CurrentQuestion({
           <div className="space-y-4 mt-4">
             <RadioGroup
               value={field.value || ""}
-              onValueChange={(val) => {
-                field.onChange(val);
-              }}
+              onValueChange={(val) => field.onChange(val)}
               className="flex flex-col md:flex-row gap-4"
             >
-              <div
+              <Label
+                htmlFor={`${question.id}-true`}
                 className={`flex items-center justify-center space-x-2 p-6 rounded-md border flex-1 cursor-pointer
-                  ${
-                    field.value === "true"
-                      ? "bg-green-50 border-green-500 dark:bg-green-900/20"
-                      : "border-gray-200 hover:bg-muted/50"
-                  }`}
-                onClick={() => field.onChange("true")}
+                ${
+                  field.value === "true"
+                    ? "bg-green-50 border-green-500 dark:bg-green-900/20"
+                    : "border-gray-200 hover:bg-muted/50"
+                }`}
               >
                 <RadioGroupItem
+                  hidden
                   value="true"
                   id={`${question.id}-true`}
                   className="text-green-500"
                 />
-                <Label
-                  htmlFor={`${question.id}-true`}
-                  className="cursor-pointer font-medium text-lg flex items-center gap-2"
-                >
+                <div className="font-medium text-lg flex items-center gap-2 cursor-pointer">
                   <Check className="h-5 w-5 text-green-500" />
                   True
-                </Label>
-              </div>
+                </div>
+              </Label>
 
-              <div
+              <Label
+                htmlFor={`${question.id}-false`}
                 className={`flex items-center justify-center space-x-2 p-6 rounded-md border flex-1 cursor-pointer
-                  ${
-                    field.value === "false"
-                      ? "bg-red-50 border-red-500 dark:bg-red-900/20"
-                      : "border-gray-200 hover:bg-muted/50"
-                  }`}
-                onClick={() => field.onChange("false")}
+                ${
+                  field.value === "false"
+                    ? "bg-red-50 border-red-500 dark:bg-red-900/20"
+                    : "border-gray-200 hover:bg-muted/50"
+                }`}
               >
                 <RadioGroupItem
+                  hidden
                   value="false"
                   id={`${question.id}-false`}
                   className="text-red-500"
                 />
-                <Label
-                  htmlFor={`${question.id}-false`}
-                  className="cursor-pointer font-medium text-lg flex items-center gap-2"
-                >
+                <div className="font-medium text-lg flex items-center gap-2 cursor-pointer">
                   <X className="h-5 w-5 text-red-500" />
                   False
-                </Label>
-              </div>
+                </div>
+              </Label>
             </RadioGroup>
 
             {q.explanation && (
@@ -227,7 +221,8 @@ export default function CurrentQuestion({
               />
               {q.acceptedAnswers && q.acceptedAnswers.length > 0 && (
                 <p className="text-xs text-muted-foreground">
-                  <span className="font-medium">Hint:</span> Multiple answers may be correct
+                  <span className="font-medium">Hint:</span> Multiple answers
+                  may be correct
                 </p>
               )}
             </div>
