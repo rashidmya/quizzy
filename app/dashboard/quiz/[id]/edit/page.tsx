@@ -1,7 +1,7 @@
 // db
 import { getQuizWithQuestions } from "@/lib/db/queries/quizzes";
 // sections
-import QuizNewEdit from "@/sections/dashboard/quiz/new-edit-form";
+import QuizNewEdit from "@/sections/@dashboard/quiz/new-edit-form";
 
 // This will be replaced by 'use cache' soon
 export const dynamic = "force-static";

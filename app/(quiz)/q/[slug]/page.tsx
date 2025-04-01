@@ -2,8 +2,8 @@ import { notFound } from "next/navigation";
 // queries
 import { getQuizWithQuestions } from "@/lib/db/queries/quizzes";
 // sections
-import QuizTakingForm from "@/sections/(quiz)/quiz-taking";
-import QuizOffline from "@/sections/(quiz)/quiz-offline";
+import QuizTakingForm from "@/sections/@quiz-taking";
+import QuizOffline from "@/sections/@quiz-taking/quiz-offline";
 // utils
 import { decodeUUID } from "@/utils/encode-uuid";
 import { SessionProvider } from "@/components/providers/session-provider";

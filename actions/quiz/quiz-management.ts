@@ -4,13 +4,19 @@ import { revalidatePath } from "next/cache";
 
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db/drizzle";
-import { quizzes, questions, choices } from "@/lib/db/schema";
+import {
+  quizzes,
+  questions,
+  multipleChoiceDetails,
+  trueFalseDetails,
+  fillInBlankDetails,
+  openEndedDetails,
+} from "@/lib/db/schema";
 
 import { TimerMode, QuizStatus } from "@/types/quiz";
-import { QuestionType } from "@/types/question";
 
 /**
- * Creates or updates a quiz (and its questions/choices).
+ * Creates or updates a quiz (and its questions/answers).
  */
 export async function upsertQuiz(formData: FormData) {
   try {
@@ -32,13 +38,23 @@ export async function upsertQuiz(formData: FormData) {
       return { message: "Timer mode is required", error: true };
     }
 
+    // The structure of each question now includes fields for different types.
     let quizQuestions: Array<{
       id?: string;
       text: string;
-      type: QuestionType;
+      type: "multiple_choice" | "true_false" | "fill_in_blank" | "open_ended";
       timer?: number;
       points: number;
-      choices: Array<{ id?: string; text: string; isCorrect: boolean }>;
+      // For multiple choice
+      choices?: Array<{ id?: string; text: string; isCorrect: boolean }>;
+      // for true/false and fill in blank
+      correctAnswer: boolean | string;
+      // For true/false
+      explanation?: string;
+      // For fill in blank
+      acceptedAnswers?: string; // expected as array, stored as comma-separated string
+      // For open ended answer
+      guidelines?: string;
     }>;
 
     try {
@@ -56,7 +72,7 @@ export async function upsertQuiz(formData: FormData) {
         .set({ title, timerMode, timer, shuffleQuestions, updatedAt })
         .where(eq(quizzes.id, quizId));
 
-      // Remove existing questions (cascade deletes choices).
+      // Remove existing questions (cascade deletes detail rows).
       await db.delete(questions).where(eq(questions.quizId, quizId));
 
       newQuizId = quizId;
@@ -80,7 +96,7 @@ export async function upsertQuiz(formData: FormData) {
       newQuizId = insertedQuiz.id;
     }
 
-    // Insert new questions/choices
+    // Insert new questions and their type-specific details.
     for (const q of quizQuestions) {
       const [insertedQuestion] = await db
         .insert(questions)
@@ -89,16 +105,46 @@ export async function upsertQuiz(formData: FormData) {
           text: q.text,
           type: q.type,
           timer: q.timer,
-          points: q.points ?? 1,
+          points: q.points,
         })
         .returning({ id: questions.id });
 
-      for (const c of q.choices) {
-        await db.insert(choices).values({
-          questionId: insertedQuestion.id,
-          text: c.text,
-          isCorrect: c.isCorrect,
-        });
+      // Insert into the detail table based on question type.
+      switch (q.type) {
+        case "multiple_choice":
+          if (q.choices && q.choices.length > 0) {
+            for (const c of q.choices) {
+              await db.insert(multipleChoiceDetails).values({
+                questionId: insertedQuestion.id,
+                text: c.text,
+                isCorrect: c.isCorrect,
+              });
+            }
+          }
+          break;
+        case "true_false":
+          await db.insert(trueFalseDetails).values({
+            questionId: insertedQuestion.id,
+            correctAnswer: (q.correctAnswer as boolean) ?? false,
+            explanation: q.explanation || null,
+          });
+          break;
+        case "fill_in_blank":
+          await db.insert(fillInBlankDetails).values({
+            questionId: insertedQuestion.id,
+            correctAnswer: q.correctAnswer as string,
+            acceptedAnswers: q.acceptedAnswers || null,
+          });
+          break;
+        case "open_ended":
+          await db.insert(openEndedDetails).values({
+            questionId: insertedQuestion.id,
+            guidelines: q.guidelines || null,
+          });
+          break;
+        default:
+          // Optionally handle unknown types.
+          break;
       }
     }
 

@@ -1,10 +1,18 @@
+// actions/quiz/quiz-taking.ts
 "use server";
 
 import { revalidatePath } from "next/cache";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/db/drizzle";
-import { quizAttempts, attemptAnswers } from "@/lib/db/schema";
+import { 
+  quizAttempts, 
+  attemptAnswers, 
+  multipleChoiceDetails, 
+  trueFalseDetails,
+  fillInBlankDetails,
+  openEndedDetails
+} from "@/lib/db/schema";
 
 import { QuizAttempt } from "@/types/attempt";
 
@@ -171,5 +179,101 @@ export async function getAttemptAnswers({
   } catch (error) {
     console.error("Error fetching attempt answers:", error);
     return { message: "Error fetching attempt answers", error: true };
+  }
+}
+
+/**
+ * Fetches question-specific details for all question types
+ */
+export async function getQuestionDetails(
+  questionIds: string[]
+): Promise<{ 
+  message: string; 
+  data?: Record<string, any>; 
+  error?: boolean;
+}> {
+  if (!questionIds.length) {
+    return { message: "No question IDs provided", error: true };
+  }
+  
+  try {
+    // Create an object to hold all question details
+    const questionDetails: Record<string, any> = {};
+    
+    // 1. Fetch multiple choice details
+    const mcDetails = await db
+      .select()
+      .from(multipleChoiceDetails)
+      .where(inArray(multipleChoiceDetails.questionId, questionIds));
+    
+    // Group multiple choice details by question ID
+    mcDetails.forEach(choice => {
+      if (!questionDetails[choice.questionId]) {
+        questionDetails[choice.questionId] = { choices: [] };
+      }
+      questionDetails[choice.questionId].choices.push({
+        id: choice.id,
+        text: choice.text,
+        isCorrect: choice.isCorrect
+      });
+    });
+    
+    // 2. Fetch true/false details
+    const tfDetails = await db
+      .select()
+      .from(trueFalseDetails)
+      .where(inArray(trueFalseDetails.questionId, questionIds));
+    
+    tfDetails.forEach(detail => {
+      if (!questionDetails[detail.questionId]) {
+        questionDetails[detail.questionId] = {};
+      }
+      questionDetails[detail.questionId] = {
+        ...questionDetails[detail.questionId],
+        correctAnswer: detail.correctAnswer,
+        explanation: detail.explanation
+      };
+    });
+    
+    // 3. Fetch fill-in-blank details
+    const fibDetails = await db
+      .select()
+      .from(fillInBlankDetails)
+      .where(inArray(fillInBlankDetails.questionId, questionIds));
+    
+    fibDetails.forEach(detail => {
+      if (!questionDetails[detail.questionId]) {
+        questionDetails[detail.questionId] = {};
+      }
+      questionDetails[detail.questionId] = {
+        ...questionDetails[detail.questionId],
+        correctAnswer: detail.correctAnswer,
+        acceptedAnswers: detail.acceptedAnswers
+      };
+    });
+    
+    // 4. Fetch open-ended details
+    const oeDetails = await db
+      .select()
+      .from(openEndedDetails)
+      .where(inArray(openEndedDetails.questionId, questionIds));
+    
+    oeDetails.forEach(detail => {
+      if (!questionDetails[detail.questionId]) {
+        questionDetails[detail.questionId] = {};
+      }
+      questionDetails[detail.questionId] = {
+        ...questionDetails[detail.questionId],
+        guidelines: detail.guidelines
+      };
+    });
+    
+    return { 
+      message: "Question details fetched successfully", 
+      data: questionDetails 
+    };
+  } catch (error) {
+    console.error("Error fetching question details:", error);
+    return { message: "Error fetching question details", error: true };
   }
 }
