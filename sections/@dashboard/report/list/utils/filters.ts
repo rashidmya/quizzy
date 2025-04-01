@@ -56,7 +56,7 @@ export function filterReports({
   // Apply ownership filter
   if (ownershipFilter === "shared") {
     // In a real app, filter for shared reports
-    filtered = filtered.filter(report => false); // Placeholder
+    filtered = filtered.filter(() => false); // Placeholder
   }
   
   return filtered;

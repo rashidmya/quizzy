@@ -32,7 +32,6 @@ import {
   MoreHorizontal,
   ToggleLeft,
   Check,
-  X,
 } from "lucide-react";
 // sections
 import TrueFalseDialog from "../question-dialogs/true-false-dialog";

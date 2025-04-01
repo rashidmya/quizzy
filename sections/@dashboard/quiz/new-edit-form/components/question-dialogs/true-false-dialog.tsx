@@ -50,7 +50,6 @@ export default function TrueFalseDialog({
   // Create form instance
   const {
     control,
-    register,
     handleSubmit,
     formState: { errors, isValid },
     reset,

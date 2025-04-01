@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 
 import { getQuizWithQuestions } from "@/lib/db/queries/quizzes";
-import { getQuizAttemptsByQuizId } from "@/lib/db/queries/quizzes";
 
 export const dynamic = "force-static";
 
@@ -18,7 +17,6 @@ export default async function QuizReportPage({
 
   // Fetch quiz data and attempts data
   const quiz = await getQuizWithQuestions(id);
-  const attempts = await getQuizAttemptsByQuizId(id);
 
   if (!quiz) {
     return notFound();

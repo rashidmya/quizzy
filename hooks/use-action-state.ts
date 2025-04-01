@@ -1,5 +1,5 @@
 // lib/use-action-state.ts
-import { startTransition, useState } from "react";
+import { useState } from "react";
 
 export function useActionState<T, P>(
   action: (payload: P) => Promise<T>,
@@ -14,6 +14,7 @@ export function useActionState<T, P>(
       const result = await action(payload);
       setState(result);
       return result;
+      // eslint-disable-next-line no-useless-catch
     } catch (err) {
       throw err;
     } finally {

@@ -1,6 +1,5 @@
 // sections/dashboard/quiz/view/components/fill-in-blank-question.tsx
 import { FileQuestion } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 
 /**
  * Props for the FillInBlankQuestion component

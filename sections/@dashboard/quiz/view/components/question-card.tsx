@@ -9,7 +9,6 @@ import FillInBlankQuestion from "./question-types/fill-in-blank-question";
 import OpenEndedQuestion from "./question-types/open-ended-question";
 import {
   getQuestionTypeLabel,
-  getQuestionTypeIcon,
 } from "@/utils/get-question-type";
 
 /**
@@ -25,9 +24,6 @@ interface QuestionCardProps {
  */
 export default function QuestionCard({ question, index }: QuestionCardProps) {
   const label = getQuestionTypeLabel(question.type);
-  const icon = getQuestionTypeIcon(question.type);
-
-  console.log(question);
 
   return (
     <Card className="overflow-hidden transition-shadow hover:shadow-md">

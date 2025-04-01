@@ -213,7 +213,7 @@ export default function QuizScheduleDialog({
           <p className="text-sm text-muted-foreground">
             Scheduling a quiz will make it available to participants at the
             specified date and time. The quiz status will automatically change
-            to "Active" at the scheduled time.
+            to &quot;Active&quot; at the scheduled time.
             {withEndDate &&
               " It will automatically end at the specified end time."}
           </p>

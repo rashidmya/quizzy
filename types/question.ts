@@ -24,11 +24,8 @@ export type QuestionType =
   | "fill_in_blank"
   | "open_ended";
 
-// Base question with common fields.
-export interface BaseQuestion extends Question {}
-
 // Extend for multiple-choice questions.
-export interface MultipleChoiceQuestion extends BaseQuestion {
+export interface MultipleChoiceQuestion extends Question {
   type: "multiple_choice";
   // Replace with your detailed type if available.
   choices: {
@@ -39,21 +36,21 @@ export interface MultipleChoiceQuestion extends BaseQuestion {
 }
 
 // Extend for true/false questions.
-export interface TrueFalseQuestion extends BaseQuestion {
+export interface TrueFalseQuestion extends Question {
   type: "true_false";
   explanation?: string;
   correctAnswer: boolean;
 }
 
 // Extend for fill-in-the-blank questions.
-export interface FillInBlankQuestion extends BaseQuestion {
+export interface FillInBlankQuestion extends Question {
   type: "fill_in_blank";
   correctAnswer: string;
   acceptedAnswers?: string; // Optionally, list alternative correct answers.
 }
 
 // Extend for open ended questions.
-export interface OpenEndedQuestion extends BaseQuestion {
+export interface OpenEndedQuestion extends Question {
   type: "open_ended";
   guidelines?: string;
 }

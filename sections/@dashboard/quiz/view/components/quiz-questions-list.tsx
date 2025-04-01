@@ -1,7 +1,7 @@
 // sections/dashboard/quiz/view/components/quiz-questions-list.tsx
 import { FileQuestion } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Question, QuestionUnion } from "@/types/question";
+import { QuestionUnion } from "@/types/question";
 import QuestionCard from "./question-card";
 
 /**

@@ -127,7 +127,7 @@ export function PublicQuizSearch() {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h4 className="text-sm font-medium">
-                {filteredResults.length} results for "{searchQuery}"
+                {filteredResults.length} results for &quot;{searchQuery}&quot;
               </h4>
               
               <Tabs value={activeCategory} onValueChange={setActiveCategory} className="h-8">

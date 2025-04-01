@@ -49,7 +49,7 @@ async function main() {
     points: number;
   }[] = [];
   for (const quiz of insertedQuizzes) {
-    const questionsForQuiz = QUESTION_TYPES.map((qType, idx) => ({
+    const questionsForQuiz = QUESTION_TYPES.map((qType) => ({
       quizId: quiz.id,
       text: `Sample ${qType} question for quiz "${quiz.title}"?`,
       type: qType,

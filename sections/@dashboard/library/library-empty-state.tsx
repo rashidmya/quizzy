@@ -23,7 +23,7 @@ export default function LibraryEmptyState({ searchTerm }: EmptyStateProps) {
           </div>
           <h3 className="text-lg font-medium mb-2">No quizzes found</h3>
           <p className="text-muted-foreground max-w-md mb-4">
-            We couldn't find any quizzes matching "{searchTerm}". Try a
+            We couldn&apos;t find any quizzes matching &qout;{searchTerm}&quot;. Try a
             different search term or create a new quiz.
           </p>
         </>

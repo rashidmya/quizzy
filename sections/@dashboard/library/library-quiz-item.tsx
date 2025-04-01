@@ -239,7 +239,7 @@ export default function LibraryQuizItem({
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete "{quiz.title}" and all associated
+              This will permanently delete &quot;{quiz.title}&quot; and all associated
               questions. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>

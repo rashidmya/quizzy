@@ -162,13 +162,13 @@ export default function QuizSettingsDialog({
     const currentValues = getValues();
 
     if (localTimerMode === "none") {
-      const updatedQuestions = currentValues.questions.map((q: any) => ({
+      const updatedQuestions = currentValues.questions.map((q) => ({
         ...q,
         timer: undefined,
       }));
       setValue("questions", updatedQuestions, { shouldDirty: true });
     } else if (localTimerMode === "global") {
-      const updatedQuestions = currentValues.questions.map((q: any) => ({
+      const updatedQuestions = currentValues.questions.map((q) => ({
         ...q,
         timer: undefined,
       }));

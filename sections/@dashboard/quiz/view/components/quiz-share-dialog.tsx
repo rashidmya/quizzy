@@ -99,7 +99,7 @@ export default function QuizShareDialog({ quizUrl }: QuizShareDialogProps) {
             </div>
 
             <div className="text-sm text-muted-foreground">
-              Share this link with anyone you want to take the quiz. They won't
+              Share this link with anyone you want to take the quiz. They won&apos;t
               need to create an account.
             </div>
           </TabsContent>

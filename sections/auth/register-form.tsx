@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useState } from "react";
+import { useState } from "react";
 // next
 import Link from "next/link";
 import { signIn } from "next-auth/react";

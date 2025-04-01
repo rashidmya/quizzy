@@ -36,10 +36,10 @@ export default function Navbar() {
       <div className="max-w-container relative mx-auto">
         <NavbarComponent>
           <NavbarLeft>
-            <a href="/" className="flex items-center gap-2 text-xl font-bold">
+            <Link href="/" className="flex items-center gap-2 text-xl font-bold">
               <LaunchUI />
               Quizzy
-            </a>
+            </Link>
             <Navigation user={user} />
           </NavbarLeft>
           <NavbarRight>
@@ -80,12 +80,12 @@ export default function Navbar() {
               </SheetTrigger>
               <SheetContent side="right">
                 <nav className="grid gap-6 text-lg font-medium">
-                  <a
+                  <Link
                     href="/"
                     className="flex items-center gap-2 text-xl font-bold"
                   >
                     <span>Quizzy</span>
-                  </a>
+                  </Link>
 
                   {user ? (
                     <>

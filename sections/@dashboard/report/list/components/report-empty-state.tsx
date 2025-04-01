@@ -26,7 +26,7 @@ export default function ReportEmptyState({
           </div>
           <h3 className="text-xl font-medium mb-2">No Reports Available</h3>
           <p className="text-muted-foreground mb-8 max-w-md">
-            You don't have any quizzes with reports yet. Create a quiz and share it
+            You don&apos;t have any quizzes with reports yet. Create a quiz and share it
             with participants to generate reports and analytics.
           </p>
         </CardContent>

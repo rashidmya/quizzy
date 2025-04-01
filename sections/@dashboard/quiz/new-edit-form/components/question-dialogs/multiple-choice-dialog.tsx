@@ -24,7 +24,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   Pencil,
   Plus,
-  Trash2,
   GripVertical,
   X,
   AlertCircle,

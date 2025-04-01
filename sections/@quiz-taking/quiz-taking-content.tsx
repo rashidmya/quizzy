@@ -1,7 +1,7 @@
 // sections/(quiz)/quiz-taking/quiz-taking-content.tsx
 "use client";
 
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 // sonner
 import { toast } from "sonner";
 // components
@@ -19,7 +19,6 @@ import {
   submitQuizAttempt,
   autoSaveAnswer,
   getAttemptAnswers,
-  getQuestionDetails,
 } from "@/actions/quiz/quiz-taking";
 // hooks
 import { useActionState } from "@/hooks/use-action-state";
@@ -46,19 +45,14 @@ export default function QuizTakingContent({
   const [initialAnswers, setInitialAnswers] = useState<
     Record<string, string> | undefined
   >(undefined);
-  const [questionDetails, setQuestionDetails] = useState<Record<string, any>>(
-    {}
-  );
-  const [isLoadingDetails, setIsLoadingDetails] = useState(true);
 
   // Form reference for submission and interaction
   const formRef = useRef<QuizTakingFormRef>(null);
 
-  const isReady =
-    attempt !== null && initialAnswers !== undefined && !isLoadingDetails;
+  const isReady = attempt !== null && initialAnswers !== undefined;
 
   // Question order management (handles shuffling)
-  const { displayOrder, orderedQuestions } = useQuestionOrder(
+  const { orderedQuestions } = useQuestionOrder(
     quiz.questions,
     quiz.shuffleQuestions,
     isReady
@@ -71,7 +65,7 @@ export default function QuizTakingContent({
   );
 
   // Timer management
-  const { isTimeUp, canContinueQuiz, startTimer, handleTimeUp } = useQuizTimer(
+  const { canContinueQuiz, startTimer, handleTimeUp } = useQuizTimer(
     quiz.timerMode,
     quiz.timer,
     attempt?.startedAt,
@@ -117,36 +111,6 @@ export default function QuizTakingContent({
   }, [userEmail, quiz.id, attempt, startTimer, onQuizComplete]);
 
   /**
-   * Fetch question-specific details
-   */
-  useEffect(() => {
-    const fetchQuestionDetails = async () => {
-      if (quiz.questions.length > 0) {
-        setIsLoadingDetails(true);
-
-        try {
-          // Fetch details for all questions in the quiz
-          const questionIds = quiz.questions.map((q) => q.id);
-          const details = await getQuestionDetails(questionIds);
-
-          if (!details.error) {
-            setQuestionDetails(details.data || {});
-          } else {
-            toast.error("Failed to load question details");
-          }
-        } catch (error) {
-          console.error("Error fetching question details:", error);
-          toast.error("Failed to load question details");
-        } finally {
-          setIsLoadingDetails(false);
-        }
-      }
-    };
-
-    fetchQuestionDetails();
-  }, [quiz.questions]);
-
-  /**
    * Fetch previously saved answers for the current attempt
    */
   useEffect(() => {
@@ -168,7 +132,7 @@ export default function QuizTakingContent({
         quiz.questions.forEach(({ id }) => {
           if (!answersRecord[id]) answersRecord[id] = "";
         });
-        
+
         setInitialAnswers(answersRecord);
       }
     };
@@ -235,23 +199,6 @@ export default function QuizTakingContent({
     [attempt, autoSaveAction]
   );
 
-  /**
-   * Enhance questions with type-specific details
-   */
-  const enhanceQuestionsWithDetails = useCallback(() => {
-    if (!orderedQuestions || !questionDetails) return [];
-
-    return orderedQuestions.map((question) => {
-      const details = questionDetails[question.id] || {};
-
-      // Combine the base question with type-specific details
-      return {
-        ...question,
-        ...details,
-      };
-    });
-  }, [orderedQuestions, questionDetails]);
-
   // Loading attempt
   if (!attempt) {
     return <QuizTakingState text="Preparing your quiz..." isLoading />;
@@ -260,11 +207,6 @@ export default function QuizTakingContent({
   // Loading saved answers
   if (initialAnswers === undefined) {
     return <QuizTakingState text="Loading your saved answers..." isLoading />;
-  }
-
-  // Loading question details
-  if (isLoadingDetails) {
-    return <QuizTakingState text="Loading question details..." isLoading />;
   }
 
   // Time is up
@@ -277,8 +219,11 @@ export default function QuizTakingContent({
     );
   }
 
-  // Get enhanced questions with their type-specific details
-  const enhancedQuestions = enhanceQuestionsWithDetails();
+  // Create a quiz object with ordered questions (if shuffling is enabled)
+  const quizWithOrderedQuestions = {
+    ...quiz,
+    questions: orderedQuestions || quiz.questions,
+  };
 
   // Quiz in progress - the main form
   return (
@@ -294,10 +239,7 @@ export default function QuizTakingContent({
       <div className="pt-20 pb-20">
         <QuizTakingForm
           ref={formRef}
-          quiz={{
-            ...quiz,
-            questions: enhancedQuestions,
-          }}
+          quiz={quizWithOrderedQuestions}
           onSubmit={handleQuizSubmit}
           onAutoSave={handleAutoSave}
           isAutoSavePending={isAutoSavePending}

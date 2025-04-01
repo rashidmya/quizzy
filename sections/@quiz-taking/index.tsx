@@ -1,7 +1,7 @@
 // sections/(quiz)/quiz-taking/quiz-taking-container.tsx
 "use client";
 
-import React, { useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 // next-auth
 import { useSession } from "next-auth/react";
 // components
@@ -49,7 +49,7 @@ export default function QuizTakingContainer({
   }
 
   // Not logged in
-  if (status === "unauthenticated" || !session) {
+  if (status === "unauthenticated" || !session || !session.user || !session.user.email) {
     return <QuizTakingLogin quizId={quiz.id} />;
   }
 
@@ -75,7 +75,7 @@ export default function QuizTakingContainer({
   return (
     <QuizTakingContent
       quiz={quiz}
-      userEmail={session.user.email!}
+      userEmail={session.user.email}
       onQuizComplete={handleQuizComplete}
     />
   );

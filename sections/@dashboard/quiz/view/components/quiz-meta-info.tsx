@@ -1,12 +1,10 @@
 // sections/dashboard/quiz/view/components/quiz-meta-info.tsx
 import {
-  Clock,
   Calendar,
   Shuffle,
   Award,
   Timer,
   TimerOff,
-  Users,
 } from "lucide-react";
 import { QuizStatus, QuizWithQuestions } from "@/types/quiz";
 import { fDateTime } from "@/utils/format-time";

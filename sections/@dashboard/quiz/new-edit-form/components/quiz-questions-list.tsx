@@ -4,19 +4,29 @@ import { useState } from "react";
 // components
 import { Button } from "@/components/ui/button";
 // question cards
-import MultipleChoiceCard from "./question-cards/multiple-choice-card";
-import TrueFalseCard from "./question-cards/true-false-card";
-import FillInBlankCard from "./question-cards/fill-in-blank-card";
-import OpenEndedCard from "./question-cards/open-ended-card";
+import MultipleChoiceCard, {
+  MultipleChoiceData,
+} from "./question-cards/multiple-choice-card";
+import TrueFalseCard, { TrueFalseData } from "./question-cards/true-false-card";
+import FillInBlankCard, {
+  FillInBlankData,
+} from "./question-cards/fill-in-blank-card";
+import OpenEndedCard, { OpenEndedData } from "./question-cards/open-ended-card";
 // icons
 import { ChevronUp, ChevronDown } from "lucide-react";
 
-interface QuestionFieldProps {
-  questionFields: any[];
+type QuestionField =
+  | TrueFalseData
+  | OpenEndedData
+  | MultipleChoiceData
+  | FillInBlankData;
+
+interface QuizQuestionListProps {
+  questionFields: QuestionField[];
   timerMode: string;
-  onUpdate: (index: number, value: any) => void;
+  onUpdate: (index: number, value: QuestionField) => void;
   onDelete: (index: number) => void;
-  onDuplicate: (questionData: any) => void;
+  onDuplicate: (questionData: QuestionField) => void;
   onMove: (from: number, to: number) => void;
   onChange: () => void;
 }
@@ -29,11 +39,11 @@ export default function QuizQuestionsList({
   onDuplicate,
   onMove,
   onChange,
-}: QuestionFieldProps) {
+}: QuizQuestionListProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   // Render the appropriate question card based on type
-  const renderQuestionCard = (field: any, index: number) => {
+  const renderQuestionCard = (field: QuestionField, index: number) => {
     switch (field.type) {
       case "multiple_choice":
         return (

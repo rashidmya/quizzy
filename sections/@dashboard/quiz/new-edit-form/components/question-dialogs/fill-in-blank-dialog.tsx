@@ -56,7 +56,6 @@ export default function FillInBlankDialog({
   // Create form instance
   const {
     control,
-    register,
     handleSubmit,
     formState: { errors, isValid },
     reset,

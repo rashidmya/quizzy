@@ -23,7 +23,12 @@ export const authMainOptions: NextAuthOptions = {
         },
         password: { label: "Password", type: "password" },
       },
-      async authorize({ email, password }: any) {
+      async authorize(
+        credentials: Record<"email" | "password", string> | undefined
+      ) {
+        if (!credentials) return null;
+
+        const { email, password } = credentials;
         if (!email || !password) return null;
 
         const user = await getUser(email);
@@ -31,7 +36,7 @@ export const authMainOptions: NextAuthOptions = {
           return null;
         }
 
-        const passwordsMatch = await compare(password, user[0].password!);
+        const passwordsMatch = await compare(password, user[0].password);
         if (passwordsMatch) {
           return user[0];
         }
@@ -48,7 +53,7 @@ export const authMainOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    async signIn({ user, account, profile, email, credentials }) {
+    async signIn() {
       // added later in auth.ts since it requires bcrypt which is only compatible with Node.js
       // while this file is also used in non-Node.js environments
       return true;

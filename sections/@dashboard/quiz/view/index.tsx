@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 // components
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -37,8 +37,6 @@ import {
   PlayCircle,
   StopCircle,
   Trash2,
-  FileQuestion,
-  BarChart3,
 } from "lucide-react";
 // types
 import { QuizStatus, QuizWithQuestions } from "@/types/quiz";
@@ -65,7 +63,6 @@ export default function QuizDetailView({ quiz }: QuizDetailViewProps) {
     quiz.status || "draft"
   );
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("questions");
 
   // Action states
   const [_, setStatusAction, isStatusPending] = useActionState(setQuizStatus, {

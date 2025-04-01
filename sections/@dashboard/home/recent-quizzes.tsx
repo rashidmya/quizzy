@@ -4,7 +4,6 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { ChevronRight, Clock, Users, FilePlus, PlusCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
@@ -101,7 +100,7 @@ export function RecentQuizzes() {
             <FilePlus className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
             <h3 className="text-lg font-medium mb-1">No quizzes yet</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              You haven't created any quizzes yet.
+              You haven&apos;t created any quizzes yet.
             </p>
             <Button asChild size="sm">
               <Link href={PATH_DASHBOARD.quiz.new}>

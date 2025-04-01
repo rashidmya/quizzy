@@ -1,6 +1,6 @@
 import { quizzes } from "@/lib/db/schema";
 import { InferSelectModel } from "drizzle-orm";
-import { Question, QuestionUnion } from "./question";
+import { QuestionUnion } from "./question";
 
 export type TimerMode = "none" | "global" | "question";
 
@@ -13,7 +13,7 @@ export type QuizWithQuestions = Omit<Quiz, "createdBy"> & {
     id: string;
     name: string;
   };
-  questions: (Question & QuestionUnion)[];
+  questions: QuestionUnion[];
 };
 
 export type LibraryQuiz = Omit<Quiz, "createdBy"> & {

@@ -13,22 +13,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-// icons
-import { Trash2 } from "lucide-react";
 // hooks
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { DeleteAccountDialog } from "./settings-delete-account-dialog";
@@ -41,7 +31,6 @@ export default function AccountSettingsPage() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   // Dummy handlers – replace these with your actual API calls.
   const handleEmailUpdate = () => {
@@ -55,12 +44,7 @@ export default function AccountSettingsPage() {
     }
     console.log("Password updated");
   };
-
-  const handleAccountDelete = () => {
-    console.log("Account deleted");
-    setShowDeleteDialog(false);
-  };
-
+  
   return (
     <div className="p-6">
       <div className="max-w-2xl mx-auto">

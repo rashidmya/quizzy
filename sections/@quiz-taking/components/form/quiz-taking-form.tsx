@@ -1,7 +1,7 @@
 // sections/(quiz)/quiz-taking/components/form/quiz-taking-form.tsx
 "use client";
 
-import React, {
+import {
   useImperativeHandle,
   forwardRef,
   useState,
@@ -85,7 +85,7 @@ const QuizTakingForm = forwardRef<QuizTakingFormRef, QuizTakingFormProps>(
       mode: "onChange",
     });
 
-    const { control, handleSubmit, reset, getValues, formState, watch } = methods;
+    const { handleSubmit, reset, getValues, watch } = methods;
     
     // Watch all form values for changes to trigger auto-save
     const watchAllFields = watch();

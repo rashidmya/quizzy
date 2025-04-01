@@ -32,7 +32,7 @@ import { toast } from "sonner";
 import { quizFormSchema } from "./schemas/quiz-form-schema";
 import { createDefaultQuestion } from "./utils/default-question";
 import { QuizWithQuestions } from "@/types/quiz";
-import { MultipleChoice } from "@/types/question";
+import { QuestionUnion } from "@/types/question";
 
 export type QuizFormValues = z.infer<typeof quizFormSchema>;
 
@@ -71,7 +71,7 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
       timerMode: quiz.timerMode || "none",
       shuffleQuestions: quiz.shuffleQuestions || false,
       questions:
-        quiz.questions?.map((q: any) => {
+        quiz.questions?.map((q: QuestionUnion) => {
           // Handle different question types
           if (q.type === "multiple_choice") {
             return {
@@ -80,7 +80,7 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
               type: q.type,
               timer: q.timer || undefined,
               points: q.points || 1,
-              choices: q.choices.map((c: any) => ({
+              choices: q.choices.map((c) => ({
                 id: c.id,
                 text: c.text,
                 isCorrect: c.isCorrect,
@@ -104,7 +104,7 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
               timer: q.timer || undefined,
               points: q.points || 1,
               correctAnswer: q.correctAnswer,
-              acceptedAnswers: q.acceptedAnswers
+              acceptedAnswers: q.acceptedAnswers,
             };
           } else if (q.type === "open_ended") {
             return {
@@ -196,7 +196,7 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
       formData.append("userId", user.id || "");
     }
 
-    const promise = upsertAction(formData).then((result: any) => {
+    const promise = upsertAction(formData).then((result) => {
       if (result.error) {
         throw new Error(result.message);
       }
@@ -205,14 +205,18 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
 
     toast.promise(promise, {
       loading: isEdit ? "Updating quiz..." : "Creating quiz...",
-      success: (data: any) => {
+      success: (data) => {
         setHasChanged(false);
-        push(PATH_DASHBOARD.quiz.view(data.quizId));
+
+        if (data.quizId) {
+          push(PATH_DASHBOARD.quiz.view(data.quizId));
+        }
+
         return isEdit
           ? "Quiz updated successfully!"
           : "Quiz created successfully!";
       },
-      error: (error: any) =>
+      error: (error) =>
         error.message || `Error ${isEdit ? "updating" : "creating"} quiz`,
     });
   };
@@ -337,11 +341,6 @@ export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
                 const newQuestion = {
                   ...questionData,
                   id: undefined,
-                  choices: questionData.choices?.map(
-                    (choice: MultipleChoice) => ({
-                      ...choice,
-                    })
-                  ),
                 };
                 appendQuestion(newQuestion);
                 setHasChanged(true);

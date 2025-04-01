@@ -114,7 +114,6 @@ export function applySortFilter({
   quizzes,
   comparator,
   filterName,
-  filterType = "all",
 }: {
   quizzes: LibraryQuiz[];
   comparator: (a: LibraryQuiz, b: LibraryQuiz) => number;
