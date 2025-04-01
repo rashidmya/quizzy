@@ -5,11 +5,11 @@ import { Check, X, CheckSquare } from "lucide-react";
  * Props for the MultipleChoiceQuestion component
  */
 interface MultipleChoiceQuestionProps {
-  choices: Array<{
+  choices: {
     id?: string;
     text: string;
     isCorrect: boolean;
-  }>;
+  }[];
 }
 
 /**

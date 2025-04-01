@@ -37,23 +37,23 @@ import {
 // sections
 import QuestionEditDialog from "../question-dialogs/multiple-choice-dialog";
 
-export type MultipleChoiceData = {
+export interface MultipleChoiceData {
   id?: string;
   type: "multiple_choice";
   choices: { id?: string; text: string; isCorrect: boolean }[];
   text: string;
   timer?: number;
   points: number;
-};
+}
 
-export type MultipleChoiceCardProps = {
+export interface MultipleChoiceCardProps {
   questionIndex: number;
   question: MultipleChoiceData;
   timerMode: string;
   onUpdate: (updatedQuestion: MultipleChoiceData) => void;
   onDelete: () => void;
   onDuplicate: (questionData: MultipleChoiceData) => void;
-};
+}
 
 export default function MultipleChoiceCard({
   questionIndex,

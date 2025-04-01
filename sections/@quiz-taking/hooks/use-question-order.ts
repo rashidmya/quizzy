@@ -6,7 +6,7 @@ import {  QuestionUnion } from '@/types/question';
  * Hook to manage question ordering and shuffling
  */
 export function useQuestionOrder(
-  questions: Array<QuestionUnion>,
+  questions: QuestionUnion[],
   shouldShuffle: boolean,
   isReady: boolean
 ) {

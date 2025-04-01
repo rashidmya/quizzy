@@ -31,7 +31,7 @@ import {
 // dialogs
 import QuizSettingsDialog from "./quiz-settings-dialog";
 
-type Props = {
+interface Props {
   onBack: () => void;
   title: string;
   isPending: boolean;
@@ -39,7 +39,7 @@ type Props = {
   onConfirmExit?: () => void;
   onCancelExit?: () => void;
   isEdit?: boolean;
-};
+}
 
 export default function QuizHeader({
   onBack,

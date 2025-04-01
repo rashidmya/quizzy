@@ -11,9 +11,9 @@ import {
 // components
 import { Badge } from "./ui/badge";
 
-type StatusBadgeProps = {
+interface StatusBadgeProps {
   status: QuizStatus;
-};
+}
 
 export default function StatusBadge({ status }: StatusBadgeProps) {
   const statusConfig: Record<

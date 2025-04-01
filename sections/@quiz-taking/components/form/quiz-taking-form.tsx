@@ -33,9 +33,9 @@ export interface QuizTakingFormRef {
 /**
  * Form values interface for managed input data
  */
-export type QuizTakingFormValues = {
+export interface QuizTakingFormValues {
   answers: Record<string, string>;
-};
+}
 
 /**
  * Form validation schema

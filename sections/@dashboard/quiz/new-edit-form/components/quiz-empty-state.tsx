@@ -3,9 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { FileQuestion, Plus } from "lucide-react";
 
-type QuizEmptyStateProps = {
+interface QuizEmptyStateProps {
   onAddQuestion: () => void;
-};
+}
 
 export default function QuizEmptyState({ onAddQuestion }: QuizEmptyStateProps) {
   return (

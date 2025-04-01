@@ -9,9 +9,9 @@ import { Button } from "@/components/ui/button";
 // paths
 import { PATH_DASHBOARD } from "@/routes/paths";
 
-type EmptyStateProps = {
+interface EmptyStateProps {
   searchTerm?: string;
-};
+}
 
 export default function LibraryEmptyState({ searchTerm }: EmptyStateProps) {
   return (

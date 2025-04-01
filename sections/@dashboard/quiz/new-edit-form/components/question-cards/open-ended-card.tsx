@@ -36,23 +36,23 @@ import {
 // sections
 import OpenEndedDialog from "../question-dialogs/open-ended-dialog";
 
-export type OpenEndedData = {
+export interface OpenEndedData {
   id?: string;
   type: "open_ended";
   text: string;
   timer?: number;
   points: number;
   guidelines?: string;
-};
+}
 
-export type OpenEndedCardProps = {
+export interface OpenEndedCardProps {
   questionIndex: number;
   question: OpenEndedData;
   timerMode: string;
   onUpdate: (updatedQuestion: OpenEndedData) => void;
   onDelete: () => void;
   onDuplicate: (questionData: OpenEndedData) => void;
-};
+}
 
 export default function OpenEndedCard({
   questionIndex,

@@ -11,7 +11,7 @@ import OpenEndedCard from "./question-cards/open-ended-card";
 // icons
 import { ChevronUp, ChevronDown } from "lucide-react";
 
-type QuestionFieldProps = {
+interface QuestionFieldProps {
   questionFields: any[];
   timerMode: string;
   onUpdate: (index: number, value: any) => void;
@@ -19,7 +19,7 @@ type QuestionFieldProps = {
   onDuplicate: (questionData: any) => void;
   onMove: (from: number, to: number) => void;
   onChange: () => void;
-};
+}
 
 export default function QuizQuestionsList({
   questionFields,

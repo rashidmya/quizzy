@@ -37,7 +37,7 @@ import {
 // sections
 import TrueFalseDialog from "../question-dialogs/true-false-dialog";
 
-export type TrueFalseData = {
+export interface TrueFalseData {
   id?: string;
   type: "true_false";
   text: string;
@@ -45,16 +45,16 @@ export type TrueFalseData = {
   points: number;
   correctAnswer: boolean;
   explanation?: string;
-};
+}
 
-export type TrueFalseCardProps = {
+export interface TrueFalseCardProps {
   questionIndex: number;
   question: TrueFalseData;
   timerMode: string;
   onUpdate: (updatedQuestion: TrueFalseData) => void;
   onDelete: () => void;
   onDuplicate: (questionData: TrueFalseData) => void;
-};
+}
 
 export default function TrueFalseCard({
   questionIndex,

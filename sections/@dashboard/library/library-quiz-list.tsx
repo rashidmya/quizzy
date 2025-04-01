@@ -5,11 +5,11 @@ import LibraryQuizItem from "./library-quiz-item";
 // types
 import { LibraryQuiz } from "@/types/quiz";
 
-type LibraryQuizListProps = {
+interface LibraryQuizListProps {
   quizzes: LibraryQuiz[];
   onDelete: (quizId: string) => void;
   onEdit: (quizId: string) => void;
-};
+}
 
 export default function LibraryQuizList({
   quizzes,
@@ -92,12 +92,12 @@ export default function LibraryQuizList({
   );
 }
 
-type QuizGroupProps = {
+interface QuizGroupProps {
   title: string;
   quizzes: LibraryQuiz[];
   onDelete: (quizId: string) => void;
   onEdit: (quizId: string) => void;
-};
+}
 
 function QuizGroup({ title, quizzes, onDelete, onEdit }: QuizGroupProps) {
   return (

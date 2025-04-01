@@ -13,7 +13,7 @@ export type QuizWithQuestions = Omit<Quiz, "createdBy"> & {
     id: string;
     name: string;
   };
-  questions: Array<Question & QuestionUnion>;
+  questions: (Question & QuestionUnion)[];
 };
 
 export type LibraryQuiz = Omit<Quiz, "createdBy"> & {

@@ -36,10 +36,10 @@ import { MultipleChoice } from "@/types/question";
 
 export type QuizFormValues = z.infer<typeof quizFormSchema>;
 
-type Props = {
+interface Props {
   quiz?: QuizWithQuestions;
   isEdit?: boolean;
-};
+}
 
 export default function QuizNewEditForm({ quiz, isEdit = false }: Props) {
   const { push } = useRouter();

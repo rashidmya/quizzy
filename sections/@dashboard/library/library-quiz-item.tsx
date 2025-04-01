@@ -57,11 +57,11 @@ import { LibraryQuiz } from "@/types/quiz";
 // utils
 import { fDate, fToNow } from "@/utils/format-time";
 
-type QuizItemProps = {
+interface QuizItemProps {
   quiz: LibraryQuiz;
   onDelete: (quizId: string) => void;
   onEdit: (quizId: string) => void;
-};
+}
 
 // Helper function to render the appropriate status badge
 

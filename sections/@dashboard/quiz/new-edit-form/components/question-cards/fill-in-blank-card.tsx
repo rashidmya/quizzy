@@ -36,7 +36,7 @@ import {
 // sections
 import FillInBlankDialog from "../question-dialogs/fill-in-blank-dialog";
 
-export type FillInBlankData = {
+export interface FillInBlankData {
   id?: string;
   type: "fill_in_blank";
   text: string;
@@ -44,16 +44,16 @@ export type FillInBlankData = {
   points: number;
   correctAnswer: string;
   acceptedAnswers?: string;
-};
+}
 
-export type FillInBlankCardProps = {
+export interface FillInBlankCardProps {
   questionIndex: number;
   question: FillInBlankData;
   timerMode: string;
   onUpdate: (updatedQuestion: FillInBlankData) => void;
   onDelete: () => void;
   onDuplicate: (questionData: FillInBlankData) => void;
-};
+}
 
 export default function FillInBlankCard({
   questionIndex,

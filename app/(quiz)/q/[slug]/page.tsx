@@ -8,9 +8,9 @@ import QuizOffline from "@/sections/@quiz-taking/quiz-offline";
 import { decodeUUID } from "@/utils/encode-uuid";
 import { SessionProvider } from "@/components/providers/session-provider";
 
-type PageProps = {
+interface PageProps {
   params: { slug: string };
-};
+}
 
 export const dynamic = "force-static";
 

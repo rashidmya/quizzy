@@ -11,14 +11,14 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-type LibraryFiltersProps = {
+interface LibraryFiltersProps {
   search: string;
   onSearchChange: (value: string) => void;
   sortOrder: string;
   onSortChange: (value: string) => void;
   filter: string;
   onFilterChange: (value: string) => void;
-};
+}
 
 export default function LibraryFilters({
   search,

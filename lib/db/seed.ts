@@ -41,13 +41,13 @@ async function main() {
 
   // Seed questions for each quiz.
   // For each quiz, insert one question per question type.
-  const insertedQuestions: Array<{
+  const insertedQuestions: {
     id: string;
     quizId: string;
     text: string;
     type: string;
     points: number;
-  }> = [];
+  }[] = [];
   for (const quiz of insertedQuizzes) {
     const questionsForQuiz = QUESTION_TYPES.map((qType, idx) => ({
       quizId: quiz.id,

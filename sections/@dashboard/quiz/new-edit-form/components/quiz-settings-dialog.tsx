@@ -54,11 +54,11 @@ import { TimerMode } from "@/types/quiz";
 import { Switch } from "@/components/ui/switch";
 import { QuizFormValues } from "..";
 
-type QuizSettingsDialogProps = {
+interface QuizSettingsDialogProps {
   onAddQuestion?: (
     type: "multiple_choice" | "true_false" | "fill_in_blank" | "open_ended"
   ) => void;
-};
+}
 
 export default function QuizSettingsDialog({
   onAddQuestion,

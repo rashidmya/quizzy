@@ -13,10 +13,10 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeftIcon, Calendar } from "lucide-react";
 import { QuizStatus } from "@/types/quiz";
 
-type QuizOfflineProps = {
+interface QuizOfflineProps {
   status: QuizStatus;
   scheduledAt?: Date | string | null;
-};
+}
 
 export default function QuizOffline({ status, scheduledAt }: QuizOfflineProps) {
   let message = "";

@@ -18,9 +18,9 @@ import { deleteQuiz } from "@/actions/quiz/quiz-management";
 import { useActionState } from "@/hooks/use-action-state";
 import { PATH_DASHBOARD } from "@/routes/paths";
 
-type LibraryProps = {
+interface LibraryProps {
   quizzes: LibraryQuiz[];
-};
+}
 
 export default function Library({ quizzes }: LibraryProps) {
   const { push } = useRouter();

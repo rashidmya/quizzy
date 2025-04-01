@@ -12,13 +12,13 @@ import {
 // next-nav
 import { usePathname, useRouter } from "next/navigation";
 
-type Props = {
+interface Props {
   nav: {
     title: string;
     url: string;
     icon: LucideIcon;
   }[];
-};
+}
 
 export function NavMain({ nav }: Props) {
   const pathname = usePathname();

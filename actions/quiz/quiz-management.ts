@@ -39,14 +39,14 @@ export async function upsertQuiz(formData: FormData) {
     }
 
     // The structure of each question now includes fields for different types.
-    let quizQuestions: Array<{
+    let quizQuestions: {
       id?: string;
       text: string;
       type: "multiple_choice" | "true_false" | "fill_in_blank" | "open_ended";
       timer?: number;
       points: number;
       // For multiple choice
-      choices?: Array<{ id?: string; text: string; isCorrect: boolean }>;
+      choices?: { id?: string; text: string; isCorrect: boolean }[];
       // for true/false and fill in blank
       correctAnswer: boolean | string;
       // For true/false
@@ -55,7 +55,7 @@ export async function upsertQuiz(formData: FormData) {
       acceptedAnswers?: string; // expected as array, stored as comma-separated string
       // For open ended answer
       guidelines?: string;
-    }>;
+    }[];
 
     try {
       quizQuestions = JSON.parse(questionsJson);
@@ -238,7 +238,7 @@ export async function scheduleQuiz({
       return { message: "Quiz ID is required", error: true };
     }
 
-    const updateData: any = {
+    const updateData: { status: QuizStatus , scheduledAt: Date, endedAt?: Date} = {
       status: "scheduled",
       scheduledAt,
     };

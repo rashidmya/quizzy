@@ -9,9 +9,9 @@ import { Button } from "@/components/ui/button";
 // paths
 import { PATH_DASHBOARD } from "@/routes/paths";
 
-type LibraryHeaderProps = {
+interface LibraryHeaderProps {
   totalQuizzes: number;
-};
+}
 
 export default function LibraryHeader({ totalQuizzes }: LibraryHeaderProps) {
   return (
