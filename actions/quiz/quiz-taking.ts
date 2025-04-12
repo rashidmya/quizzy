@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db/drizzle";
 import { quizAttempts, attemptAnswers } from "@/lib/db/schema";
+import { getAttemptAnswers as fetchAttemptAnswers } from "@/lib/db/queries/quizzes";
 
 import { QuizAttempt } from "@/types/attempt";
 
@@ -140,6 +141,7 @@ export async function submitQuizAttempt({
 
 /**
  * Retrieves all answers for a particular attempt.
+ * Wrapper around the DB query for server actions.
  */
 export async function getAttemptAnswers({
   attemptId,
@@ -147,7 +149,7 @@ export async function getAttemptAnswers({
   attemptId: string;
 }): Promise<{
   message: string;
-  answers?: { questionId: string; answer: string }[];
+  answers?: { questionId: string; answer: string; updatedAt?: Date; questionText?: string; answerText?: string; questionType?: string; isCorrect?: boolean }[];
   error?: boolean;
 }> {
   if (!attemptId?.trim()) {
@@ -155,19 +157,10 @@ export async function getAttemptAnswers({
   }
 
   try {
-    const answersData = await db
-      .select()
-      .from(attemptAnswers)
-      .where(eq(attemptAnswers.attemptId, attemptId));
-
-    const mappedAnswers = answersData.map((a) => ({
-      questionId: a.questionId as string,
-      answer: a.answer,
-    }));
-
+    const answers = await fetchAttemptAnswers(attemptId);
     return {
       message: "Attempt answers fetched successfully",
-      answers: mappedAnswers,
+      answers,
     };
   } catch (error) {
     console.error("Error fetching attempt answers:", error);
