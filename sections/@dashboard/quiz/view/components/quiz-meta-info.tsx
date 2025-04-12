@@ -1,11 +1,5 @@
 // sections/dashboard/quiz/view/components/quiz-meta-info.tsx
-import {
-  Calendar,
-  Shuffle,
-  Award,
-  Timer,
-  TimerOff,
-} from "lucide-react";
+import { Calendar, Shuffle, Award, Timer, TimerOff } from "lucide-react";
 import { QuizStatus, QuizWithQuestions } from "@/types/quiz";
 import { fDateTime } from "@/utils/format-time";
 import { Badge } from "@/components/ui/badge";
@@ -47,7 +41,7 @@ export default function QuizMetaInfo({ quiz, status }: QuizMetaInfoProps) {
           <h3 className="font-medium">Timer Mode</h3>
         </div>
         <div className="flex items-center gap-2 ml-7">
-          <Badge variant="outline">
+          <Badge variant="outline" className="text-center">
             {quiz.timerMode === "global"
               ? "Global Timer"
               : quiz.timerMode === "question"
@@ -55,7 +49,9 @@ export default function QuizMetaInfo({ quiz, status }: QuizMetaInfoProps) {
               : "No Timer"}
           </Badge>
           {quiz.timerMode === "global" && quiz.timer && (
-            <Badge variant="secondary">{formatTimer(quiz.timer)}</Badge>
+            <Badge variant="secondary" className="text-center">
+              {formatTimer(quiz.timer)}
+            </Badge>
           )}
         </div>
       </div>

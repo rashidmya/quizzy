@@ -172,6 +172,7 @@ export default function FillInBlankDialog({
             <Controller
               control={control}
               name="correctAnswer"
+              defaultValue=""
               render={({ field }) => (
                 <Input
                   id="correct-answer"

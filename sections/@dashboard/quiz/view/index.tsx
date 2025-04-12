@@ -221,21 +221,15 @@ export default function QuizDetailView({ quiz }: QuizDetailViewProps) {
               quizId={quiz.id}
               onSuccess={(newStatus) => setCurrentStatus(newStatus)}
             >
-              <Button className="gap-2" variant="outline">
+              <Button disabled className="gap-2" variant="outline">
                 <CalendarClock className="h-4 w-4" />
                 Schedule Quiz
               </Button>
             </QuizScheduleDialog>
 
-            <Button className="gap-2" variant="outline" asChild>
-              <a
-                href={`/q/${encodeUUID(quiz.id)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Eye className="h-4 w-4" />
-                Preview Quiz
-              </a>
+            <Button disabled className="gap-2" variant="outline">
+              <Eye className="h-4 w-4" />
+              Preview Quiz
             </Button>
 
             <Button
