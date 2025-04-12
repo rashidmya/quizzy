@@ -11,6 +11,7 @@ import {
   trueFalseDetails,
   fillInBlankDetails,
   openEndedDetails,
+  quizAttempts,
 } from "@/lib/db/schema";
 
 import { TimerMode, QuizStatus } from "@/types/quiz";
@@ -286,5 +287,40 @@ export async function setShuffleQuestions({
   } catch (error) {
     console.error("Error updating shuffle setting:", error);
     return { message: "Failed to update shuffle setting", error: true };
+  }
+}
+
+/**
+ * Resets a quiz by changing its status to draft and deleting all attempts.
+ */
+export async function resetQuiz({
+  quizId,
+}: {
+  quizId: string;
+}): Promise<{ message: string; error?: boolean }> {
+  try {
+    if (!quizId?.trim()) {
+      return { message: "Quiz ID is required", error: true };
+    }
+
+    await db.delete(quizAttempts).where(eq(quizAttempts.quizId, quizId));
+
+    await db
+      .update(quizzes)
+      .set({
+        status: "draft",
+        scheduledAt: null,
+        endedAt: null,
+        updatedAt: new Date(),
+      })
+      .where(eq(quizzes.id, quizId));
+
+    revalidatePath(`/dashboard/quiz/${quizId}`);
+    revalidatePath(`/dashboard/reports`);
+    
+    return { message: "Quiz has been reset successfully" };
+  } catch (error) {
+    console.error("Error resetting quiz:", error);
+    return { message: "Failed to reset quiz", error: true };
   }
 }

@@ -52,6 +52,7 @@ import { PATH_DASHBOARD } from "@/routes/paths";
 // toast
 import { toast } from "sonner";
 import StatusBadge from "@/components/status-badge";
+import QuizRestartDialog from "./components/quiz-restart-dialog";
 
 interface QuizDetailViewProps {
   quiz: QuizWithQuestions;
@@ -214,6 +215,14 @@ export default function QuizDetailView({ quiz }: QuizDetailViewProps) {
                 <StopCircle className="h-4 w-4" />
                 End Quiz
               </Button>
+            ) : null}
+
+            {/* Add the restart button right after this section */}
+            {currentStatus === "ended" ? (
+              <QuizRestartDialog
+                quizId={quiz.id}
+                onSuccess={() => setCurrentStatus("draft")}
+              />
             ) : null}
 
             {/* Always available actions */}
