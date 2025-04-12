@@ -371,12 +371,11 @@ export default function QuizSettingsDialog({
                     </Card>
 
                     <Card
-                      className={`cursor-pointer hover:border-primary ${
+                      className={`opacity-50 bg-muted/30 border-dashed cursor-not-allowed ${
                         localTimerMode === "question"
                           ? "border-primary bg-primary/5"
                           : ""
                       }`}
-                      onClick={() => setLocalTimerMode("question")}
                     >
                       <CardContent className="p-4 flex flex-col items-center text-center gap-2">
                         <Timer className="h-8 w-8 text-muted-foreground" />
@@ -384,6 +383,9 @@ export default function QuizSettingsDialog({
                           <h3 className="font-medium">Per Question</h3>
                           <p className="text-xs text-muted-foreground">
                             Set time limit for each question
+                          </p>
+                          <p className="text-xs text-destructive mt-1">
+                            Currently unavailable
                           </p>
                         </div>
                       </CardContent>
