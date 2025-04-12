@@ -1,26 +1,27 @@
 import { notFound } from "next/navigation";
 
-import { getQuizWithQuestions } from "@/lib/db/queries/quizzes";
+import { getQuizReportDetails } from "@/lib/db/queries/quizzes";
+import ReportDetailView from "@/sections/@dashboard/report/detail";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 export default async function QuizReportPage({
   params,
 }: {
   params: { id: string };
 }) {
-  const { id } = await params;
+  const { id } = params;
 
   if (!id) {
     return notFound();
   }
 
-  // Fetch quiz data and attempts data
-  const quiz = await getQuizWithQuestions(id);
+  // Fetch quiz report data
+  const reportDetails = await getQuizReportDetails(id);
 
-  if (!quiz) {
+  if (!reportDetails) {
     return notFound();
   }
 
-  return <>nothing to see here</>;
+  return <ReportDetailView reportData={reportDetails} />;
 }
