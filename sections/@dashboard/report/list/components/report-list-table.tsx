@@ -78,11 +78,11 @@ export default function ReportTable({
         </div>
       </CardHeader>
       <CardContent className="p-0">
-        <Table className="p">
+        <Table className="p-0">
           <TableHeader>
-            <TableRow>
+            <TableRow className="hover:bg-transparent">
               <TableHead
-                className="w-[300px] cursor-pointer"
+                className="w-[300px] cursor-pointer p-4"
                 onClick={() => onSort("title")}
               >
                 <div className="flex items-center">
@@ -91,9 +91,9 @@ export default function ReportTable({
                   {getSortIndicator("title")}
                 </div>
               </TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead className="p-4">Status</TableHead>
               <TableHead
-                className="cursor-pointer"
+                className="cursor-pointer p-4"
                 onClick={() => onSort("participantCount")}
               >
                 <div className="flex items-center">
@@ -103,7 +103,7 @@ export default function ReportTable({
                 </div>
               </TableHead>
               <TableHead
-                className="cursor-pointer"
+                className="cursor-pointer p-4"
                 onClick={() => onSort("accuracy")}
               >
                 <div className="flex items-center">
@@ -113,7 +113,7 @@ export default function ReportTable({
                 </div>
               </TableHead>
               <TableHead
-                className="cursor-pointer"
+                className="cursor-pointer p-4"
                 onClick={() => onSort("lastAttempt")}
               >
                 <div className="flex items-center">
@@ -123,7 +123,7 @@ export default function ReportTable({
                 </div>
               </TableHead>
               <TableHead
-                className="cursor-pointer"
+                className="cursor-pointer p-4"
                 onClick={() => onSort("createdAt")}
               >
                 <div className="flex items-center">
@@ -132,7 +132,7 @@ export default function ReportTable({
                   {getSortIndicator("createdAt")}
                 </div>
               </TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="text-right p-4">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -142,24 +142,24 @@ export default function ReportTable({
                 className="cursor-pointer hover:bg-muted/50"
                 onClick={() => onViewReport(report.id)}
               >
-                <TableCell className="font-medium">
+                <TableCell className="font-medium p-4">
                   {report.title}
                 </TableCell>
-                <TableCell>
+                <TableCell className="p-4">
                   <StatusBadge status={report.status} />
                 </TableCell>
-                <TableCell>
+                <TableCell className="p-4">
                   <div className="flex items-center gap-1.5">
                     <Users className="h-3.5 w-3.5 text-muted-foreground" />
                     <span>{report.participantCount}</span>
                   </div>
                 </TableCell>
-                <TableCell>
-                  <Badge className={getAccuracyBadgeColor(report.accuracy)}>
-                    {Number(report.accuracy).toFixed(1)}%
+                <TableCell className="p-4">
+                  <Badge className={getAccuracyBadgeColor(Number(report.accuracy) || 0)}>
+                    {isNaN(Number(report.accuracy)) ? '0.0' : Number(report.accuracy).toFixed(1)}%
                   </Badge>
                 </TableCell>
-                <TableCell>
+                <TableCell className="p-4">
                   <div className="flex items-center gap-1.5">
                     <Clock className="h-3.5 w-3.5 text-muted-foreground" />
                     <span>
@@ -169,10 +169,10 @@ export default function ReportTable({
                     </span>
                   </div>
                 </TableCell>
-                <TableCell>
+                <TableCell className="p-4">
                   {fDate(report.createdAt, "MMM dd, yyyy")}
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-right p-4">
                   <div className="flex items-center justify-end gap-1">
                     <TooltipProvider>
                       <Tooltip>
