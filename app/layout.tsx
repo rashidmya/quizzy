@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
+// fonts
 import { Roboto } from "next/font/google";
 // css
 import "./globals.css";
-//
+//providers
 import { SessionProvider } from "@/components/providers/session-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+// toaster
+import { Toaster } from "@/components/ui/sonner";
 
-const acme = Roboto({
+const roboto = Roboto({
   subsets: ["latin"],
-  weight: "400",
+  weight: ["100", "300", "400", "500", "700", "900"],
 });
 
 export const metadata: Metadata = {
@@ -24,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${acme.className} flex min-h-screen flex-col font-regular antialiased`}
+        className={`${roboto.className} flex min-h-screen flex-col font-regular antialiased`}
       >
         <SessionProvider>
           <ThemeProvider
@@ -33,9 +36,10 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <div className="flex min-h-screen w-full flex-col">
-              <main>{children}</main>
-            </div>
+            <Toaster />
+            <main className="flex min-h-screen w-full flex-col">
+              {children}
+            </main>
           </ThemeProvider>
         </SessionProvider>
       </body>

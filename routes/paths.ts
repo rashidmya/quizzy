@@ -17,9 +17,17 @@ export const PATH_DASHBOARD = {
   root: ROOTS_DASHBOARD,
   quiz: {
     root: path(ROOTS_DASHBOARD, "/quiz"),
-    list: path(ROOTS_DASHBOARD, "/quiz/list"),
     new: path(ROOTS_DASHBOARD, "/quiz/new"),
     view: (id: string) => path(ROOTS_DASHBOARD, `/quiz/${id}`),
     edit: (id: string) => path(ROOTS_DASHBOARD, `/quiz/${id}/edit`),
+  },
+  library: {
+    root: path(ROOTS_DASHBOARD, "/library"),
+  },
+  reports: {
+    root: path(ROOTS_DASHBOARD, "/reports"),
+  },
+  settings: {
+    root: path(ROOTS_DASHBOARD, "/settings"),
   },
 };

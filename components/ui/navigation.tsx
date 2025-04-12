@@ -19,20 +19,25 @@ import {
 } from "./navigation-menu";
 // paths
 import { PATH_AUTH, PATH_DASHBOARD } from "@/routes/paths";
+// logo
 import LaunchUI from "../logos/launch-ui";
 
-export default function Navigation({ user }: { user?: any }) {
+export default function Navigation({ user }: {   user: {
+  id: string
+  email: string
+  name: string
+}}) {
   return (
     <NavigationMenu className="hidden md:flex">
       <NavigationMenuList>
-        {user ? (
+        {user.id ? (
           <NavigationMenuItem>
             <NavigationMenuTrigger>{user.email}</NavigationMenuTrigger>
             <NavigationMenuContent>
               <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
                 <li className="row-span-3">
                   <NavigationMenuLink asChild>
-                    <a
+                    <Link
                       className="flex h-full w-full select-none flex-col justify-end rounded-md bg-linear-to-b from-muted/30 to-muted/10 p-6 no-underline outline-hidden focus:shadow-md"
                       href="/"
                     >
@@ -44,7 +49,7 @@ export default function Navigation({ user }: { user?: any }) {
                         Manage your account settings, update your profile, and
                         review your activity.
                       </p>
-                    </a>
+                    </Link>
                   </NavigationMenuLink>
                 </li>
                 <ListItem

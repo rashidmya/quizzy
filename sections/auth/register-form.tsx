@@ -1,10 +1,8 @@
 "use client";
 
-import { startTransition } from "react";
+import { useState } from "react";
 // next
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-// nextauth
 import { signIn } from "next-auth/react";
 // lib
 import { cn } from "@/lib/utils";
@@ -22,6 +20,9 @@ import { createUser } from "@/actions/user";
 
 const registerSchema = z
   .object({
+    // Added firstName and lastName fields
+    firstName: z.string().min(1, "First name is required"),
+    lastName: z.string().min(1, "Last name is required"),
     email: z.string().email("Please enter a valid email"),
     password: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z
@@ -50,32 +51,41 @@ export default function RegisterForm(
     createUser,
     {
       message: "",
+      error: false,
     }
   );
 
+  const [loading, setLoading] = useState(false);
+
   const onSubmit = async (data: RegisterFormValues) => {
     try {
+      setLoading(true);
+      // Create FormData for registration.
       const formData = new FormData();
+      // Append firstName and lastName along with email and password.
+      formData.append("firstName", data.firstName);
+      formData.append("lastName", data.lastName);
       formData.append("email", data.email);
       formData.append("password", data.password);
 
-      // Await the result of createUser.
+      // Call your server action to create the user.
+
       const result = await createAction(formData);
 
-      // Check the result for an error.
-      if (result.error) {
-        return;
+      // Optionally, sign in the user after successful registration.
+      if (!result.error) {
+        await signIn("credentials", {
+          email: data.email,
+          password: data.password,
+          redirect: true,
+          callbackUrl: "/dashboard",
+        });
       }
-
-      // If registration is successful, sign in.
-      await signIn("credentials", {
-        email: data.email,
-        password: data.password,
-        redirect: true,
-        callbackUrl: "/dashboard",
-      });
+      
+      setLoading(false);
     } catch (e) {
       console.log(e);
+      setLoading(false);
     }
   };
 
@@ -99,6 +109,36 @@ export default function RegisterForm(
         </p>
       </div>
       <div className="grid gap-6">
+        <div className="grid gap-2">
+          <Label htmlFor="firstName">First Name</Label>
+          <Input
+            id="firstName"
+            type="text"
+            placeholder="Your first name"
+            {...register("firstName")}
+            required
+          />
+          {errors.firstName && (
+            <p className="mt-1 text-xs text-red-600">
+              {errors.firstName.message}
+            </p>
+          )}
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="lastName">Last Name</Label>
+          <Input
+            id="lastName"
+            type="text"
+            placeholder="Your last name"
+            {...register("lastName")}
+            required
+          />
+          {errors.lastName && (
+            <p className="mt-1 text-xs text-red-600">
+              {errors.lastName.message}
+            </p>
+          )}
+        </div>
         <div className="grid gap-2">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -142,12 +182,16 @@ export default function RegisterForm(
             </p>
           )}
         </div>
-        <Button type="submit" className="w-full" disabled={isCreatePending}>
-          {isCreatePending ? "Signing up..." : "Sign Up"}
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={isCreatePending || loading}
+        >
+          {isCreatePending || loading ? "Signing up..." : "Sign Up"}
         </Button>
       </div>
       <div className="text-center text-sm">
-        Already have an account?
+        Already have an account?{" "}
         <Link href="/auth/login" className="underline underline-offset-4">
           Sign in
         </Link>

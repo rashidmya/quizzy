@@ -1,10 +1,6 @@
 // components
-import { AppSidebar } from "@/components/app-sidebar";
-import {
-  SidebarInset,
-  SidebarProvider,
-} from "@/components/ui/sidebar";
-
+import { AppSidebar } from "@/components/navigation/app-sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 export default function DashboardLayout({
   children,
@@ -15,8 +11,10 @@ export default function DashboardLayout({
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-4">
-         {children}
+        <div className="flex justify-center overflow-auto ">
+          <div className="flex w-full h-full ">
+            <div className="flex flex-col w-full min-h-screen max-w-[1024px] mx-auto p-12">{children}</div>
+          </div>
         </div>
       </SidebarInset>
     </SidebarProvider>

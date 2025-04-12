@@ -8,7 +8,6 @@ import { Mockup, MockupFrame } from "@/components/ui/mockup";
 import Glow from "@/components/ui/glow";
 import Image from "next/image";
 import { useTheme } from "next-themes";
-import Github from "@/components/logos/github";
 import Link from "next/link";
 
 export default function Hero() {
@@ -53,7 +52,7 @@ export default function Hero() {
           <div className="relative z-10 flex animate-appear justify-center gap-4 opacity-0 delay-300">
             <div className="relative z-10 flex animate-appear justify-center gap-4 opacity-0 delay-300">
               <Button variant="default" size="lg" asChild>
-                <a href="/dashboard/quiz">Create Quiz</a>
+                <Link href="/dashboard/quiz">Create Quiz</Link>
               </Button>
             </div>
           </div>
