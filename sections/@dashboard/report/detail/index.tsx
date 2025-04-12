@@ -7,7 +7,6 @@ import Link from "next/link";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 import { PATH_DASHBOARD } from "@/routes/paths";
 import StatsCards from "./components/stats-cards";
