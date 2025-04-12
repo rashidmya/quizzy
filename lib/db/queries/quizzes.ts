@@ -54,42 +54,44 @@ export async function getQuizzesWithReport(userId: string) {
         participantCount: sql<number>`CAST((SELECT COUNT(*) FROM quiz_attempts WHERE quiz_attempts.quiz_id = ${quizzes.id}) AS INTEGER)`,
 
         // Calculate accuracy using CTEs to avoid nested aggregates
-        accuracy: sql<number>`COALESCE(
-          (WITH correct_answers AS (
-            SELECT 
-              qa.id as attempt_id,
-              COUNT(aa.id) as total_answers,
-              SUM(CASE WHEN mc.is_correct = true THEN 1 ELSE 0 END) as correct_count
-            FROM quiz_attempts qa
-            JOIN attempt_answers aa ON qa.id = aa.attempt_id
-            JOIN ${multipleChoiceDetails} mc ON aa.answer = mc.text
-            WHERE qa.quiz_id = ${quizzes.id}
-            GROUP BY qa.id
-          )
-          SELECT CAST(
-            (SUM(correct_count) * 100.0 / NULLIF(SUM(total_answers), 0))
-          AS NUMERIC(5,1))
-          FROM correct_answers), 0)`,
+        accuracy: sql<number>`
+          COALESCE(
+            (WITH correct_answers AS (
+              SELECT 
+                qa.id as attempt_id,
+                COUNT(aa.id) as total_answers,
+                SUM(CASE WHEN mc.is_correct = true THEN 1 ELSE 0 END) as correct_count
+              FROM quiz_attempts qa
+              JOIN attempt_answers aa ON qa.id = aa.attempt_id
+              JOIN ${multipleChoiceDetails} mc ON aa.answer = mc.text
+              WHERE qa.quiz_id = ${quizzes.id}
+              GROUP BY qa.id
+            )
+            SELECT CAST(
+              (SUM(correct_count) * 100.0 / NULLIF(SUM(total_answers), 0))
+            AS NUMERIC(5,1))
+            FROM correct_answers), 0)`,
 
         // Calculate completion rate also avoiding nested aggregates
-        completionRate: sql<number>`COALESCE(
-          (WITH question_counts AS (
-            SELECT COUNT(*) as total_questions
-            FROM questions 
-            WHERE questions.quiz_id = ${quizzes.id}
-          ),
-          attempt_counts AS (
-            SELECT 
-              COUNT(DISTINCT qa.id) as total_attempts,
-              COUNT(aa.id) as total_answers
-            FROM quiz_attempts qa
-            LEFT JOIN attempt_answers aa ON qa.id = aa.attempt_id
-            WHERE qa.quiz_id = ${quizzes.id}
-          )
-          SELECT CAST(
-            (total_answers * 100.0 / NULLIF(total_attempts * total_questions, 0)) 
-          AS NUMERIC(5,1))
-          FROM attempt_counts, question_counts), 0)`,
+        completionRate: sql<number>`
+          COALESCE(
+            (WITH question_counts AS (
+              SELECT COUNT(*) as total_questions
+              FROM questions 
+              WHERE questions.quiz_id = ${quizzes.id}
+            ),
+            attempt_counts AS (
+              SELECT 
+                COUNT(DISTINCT qa.id) as total_attempts,
+                COUNT(aa.id) as total_answers
+              FROM quiz_attempts qa
+              LEFT JOIN attempt_answers aa ON qa.id = aa.attempt_id
+              WHERE qa.quiz_id = ${quizzes.id}
+            )
+            SELECT CAST(
+              (total_answers * 100.0 / NULLIF(total_attempts * total_questions, 0)) 
+            AS NUMERIC(5,1))
+            FROM attempt_counts, question_counts), 0)`,
 
         // Get the most recent attempt date
         lastAttempt: sql<Date>`(

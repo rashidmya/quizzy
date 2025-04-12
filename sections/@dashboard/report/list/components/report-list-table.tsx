@@ -78,7 +78,7 @@ export default function ReportTable({
         </div>
       </CardHeader>
       <CardContent className="p-0">
-        <Table>
+        <Table className="p">
           <TableHeader>
             <TableRow>
               <TableHead
@@ -156,7 +156,7 @@ export default function ReportTable({
                 </TableCell>
                 <TableCell>
                   <Badge className={getAccuracyBadgeColor(report.accuracy)}>
-                    {report.accuracy}%
+                    {Number(report.accuracy).toFixed(1)}%
                   </Badge>
                 </TableCell>
                 <TableCell>
