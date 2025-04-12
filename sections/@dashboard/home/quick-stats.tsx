@@ -4,7 +4,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart3, Users, CheckCircle, Clock } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface StatCardProps {
   title: string;
@@ -12,6 +12,17 @@ interface StatCardProps {
   description: string;
   icon: React.ReactNode;
   color?: string;
+}
+
+interface StatsData {
+  totalQuizzes: number;
+  totalParticipants: number;
+  avgAccuracy: number;
+  completionRate: number;
+}
+
+interface QuickStatsProps {
+  initialStats: StatsData;
 }
 
 function StatCard({ title, value, description, icon, color }: StatCardProps) {
@@ -33,41 +44,9 @@ function StatCard({ title, value, description, icon, color }: StatCardProps) {
   );
 }
 
-export function QuickStats() {
-  const [loading, setLoading] = useState(true);
+export function QuickStats({ initialStats }: QuickStatsProps) {
+  const [stats] = useState<StatsData>(initialStats);
   
-  // In a real app, you'd fetch these stats from an API
-  const stats = {
-    totalQuizzes: 12,
-    totalParticipants: 158,
-    avgAccuracy: 76.4,
-    completionRate: 92.1,
-  };
-
-  // Simulate API loading
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {[1, 2, 3, 4].map((i) => (
-          <Card key={i}>
-            <CardHeader className="pb-2">
-              <Skeleton className="h-4 w-24" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-8 w-12 mb-2" />
-              <Skeleton className="h-3 w-32" />
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    );
-  }
-
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <StatCard 
@@ -88,7 +67,7 @@ export function QuickStats() {
       
       <StatCard 
         title="Average Accuracy" 
-        value={`${stats.avgAccuracy}%`}
+        value={`${stats.avgAccuracy.toFixed(1)}%`}
         description="Across all your quizzes"
         icon={<CheckCircle className="h-4 w-4 text-green-600" />}
         color="green"
@@ -96,7 +75,7 @@ export function QuickStats() {
       
       <StatCard 
         title="Completion Rate" 
-        value={`${stats.completionRate}%`}
+        value={`${stats.completionRate.toFixed(1)}%`}
         description="Questions answered vs total"
         icon={<BarChart3 className="h-4 w-4 text-purple-600" />}
         color="purple"

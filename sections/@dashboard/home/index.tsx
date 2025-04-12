@@ -8,7 +8,17 @@ import { QuickActions } from './quick-actions';
 import { PublicQuizSearch } from './public-quiz-search';
 import { WelcomeMessage } from './welcome-message';
 
-export function DashboardOverview() {
+interface DashboardOverviewProps {
+  stats: {
+    totalQuizzes: number;
+    totalParticipants: number;
+    avgAccuracy: number;
+    completionRate: number;
+  };
+  recentQuizzes: any[]; // Using any[] for simplicity, ideally would define a proper type
+}
+
+export function DashboardOverview({ stats, recentQuizzes }: DashboardOverviewProps) {
   const user = useCurrentUser();
   
   return (
@@ -17,14 +27,14 @@ export function DashboardOverview() {
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2">
-          <QuickStats />
+          <QuickStats initialStats={stats} />
         </div>
         <div>
           <QuickActions />
         </div>
       </div>
       
-      <RecentQuizzes />
+      <RecentQuizzes initialQuizzes={recentQuizzes} />
       
       <PublicQuizSearch />
     </div>

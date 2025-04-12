@@ -1,85 +1,37 @@
 // sections/dashboard/home/recent-quizzes.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Clock, Users, FilePlus, PlusCircle } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { PATH_DASHBOARD } from "@/routes/paths";
 import StatusBadge from "@/components/status-badge";
 import { QuizStatus } from "@/types/quiz";
+import { formatDistanceToNow } from "date-fns";
 
 interface QuizItem {
   id: string;
   title: string;
   status: QuizStatus;
-  participants: number;
-  createdAt: string;
+  participantCount?: number;
+  createdAt: Date;
 }
 
-export function RecentQuizzes() {
-  const [loading, setLoading] = useState(true);
+interface RecentQuizzesProps {
+  initialQuizzes: QuizItem[];
+}
+
+export function RecentQuizzes({ initialQuizzes }: RecentQuizzesProps) {
+  const [recentQuizzes] = useState<QuizItem[]>(
+    initialQuizzes.map(quiz => ({
+      ...quiz,
+      // Make sure createdAt is a Date object since it may come as a string from the server
+      createdAt: new Date(quiz.createdAt)
+    }))
+  );
   
-  // In a real app, you'd fetch these from an API
-  const recentQuizzes: QuizItem[] = [
-    {
-      id: "1",
-      title: "JavaScript Fundamentals",
-      status: 'active',
-      participants: 45,
-      createdAt: "2 days ago",
-    },
-    {
-      id: "2",
-      title: "React Hooks Advanced",
-      status: 'draft',
-      participants: 12,
-      createdAt: "1 week ago",
-    },
-    {
-      id: "3",
-      title: "CSS Grid & Flexbox",
-      status: "scheduled",
-      participants: 23,
-      createdAt: "3 days ago",
-    },
-  ];
-
-  // Simulate API loading
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1500);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (loading) {
-    return (
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <Skeleton className="h-5 w-36" />
-          <Skeleton className="h-8 w-24" />
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex items-center justify-between py-3">
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-48" />
-                  <div className="flex gap-2">
-                    <Skeleton className="h-4 w-24" />
-                    <Skeleton className="h-4 w-20" />
-                  </div>
-                </div>
-                <Skeleton className="h-8 w-16" />
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -129,11 +81,11 @@ export function RecentQuizzes() {
                   <div className="flex items-center text-xs text-muted-foreground gap-2">
                     <div className="flex items-center gap-1">
                       <Users className="h-3 w-3" />
-                      <span>{quiz.participants} participants</span>
+                      <span>{quiz.participantCount || 0} participants</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Clock className="h-3 w-3" />
-                      <span>{quiz.createdAt}</span>
+                      <span>{formatDistanceToNow(quiz.createdAt, { addSuffix: true })}</span>
                     </div>
                   </div>
                 </div>
