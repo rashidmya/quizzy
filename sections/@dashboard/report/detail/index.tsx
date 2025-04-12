@@ -59,7 +59,7 @@ export default function ReportDetailView({ reportData }: ReportDetailViewProps) 
   const { quiz, stats, participants, questions } = reportData;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-h-screen">
       {/* Header with back button and title */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
