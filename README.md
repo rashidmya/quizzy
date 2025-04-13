@@ -17,7 +17,7 @@ A modern quiz application built with Next.js and PostgreSQL that allows you to c
 
 - **Question-Based Timer**: Set time limits for individual questions
 - **Quiz Sessions**: Create timed quiz sessions for groups
-- **Share Quizzes**: Generate shareable links to distribute your quizzes
+- **Share Quizzes**: Share and use publicly made quizzes
 - **Analytics**: Get detailed insights about quiz performance
 
 ## Tech Stack
